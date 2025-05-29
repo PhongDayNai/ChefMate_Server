@@ -1,0 +1,21 @@
+const express = require('express');
+const bodyParser = require('body-parser');
+const cors = require('cors');
+require('dotenv').config();
+const userRoutes = require('./routes/userRoutes');
+// const recipeRoutes = require('./routes/recipeRoutes');
+// const interactionRoutes = require('./routes/interactionRoutes');
+
+const app = express();
+
+app.use(cors());
+app.use(bodyParser.json());
+
+app.use('/api/users', userRoutes);
+// app.use('/api/recipes', recipeRoutes);
+// app.use('/api/interactions', interactionRoutes);
+
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, () => {
+    console.log(`Server đang chạy tại http://localhost:${PORT}`);
+});
