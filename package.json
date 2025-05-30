@@ -19,6 +19,8 @@
     "fs": "^0.0.1-security",
     "http": "^0.0.1-security",
     "localtunnel": "^1.8.3",
-    "mssql": "^11.0.1"
+    "mssql": "^11.0.1",
+    "multer": "^2.0.0",
+    "path": "^0.12.7"
   }
 }
