@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 require('dotenv').config();
+const path = require('path');
 const userRoutes = require('./routes/userRoutes');
 // const recipeRoutes = require('./routes/recipeRoutes');
 // const interactionRoutes = require('./routes/interactionRoutes');
@@ -10,6 +11,9 @@ const app = express();
 
 app.use(cors());
 app.use(bodyParser.json());
+
+app.use(express.static(path.join(__dirname, 'assets')));
+// app.use('/static', express.static(path.join(__dirname, 'assets')));
 
 app.use('/api/users', userRoutes);
 // app.use('/api/recipes', recipeRoutes);
