@@ -1,5 +1,5 @@
 const userModel = require('../models/userModel');
-const bcrypt = require('bcrypt')
+const bcrypt = require('bcrypt');
 
 exports.getAllUsers = async (req, res) => {
     try {
@@ -69,18 +69,6 @@ exports.login = async (req, res) => {
     }
 };
 
-exports.getUserPoints = async (req, res) => {
-    const { userId } = req.body;
-
-    try {
-        const points = await userModel.getUserPoints(userId);
-        return res.status(200).json({ userId, points });
-    } catch (error) {
-        console.error("error: ", error);
-        return res.status(400).json({ error: error.message });
-    }
-};
-
 exports.resetPassword = async (req, res) => {
     const { phone } = req.body;
 
@@ -122,5 +110,29 @@ exports.changePassword = async (req, res) => {
     } catch (error) {
         console.log("error: ", error);
         return res.status(500).json({ error: 'Có lỗi khi thay đổi mật khẩu' });
+    }
+};
+
+exports.updateUserInformation = async (req, res) => {
+    const { userId, fullName, phone } = req.body;
+
+    try {
+        const rsUser = await userModel.updateUserInforamtion(userId, fullName, phone);
+        return res.status(200).json({ userId, fullName, phone, rsUser });
+    } catch (error) {
+        console.log("error: ", error);
+        return res.status(500).json({ error: 'Có lỗi khi thay đổi mật khẩu' });
+    }
+};
+
+exports.getRecipesViewHistory = async (req, res) => {
+    const { userId } = req.body;
+
+    try {
+        const recipesViewHistory = await userModel.getRecipesViewHistory(userId);
+        return res.status(200).json({ userId, recipesViewHistory });
+    } catch (error) {
+        console.error("error: ", error);
+        return res.status(400).json({ error: error.message });
     }
 };
