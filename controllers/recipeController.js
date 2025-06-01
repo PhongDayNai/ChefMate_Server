@@ -1,8 +1,5 @@
 const express = require('express');
-const router = express.Router();
-const upload = require('../middleware/multer');
 const recipeModel = require('../models/recipeModel');
-const path = require('path');
 
 exports.getAllRecipes = async (req, res) => {
     try {
@@ -16,9 +13,9 @@ exports.getAllRecipes = async (req, res) => {
 
 exports.createRecipe = async (req, res) => {
     console.log('req.file:', req.file);
-    const { recipeName, ingredients, cookingSteps } = req.body;
+    const { recipeName, ingredients, cookingSteps, userId } = req.body;
 
-    if (!recipeName || !ingredients || !cookingSteps) {
+    if (!recipeName || !ingredients || !cookingSteps || !userId) {
         return res.status(400).json({ error: 'All fields are required' });
     }
 
@@ -42,6 +39,7 @@ exports.createRecipe = async (req, res) => {
             imagePath,
             parsedIngredients,
             parsedCookingSteps,
+            userId
         );
 
         res.status(201).json(newRecipe);
@@ -58,14 +56,18 @@ exports.searchRecipe = async (req, res) => {
         return res.status(400).json({ error: 'Request body is missing' });
     }
 
-    const { recipeName } = req.body;
+    const { recipeName, userId } = req.body;
 
     if (!recipeName || typeof recipeName !== 'string') {
-        return res.status(400).json({ error: 'All fields are required' });
+        return res.status(400).json({ error: 'recipeName is required and must be a string' });
+    }
+
+    if (userId && (typeof userId !== 'number' || userId <= 0)) {
+        return res.status(400).json({ error: 'userId must be a positive number if provided' });
     }
 
     try {
-        const result = await recipeModel.searchRecipe(recipeName);
+        const result = await recipeModel.searchRecipe(recipeName, userId);
         return res.status(200).json({ result });
     } catch (error) {
         console.error(error);
@@ -80,10 +82,18 @@ exports.getDirectRecipe = async (req, res) => {
         return res.status(400).json({ error: 'Request body is missing' });
     }
 
-    const { recipeId } = req.body;
+    const { recipeId, userId } = req.body;
+
+    if (!recipeId || typeof recipeId !== 'number' || recipeId <= 0) {
+        return res.status(400).json({ error: 'recipeId is required and must be a positive number' });
+    }
+
+    if (userId && (typeof userId !== 'number' || userId <= 0)) {
+        return res.status(400).json({ error: 'userId must be a positive number if provided' });
+    }
 
     try {
-        const result = await recipeModel.getDirectRecipe(recipeId);
+        const result = await recipeModel.getDirectRecipe(recipeId, userId);
         return res.status(200).json({ result });
     } catch (error) {
         console.error(error);
@@ -109,4 +119,4 @@ exports.getTopTrending = async (req, res) => {
         console.error(error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
-}
+};
