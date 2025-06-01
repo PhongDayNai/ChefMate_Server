@@ -69,3 +69,42 @@ exports.getUserByPhone = async (phone) => {
         .query('SELECT * FROM Users WHERE Phone = @Phone');
     return result.recordset.length > 0 ? result.recordset[0] : null;
 };
+
+exports.updateUserInforamtion = async (userId, fullName, phone) => {
+    const pool = await poolPromise;
+    const existingPhone = await this.getUserByPhone(phone);
+
+    if (existingPhone !== null && existingPhone.userId !== userId) {
+        return {
+            success: false,
+            message: 'This phone is already exist'
+        }
+    } else {
+        const result = await pool.request()
+            .input('userId', sql.Int, userId)
+            .input('fullName', sql.NVarChar, fullName)
+            .input('phone', sql.NVarChar, phone)
+            .query("UPDATE Users SET fullName = @fullName, phone = @phone WHERE userId = @userId");
+        
+        const user = await this.getUserByPhone(phone);
+        return {
+            success: true,
+            user: user
+        }
+    }
+};
+
+exports.getRecipesViewHistory = async (userId) => {
+    const pool = await poolPromise;
+    
+    try {
+        const result = await pool.request()
+        .input('userId', sql.Int, userId)
+        .query('SELECT * FROM UsersViewRecipesHistory WHERE UserId = @userId');
+        
+        return result.recordset;
+    } catch (error) {
+        console.log("error: ", error);
+        throw error;
+    }
+}
