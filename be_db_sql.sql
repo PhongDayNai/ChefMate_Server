@@ -46,3 +46,9 @@ CREATE TABLE CookingSteps(
   indexStep INT NOT NULL,
   content NVARCHAR(500) NOT NULL
 );
+
+CREATE TABLE UsersViewRecipesHistory(
+  uvrId INT PRIMARY KEY IDENTITY(1, 1),
+  userId INT FOREIGN KEY REFERENCES Users(userId),
+  recipeId INT FOREIGN KEY REFERENCES Recipes(recipeId)
+);
