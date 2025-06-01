@@ -37,14 +37,14 @@ CREATE TABLE UsersLike(
 CREATE TABLE UsersComment(
   ucId INT PRIMARY KEY IDENTITY(1, 1),
   userId INT FOREIGN KEY REFERENCES Users(userId),
-  content NVARCHAR(1500) NOT NULL
+  content NVARCHAR(4000) NOT NULL
 );
 
 CREATE TABLE CookingSteps(
   csId INT PRIMARY KEY IDENTITY(1, 1),
   recipeId INT FOREIGN KEY REFERENCES Recipes(recipeId),
   indexStep INT NOT NULL,
-  content NVARCHAR(500) NOT NULL
+  content NVARCHAR(4000) NOT NULL
 );
 
 CREATE TABLE UsersViewRecipesHistory(
@@ -52,3 +52,88 @@ CREATE TABLE UsersViewRecipesHistory(
   userId INT FOREIGN KEY REFERENCES Users(userId),
   recipeId INT FOREIGN KEY REFERENCES Recipes(recipeId)
 );
+
+
+-- Lấy thông tin từ recipeId
+SELECT 
+    r.recipeId,
+    r.recipeName,
+    r.image,
+    r.likeQuantity
+FROM Recipes r
+WHERE r.recipeId = 1;
+
+SELECT 
+    cs.indexStep,
+    cs.content AS stepContent
+FROM Recipes r
+LEFT JOIN CookingSteps cs ON r.recipeId = cs.recipeId
+WHERE r.recipeId = 1
+ORDER BY cs.indexStep;
+
+SELECT 
+    i.ingredientId,
+    i.ingredientName,
+    ri.weight,
+    ri.unit
+FROM Recipes r
+LEFT JOIN RecipesIngredients ri ON r.recipeId = ri.recipeId
+LEFT JOIN Ingredients i ON ri.ingredientId = i.ingredientId
+WHERE r.recipeId = 1;
+
+
+-- Lấy thông tin tựa như recipeName
+SELECT 
+    r.recipeId,
+    r.recipeName,
+    r.image,
+    r.likeQuantity
+FROM Recipes r
+WHERE r.recipeName COLLATE SQL_Latin1_General_CP1_CI_AI LIKE '%' + 'ga' COLLATE SQL_Latin1_General_CP1_CI_AI + '%';
+
+SELECT 
+    r.recipeId,
+    cs.indexStep,
+    cs.content AS stepContent
+FROM Recipes r
+LEFT JOIN CookingSteps cs ON r.recipeId = cs.recipeId
+WHERE r.recipeName COLLATE SQL_Latin1_General_CP1_CI_AI LIKE '%' + 'ga' COLLATE SQL_Latin1_General_CP1_CI_AI + '%'
+ORDER BY cs.indexStep;
+
+SELECT 
+    r.recipeId,
+    i.ingredientId,
+    i.ingredientName,
+    ri.weight,
+    ri.unit
+FROM Recipes r
+LEFT JOIN RecipesIngredients ri ON r.recipeId = ri.recipeId
+LEFT JOIN Ingredients i ON ri.ingredientId = i.ingredientId
+WHERE r.recipeName COLLATE SQL_Latin1_General_CP1_CI_AI LIKE '%' + 'ga' COLLATE SQL_Latin1_General_CP1_CI_AI + '%'
+ORDER BY r.recipeId;
+
+
+-- UserViewRecipe
+INSERT INTO UsersViewRecipesHistory (userId, recipeId) VALUES (1, 1);
+
+-- Top Trending
+SELECT TOP 10
+    r.recipeId,
+    r.recipeName,
+    r.image,
+    r.likeQuantity,
+    COUNT(uvr.recipeId) AS viewCount
+FROM Recipes r
+LEFT JOIN UsersViewRecipesHistory uvr ON r.recipeId = uvr.recipeId
+GROUP BY r.recipeId, r.recipeName, r.image, r.likeQuantity
+ORDER BY viewCount DESC;
+
+-- Lấy lịch sử xem công thức
+SELECT * FROM UsersViewRecipesHistory WHERE UserId = @userId
+
+-- Kiểm tra thông tin bảng
+SELECT * FROM Recipes;
+SELECT * FROM Ingredients;
+SELECT * FROM RecipesIngredients;
+SELECT * FROM CookingSteps;
+SELECT * FROM UsersViewRecipesHistory;
