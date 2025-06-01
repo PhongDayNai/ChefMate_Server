@@ -5,7 +5,7 @@ require('dotenv').config();
 const path = require('path');
 const userRoutes = require('./routes/userRoutes');
 const recipeRoutes = require('./routes/recipeRoutes');
-// const interactionRoutes = require('./routes/interactionRoutes');
+const interactionRoutes = require('./routes/interactionRoutes');
 
 const app = express();
 
@@ -18,7 +18,7 @@ app.use(express.static(path.join(__dirname, 'assets')));
 
 app.use('/api/users', userRoutes);
 app.use('/api/recipes', recipeRoutes);
-// app.use('/api/interactions', interactionRoutes);
+app.use('/api/interactions', interactionRoutes);
 
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
