@@ -146,135 +146,6 @@ exports.createRecipe = async (recipeName, image, ingredients, cookingSteps, user
     }
 };
 
-// exports.searchRecipe = async (recipeName, userId = null) => {
-//     const pool = await poolPromise;
-
-//     try {
-//         console.log('recipeName:', recipeName);
-//         console.log('userId:', userId);
-
-//         // Truy vấn 1: Lấy danh sách công thức
-//         const recipesResult = await pool.request()
-//             .input('recipeName', sql.NVarChar, recipeName)
-//             .query("SELECT r.recipeId, r.recipeName, r.image, r.likeQuantity FROM Recipes r WHERE r.recipeName COLLATE SQL_Latin1_General_CP1_CI_AI LIKE '%' + @recipeName COLLATE SQL_Latin1_General_CP1_CI_AI + '%';");
-
-//         // Truy vấn 2: Lấy các bước nấu ăn
-//         const cookingStepsResult = await pool.request()
-//             .input('recipeName', sql.NVarChar, recipeName)
-//             .query("SELECT r.recipeId, cs.indexStep, cs.content AS stepContent FROM Recipes r LEFT JOIN CookingSteps cs ON r.recipeId = cs.recipeId WHERE r.recipeName COLLATE SQL_Latin1_General_CP1_CI_AI LIKE '%' + @recipeName COLLATE SQL_Latin1_General_CP1_CI_AI + '%' ORDER BY cs.indexStep;");
-
-//         const ingredientsResult = await pool.request()
-//             .input('recipeName', sql.NVarChar, recipeName)
-//             .query("SELECT r.recipeId, i.ingredientId, i.ingredientName, ri.weight, ri.unit FROM Recipes r LEFT JOIN RecipesIngredients ri ON r.recipeId = ri.recipeId LEFT JOIN Ingredients i ON ri.ingredientId = i.ingredientId WHERE r.recipeName COLLATE SQL_Latin1_General_CP1_CI_AI LIKE '%' + @recipeName COLLATE SQL_Latin1_General_CP1_CI_AI + '%' ORDER BY r.recipeId;");
-
-//         let likedRecipes = new Set();
-//         if (userId) {
-//             const recipeIds = recipesResult.recordset.map(recipe => recipe.recipeId);
-//             if (recipeIds.length > 0) {
-//                 const likeResult = await pool.request()
-//                     .input('userId', sql.Int, userId)
-//                     .query(`
-//                         SELECT recipeId 
-//                         FROM UsersLike 
-//                         WHERE userId = @userId AND recipeId IN (${recipeIds.join(',')})
-//                     `);
-//                 likedRecipes = new Set(likeResult.recordset.map(row => row.recipeId));
-//             }
-//         }
-
-//         const recipes = recipesResult.recordset.map(recipe => {
-//             const cookingSteps = cookingStepsResult.recordset.filter(
-//                 step => step.recipeId === recipe.recipeId
-//             );
-
-//             const ingredients = ingredientsResult.recordset.filter(
-//                 ingredient => ingredient.recipeId === recipe.recipeId
-//             );
-
-//             return {
-//                 ...recipe,
-//                 cookingSteps: cookingSteps.map(step => ({
-//                     indexStep: step.indexStep,
-//                     stepContent: step.stepContent
-//                 })),
-//                 ingredients: ingredients.map(ingredient => ({
-//                     ingredientId: ingredient.ingredientId,
-//                     ingredientName: ingredient.ingredientName,
-//                     weight: ingredient.weight,
-//                     unit: ingredient.unit
-//                 })),
-//                 ...(userId && { isLiked: likedRecipes.has(recipe.recipeId) })
-//             };
-//         });
-
-//         console.log('recipesResult:', recipesResult.recordset);
-//         console.log('cookingStepsResult:', cookingStepsResult.recordset);
-//         console.log('ingredientsResult:', ingredientsResult.recordset);
-
-//         return {
-//             success: true,
-//             recipes
-//         };
-//     } catch (error) {
-//         console.log("error: ", error);
-//         throw error;
-//     }
-// };
-
-// exports.getDirectRecipe = async (recipeId, userId = null) => {
-//     const pool = await poolPromise;
-
-//     try {
-//         const recipeResult = await pool.request()
-//             .input('recipeId', sql.Int, recipeId)
-//             .query("SELECT r.recipeId, r.recipeName, r.image, r.likeQuantity FROM Recipes r WHERE r.recipeId = @recipeId;");
-
-//         const cookingStepsResult = await pool.request()
-//             .input('recipeId', sql.Int, recipeId)
-//             .query("SELECT r.recipeId, cs.indexStep, cs.content AS stepContent FROM Recipes r LEFT JOIN CookingSteps cs ON r.recipeId = cs.recipeId WHERE r.recipeId = @recipeId ORDER BY cs.indexStep;");
-
-//         const ingredientsResult = await pool.request()
-//             .input('recipeId', sql.Int, recipeId)
-//             .query("SELECT r.recipeId, i.ingredientId, i.ingredientName, ri.weight, ri.unit FROM Recipes r LEFT JOIN RecipesIngredients ri ON r.recipeId = ri.recipeId LEFT JOIN Ingredients i ON ri.ingredientId = i.ingredientId WHERE r.recipeId = @recipeId");
-
-//         let isLiked = false;
-//         if (userId && recipeResult.recordset.length > 0) {
-//             const likeResult = await pool.request()
-//                 .input('userId', sql.Int, userId)
-//                 .input('recipeId', sql.Int, recipeId)
-//                 .query("SELECT COUNT(*) AS likeCount FROM UsersLike WHERE userId = @userId AND recipeId = @recipeId");
-//             isLiked = likeResult.recordset[0].likeCount > 0;
-//         }
-
-//         const recipes = recipeResult.recordset.map(recipe => ({
-//             ...recipe,
-//             cookingSteps: cookingStepsResult.recordset.map(step => ({
-//                 indexStep: step.indexStep,
-//                 stepContent: step.stepContent
-//             })),
-//             ingredients: ingredientsResult.recordset.map(ingredient => ({
-//                 ingredientId: ingredient.ingredientId,
-//                 ingredientName: ingredient.ingredientName,
-//                 weight: ingredient.weight,
-//                 unit: ingredient.unit
-//             })),
-//             ...(userId && { isLiked })
-//         }));
-
-//         console.log('recipesResult:', recipeResult.recordset);
-//         console.log('cookingStepsResult:', cookingStepsResult.recordset);
-//         console.log('ingredientsResult:', ingredientsResult.recordset);
-
-//         return {
-//             success: true,
-//             recipes
-//         };
-//     } catch (error) {
-//         console.log("error: ", error);
-//         throw error;
-//     }
-// };
-
 exports.searchRecipe = async (recipeName, userId = null) => {
     const pool = await poolPromise;
 
@@ -282,22 +153,18 @@ exports.searchRecipe = async (recipeName, userId = null) => {
         console.log('recipeName:', recipeName);
         console.log('userId:', userId);
 
-        // Truy vấn 1: Lấy danh sách công thức
         const recipesResult = await pool.request()
             .input('recipeName', sql.NVarChar, recipeName)
             .query("SELECT r.recipeId, r.recipeName, r.image, r.likeQuantity FROM Recipes r WHERE r.recipeName COLLATE SQL_Latin1_General_CP1_CI_AI LIKE '%' + @recipeName COLLATE SQL_Latin1_General_CP1_CI_AI + '%';");
 
-        // Truy vấn 2: Lấy các bước nấu ăn
         const cookingStepsResult = await pool.request()
             .input('recipeName', sql.NVarChar, recipeName)
             .query("SELECT r.recipeId, cs.indexStep, cs.content AS stepContent FROM Recipes r LEFT JOIN CookingSteps cs ON r.recipeId = cs.recipeId WHERE r.recipeName COLLATE SQL_Latin1_General_CP1_CI_AI LIKE '%' + @recipeName COLLATE SQL_Latin1_General_CP1_CI_AI + '%' ORDER BY cs.indexStep;");
 
-        // Truy vấn 3: Lấy danh sách nguyên liệu
         const ingredientsResult = await pool.request()
             .input('recipeName', sql.NVarChar, recipeName)
             .query("SELECT r.recipeId, i.ingredientId, i.ingredientName, ri.weight, ri.unit FROM Recipes r LEFT JOIN RecipesIngredients ri ON r.recipeId = ri.recipeId LEFT JOIN Ingredients i ON ri.ingredientId = i.ingredientId WHERE r.recipeName COLLATE SQL_Latin1_General_CP1_CI_AI LIKE '%' + @recipeName COLLATE SQL_Latin1_General_CP1_CI_AI + '%' ORDER BY r.recipeId;");
 
-        // Truy vấn 4: Lấy danh sách bình luận
         let commentsResult = { recordset: [] };
         if (recipesResult.recordset.length > 0) {
             const recipeIds = recipesResult.recordset.map(recipe => recipe.recipeId);
@@ -311,7 +178,6 @@ exports.searchRecipe = async (recipeName, userId = null) => {
                 `);
         }
 
-        // Truy vấn 5: Kiểm tra trạng thái like (nếu có userId)
         let likedRecipes = new Set();
         if (userId && recipesResult.recordset.length > 0) {
             const recipeIds = recipesResult.recordset.map(recipe => recipe.recipeId);
@@ -325,7 +191,6 @@ exports.searchRecipe = async (recipeName, userId = null) => {
             likedRecipes = new Set(likeResult.recordset.map(row => row.recipeId));
         }
 
-        // Gộp dữ liệu
         const recipes = recipesResult.recordset.map(recipe => {
             const cookingSteps = cookingStepsResult.recordset.filter(
                 step => step.recipeId === recipe.recipeId
@@ -381,22 +246,18 @@ exports.getDirectRecipe = async (recipeId, userId = null) => {
     const pool = await poolPromise;
 
     try {
-        // Truy vấn 1: Lấy thông tin công thức
         const recipeResult = await pool.request()
             .input('recipeId', sql.Int, recipeId)
             .query("SELECT r.recipeId, r.recipeName, r.image, r.likeQuantity FROM Recipes r WHERE r.recipeId = @recipeId;");
 
-        // Truy vấn 2: Lấy các bước nấu ăn
         const cookingStepsResult = await pool.request()
             .input('recipeId', sql.Int, recipeId)
             .query("SELECT r.recipeId, cs.indexStep, cs.content AS stepContent FROM Recipes r LEFT JOIN CookingSteps cs ON r.recipeId = cs.recipeId WHERE r.recipeId = @recipeId ORDER BY cs.indexStep;");
 
-        // Truy vấn 3: Lấy danh sách nguyên liệu
         const ingredientsResult = await pool.request()
             .input('recipeId', sql.Int, recipeId)
             .query("SELECT r.recipeId, i.ingredientId, i.ingredientName, ri.weight, ri.unit FROM Recipes r LEFT JOIN RecipesIngredients ri ON r.recipeId = ri.recipeId LEFT JOIN Ingredients i ON ri.ingredientId = i.ingredientId WHERE r.recipeId = @recipeId");
 
-        // Truy vấn 4: Lấy danh sách bình luận
         const commentsResult = await pool.request()
             .input('recipeId', sql.Int, recipeId)
             .query(`
@@ -407,7 +268,6 @@ exports.getDirectRecipe = async (recipeId, userId = null) => {
                 ORDER BY uc.createdAt DESC;
             `);
 
-        // Truy vấn 5: Kiểm tra trạng thái like (nếu có userId)
         let isLiked = false;
         if (userId && recipeResult.recordset.length > 0) {
             const likeResult = await pool.request()
@@ -417,7 +277,6 @@ exports.getDirectRecipe = async (recipeId, userId = null) => {
             isLiked = likeResult.recordset[0].likeCount > 0;
         }
 
-        // Gộp dữ liệu
         const recipes = recipeResult.recordset.map(recipe => ({
             ...recipe,
             cookingSteps: cookingStepsResult.recordset.map(step => ({
