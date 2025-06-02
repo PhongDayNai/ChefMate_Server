@@ -1,8 +1,11 @@
-# Human - Computer Interaction Assignment: ChefMate
+# Hệ thống ứng dụng công thức nấu ăn - ChefMate
 
-# II. Server
+# II. Server - Máy chủ
 
-## 1. Func
+- Công nghệ: ExpressJS
+- Cơ sở dữ liệu: SQL Server
+
+## 1. Tính năng
 
 | User | Recipe | Interaction |
 | --- | --- | --- |
@@ -36,7 +39,7 @@
 - [x]  Yêu thích công thức nấu ăn
 - [x]  Bình luận công thức nấu ăn
 
-## 2. DB
+## 2. Cơ sở dữ liệu
 
 ```sql
 CREATE DATABASE ChefMateDB;
