@@ -5,6 +5,7 @@ CREATE TABLE Users(
   fullName NVARCHAR(100) NOT NULL,
   phone NVARCHAR(10) NOT NULL UNIQUE,
   passwordHash NVARCHAR(255) NOT NULL,
+  followCount INT NOT NULL DEFAULT 0,
   createAt DATETIME DEFAULT GETDATE()
 );
 
@@ -13,6 +14,9 @@ CREATE TABLE Recipes(
   recipeName NVARCHAR(100) NOT NULL,
   image NVARCHAR(1000) NOT NULL,
   likeQuantity INT DEFAULT 0,
+  cookingTime NVARCHAR(20) NOT NULL,
+  ration INT NOT NULL,
+  viewCount INT NOT NULL DEFAULT 0,
   userId INT FOREIGN KEY REFERENCES Users(userId)
 );
 
@@ -168,10 +172,11 @@ SELECT * FROM RecipesIngredients;
 SELECT * FROM CookingSteps;
 SELECT * FROM UsersViewRecipesHistory;
 
-DROP TABLE UsersViewRecipesHistory
-DROP TABLE CookingSteps
-DROP TABLE RecipesIngredients
-DROP TABLE Ingredients
-DROP TABLE UsersLike
-DROP TABLE UsersComment
-DROP TABLE Recipes
+DROP TABLE UsersComment;
+DROP TABLE UsersViewRecipesHistory;
+DROP TABLE UsersLike;
+DROP TABLE CookingSteps;
+DROP TABLE RecipesIngredients;
+DROP TABLE Ingredients;
+DROP TABLE Recipes;
+DROP TABLE Users;
