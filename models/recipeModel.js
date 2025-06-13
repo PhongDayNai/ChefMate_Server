@@ -9,6 +9,9 @@ exports.getAllRecipes = async () => {
                 r.recipeId,
                 r.recipeName,
                 r.image,
+                r.cookingTime,
+                r.ration,
+                r.viewCount,
                 r.likeQuantity
             FROM Recipes r;
         `);
@@ -60,7 +63,7 @@ exports.getAllRecipes = async () => {
 
         return {
             success: true,
-            recipes
+            data: recipes
         };
     } catch (error) {
         console.error("Error in getAllRecipes:", error);
@@ -68,7 +71,7 @@ exports.getAllRecipes = async () => {
     }
 };
 
-exports.createRecipe = async (recipeName, image, ingredients, cookingSteps, userId) => {
+exports.createRecipe = async (recipeName, image, cookingTime, ration, ingredients, cookingSteps, userId) => {
     const pool = await poolPromise;
 
     const transaction = pool.transaction();
@@ -78,11 +81,13 @@ exports.createRecipe = async (recipeName, image, ingredients, cookingSteps, user
         const recipeResult = await transaction.request()
             .input('recipeName', sql.NVarChar, recipeName)
             .input('image', sql.NVarChar, image)
+            .input('cookingTime', sql.NVarChar, cookingTime)
+            .input('ration', sql.Int, ration)
             .input('userId', sql.Int, userId)
             .query(`
-                INSERT INTO Recipes (recipeName, image, likeQuantity)
+                INSERT INTO Recipes (recipeName, image, cookingTime, ration, likeQuantity, userId)
                 OUTPUT INSERTED.recipeId
-                VALUES (@recipeName, @image, 0, @userId)
+                VALUES (@recipeName, @image, @cookingTime, @ration, 0, @userId)
             `);
 
         const recipeId = recipeResult.recordset[0].recipeId;
@@ -136,8 +141,7 @@ exports.createRecipe = async (recipeName, image, ingredients, cookingSteps, user
 
         return {
             success: true,
-            recipeId,
-            message: 'Recipe created successfully'
+            data: recipeId
         };
     } catch (error) {
         await transaction.rollback();
@@ -155,7 +159,7 @@ exports.searchRecipe = async (recipeName, userId = null) => {
 
         const recipesResult = await pool.request()
             .input('recipeName', sql.NVarChar, recipeName)
-            .query("SELECT r.recipeId, r.recipeName, r.image, r.likeQuantity FROM Recipes r WHERE r.recipeName COLLATE SQL_Latin1_General_CP1_CI_AI LIKE '%' + @recipeName COLLATE SQL_Latin1_General_CP1_CI_AI + '%';");
+            .query("SELECT r.recipeId, r.recipeName, r.image, r.cookingTime, r.ration, r.viewCount, r.likeQuantity FROM Recipes r WHERE r.recipeName COLLATE SQL_Latin1_General_CP1_CI_AI LIKE '%' + @recipeName COLLATE SQL_Latin1_General_CP1_CI_AI + '%';");
 
         const cookingStepsResult = await pool.request()
             .input('recipeName', sql.NVarChar, recipeName)
@@ -234,7 +238,7 @@ exports.searchRecipe = async (recipeName, userId = null) => {
 
         return {
             success: true,
-            recipes
+            data: recipes
         };
     } catch (error) {
         console.log("error: ", error);
@@ -248,7 +252,7 @@ exports.getDirectRecipe = async (recipeId, userId = null) => {
     try {
         const recipeResult = await pool.request()
             .input('recipeId', sql.Int, recipeId)
-            .query("SELECT r.recipeId, r.recipeName, r.image, r.likeQuantity FROM Recipes r WHERE r.recipeId = @recipeId;");
+            .query("SELECT r.recipeId, r.recipeName, r.image, r.cookingTime, r.ration, r.viewCount, r.likeQuantity FROM Recipes r WHERE r.recipeId = @recipeId;");
 
         const cookingStepsResult = await pool.request()
             .input('recipeId', sql.Int, recipeId)
@@ -306,7 +310,7 @@ exports.getDirectRecipe = async (recipeId, userId = null) => {
 
         return {
             success: true,
-            recipes
+            data: recipes
         };
     } catch (error) {
         console.log("error: ", error);
@@ -325,7 +329,7 @@ exports.getAllIngredients = async () => {
 
         return {
             success: true,
-            ingredients: ingredientsResult.recordset
+            data: ingredientsResult.recordset
         };
     } catch (error) {
         console.log("error: ", error);
@@ -338,11 +342,20 @@ exports.getTopTrending = async () => {
 
     try {
         const topTrendingResult = await pool.request()
-            .query("SELECT TOP 10 r.recipeId, r.recipeName, r.image, r.likeQuantity, COUNT(uvr.recipeId) AS viewCount FROM Recipes r LEFT JOIN UsersViewRecipesHistory uvr ON r.recipeId = uvr.recipeId GROUP BY r.recipeId, r.recipeName, r.image, r.likeQuantity ORDER BY viewCount DESC;");
+            .query(`
+                SELECT TOP 10 
+                recipeId, 
+                recipeName, 
+                image, 
+                cookingTime, 
+                ration, 
+                viewCount, 
+                likeQuantity 
+                FROM Recipes GROUP BY recipeId, recipeName, image, cookingTime, ration, viewCount, likeQuantity ORDER BY viewCount DESC;`);
 
         return {
             success: true,
-            topTrending: topTrendingResult
+            data: topTrendingResult
         };
     } catch (error) {
         console.log("error: ", error);

@@ -13,9 +13,9 @@ exports.getAllRecipes = async (req, res) => {
 
 exports.createRecipe = async (req, res) => {
     console.log('req.file:', req.file);
-    const { recipeName, ingredients, cookingSteps, userId } = req.body;
+    const { recipeName, cookingTime, ration, ingredients, cookingSteps, userId } = req.body;
 
-    if (!recipeName || !ingredients || !cookingSteps || !userId) {
+    if (!recipeName || !cookingTime || !ration || !ingredients || !cookingSteps || !userId) {
         return res.status(400).json({ error: 'All fields are required' });
     }
 
@@ -37,6 +37,8 @@ exports.createRecipe = async (req, res) => {
         const newRecipe = await recipeModel.createRecipe(
             recipeName,
             imagePath,
+            cookingTime,
+            ration,
             parsedIngredients,
             parsedCookingSteps,
             userId
