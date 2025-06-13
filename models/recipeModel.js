@@ -63,7 +63,8 @@ exports.getAllRecipes = async () => {
 
         return {
             success: true,
-            data: recipes
+            data: recipes,
+            message: "Get all recipes successfully"
         };
     } catch (error) {
         console.error("Error in getAllRecipes:", error);
@@ -141,7 +142,8 @@ exports.createRecipe = async (recipeName, image, cookingTime, ration, ingredient
 
         return {
             success: true,
-            data: recipeId
+            data: recipeId,
+            message: "Recipe created successfully"
         };
     } catch (error) {
         await transaction.rollback();
@@ -238,7 +240,8 @@ exports.searchRecipe = async (recipeName, userId = null) => {
 
         return {
             success: true,
-            data: recipes
+            data: recipes,
+            message: "Search recipe successfully"
         };
     } catch (error) {
         console.log("error: ", error);
@@ -310,7 +313,8 @@ exports.getDirectRecipe = async (recipeId, userId = null) => {
 
         return {
             success: true,
-            data: recipes
+            data: recipes,
+            message: "Get direct recipe successfully"
         };
     } catch (error) {
         console.log("error: ", error);
@@ -329,7 +333,8 @@ exports.getAllIngredients = async () => {
 
         return {
             success: true,
-            data: ingredientsResult.recordset
+            data: ingredientsResult.recordset,
+            message: "Get all ingredients successfully"
         };
     } catch (error) {
         console.log("error: ", error);
@@ -355,7 +360,8 @@ exports.getTopTrending = async () => {
 
         return {
             success: true,
-            data: topTrendingResult
+            data: topTrendingResult,
+            message: "Get top trending successfully"
         };
     } catch (error) {
         console.log("error: ", error);
