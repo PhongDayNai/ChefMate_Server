@@ -29,7 +29,11 @@ exports.likeRecipe = async (userId, recipeId) => {
             .query("UPDATE Recipes SET likeQuantity = likeQuantity + 1 WHERE recipeId = @recipeId");
 
         await transaction.commit();
-        return { success: true, message: "Recipe liked successfully" };
+        return { 
+            success: true, 
+            data: { recipeId },
+            message: "Recipe liked successfully"
+        };
     } catch (error) {
         await transaction.rollback();
         console.error("Error in likeRecipe:", error);
@@ -70,7 +74,7 @@ exports.addComment = async (userId, recipeId, content) => {
 
         return {
             success: true,
-            commentId: commentResult.recordset[0].ucId,
+            data: { commentId: commentResult.recordset[0].ucId },
             message: "Comment added successfully"
         };
     } catch (error) {
