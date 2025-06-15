@@ -3,7 +3,12 @@ const { poolPromise, sql } = require('../config/dbConfig');
 exports.getAllUsers = async () => {
     const pool = await poolPromise;
     const result = await pool.request().query('SELECT * FROM Users');
-    return result.recordset;
+    
+    return {
+        success: true,
+        data: result.recordset,
+        message: "Get all users successfully"
+    };
 };
 
 exports.createUser = async (fullName, phone, passwordHash) => {
@@ -13,7 +18,12 @@ exports.createUser = async (fullName, phone, passwordHash) => {
         .input('Phone', sql.NVarChar, phone)
         .input('PasswordHash', sql.NVarChar, passwordHash)
         .query('INSERT INTO Users (FullName, Phone, PasswordHash) OUTPUT INSERTED.UserID VALUES (@FullName, @Phone, @PasswordHash)');
-    return result.recordset[0];
+    
+    return {
+        success: true,
+        data: result.recordset[0],
+        message: "User created successfully"
+    };
 };
 
 exports.resetPassword = async (phone, passwordHash) => {
@@ -32,11 +42,15 @@ exports.resetPassword = async (phone, passwordHash) => {
 
         user = await this.getUserByPhone(phone);
 
-        return { user }
+        return { 
+            success: true,
+            user: user,
+            message: "Reset password successfully"
+        };
     } catch (error) {
         console.log("error: ", error);
         throw error;
-    }
+    };
 };
 
 exports.changePassword = async (phone, passwordHash) => {
@@ -55,11 +69,15 @@ exports.changePassword = async (phone, passwordHash) => {
 
         user = await this.getUserByPhone(phone);
 
-        return { user }
+        return { 
+            success: true,
+            user: user,
+            message: "Change password successfully"
+        };
     } catch (error) {
         console.log("error: ", error);
         throw error;
-    }
+    };
 };
 
 exports.getUserByPhone = async (phone) => {
@@ -77,8 +95,9 @@ exports.updateUserInforamtion = async (userId, fullName, phone) => {
     if (existingPhone !== null && existingPhone.userId !== userId) {
         return {
             success: false,
+            data: null,
             message: 'This phone is already exist'
-        }
+        };
     } else {
         const result = await pool.request()
             .input('userId', sql.Int, userId)
@@ -87,11 +106,13 @@ exports.updateUserInforamtion = async (userId, fullName, phone) => {
             .query("UPDATE Users SET fullName = @fullName, phone = @phone WHERE userId = @userId");
         
         const user = await this.getUserByPhone(phone);
+
         return {
             success: true,
-            user: user
-        }
-    }
+            user: user,
+            message: "Update user information successfully"
+        };
+    };
 };
 
 exports.getRecipesViewHistory = async (userId) => {
@@ -102,9 +123,13 @@ exports.getRecipesViewHistory = async (userId) => {
         .input('userId', sql.Int, userId)
         .query('SELECT * FROM UsersViewRecipesHistory WHERE UserId = @userId');
         
-        return result.recordset;
+        return {
+            success: true,
+            data: result.recordset,
+            message: "Get recipes view history successfully"
+        };
     } catch (error) {
         console.log("error: ", error);
         throw error;
-    }
-}
+    };
+};
