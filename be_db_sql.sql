@@ -6,7 +6,7 @@ CREATE TABLE Users(
   phone NVARCHAR(10) NOT NULL UNIQUE,
   passwordHash NVARCHAR(255) NOT NULL,
   followCount INT NOT NULL DEFAULT 0,
-  createAt DATETIME DEFAULT GETDATE()
+  createdAt DATETIME DEFAULT GETDATE()
 );
 
 CREATE TABLE Recipes(
@@ -17,7 +17,8 @@ CREATE TABLE Recipes(
   cookingTime NVARCHAR(20) NOT NULL,
   ration INT NOT NULL,
   viewCount INT NOT NULL DEFAULT 0,
-  userId INT FOREIGN KEY REFERENCES Users(userId)
+  userId INT FOREIGN KEY REFERENCES Users(userId),
+  createdAt DATETIME DEFAULT GETDATE()
 );
 
 CREATE TABLE Ingredients(
@@ -43,7 +44,8 @@ CREATE TABLE CookingSteps(
 CREATE TABLE UsersViewRecipesHistory(
   uvrId INT PRIMARY KEY IDENTITY(1, 1),
   userId INT FOREIGN KEY REFERENCES Users(userId),
-  recipeId INT FOREIGN KEY REFERENCES Recipes(recipeId)
+  recipeId INT FOREIGN KEY REFERENCES Recipes(recipeId),
+  createdAt DATETIME DEFAULT GETDATE()
 );
 
 CREATE TABLE UsersLike(
