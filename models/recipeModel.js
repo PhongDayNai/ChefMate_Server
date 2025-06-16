@@ -342,29 +342,112 @@ exports.getAllIngredients = async () => {
     }
 };
 
-exports.getTopTrending = async () => {
+exports.getTopTrending = async (userId = null) => {
     const pool = await poolPromise;
 
     try {
         const topTrendingResult = await pool.request()
             .query(`
-                SELECT TOP 10 
-                recipeId, 
-                recipeName, 
-                image, 
-                cookingTime, 
-                ration, 
-                viewCount, 
-                likeQuantity 
-                FROM Recipes GROUP BY recipeId, recipeName, image, cookingTime, ration, viewCount, likeQuantity ORDER BY viewCount DESC;`);
+                SELECT TOP 30 
+                    r.recipeId, 
+                    r.recipeName, 
+                    r.image, 
+                    r.cookingTime, 
+                    r.ration, 
+                    r.viewCount, 
+                    r.likeQuantity,
+                    r.userId,
+                    r.createdAt,
+                    u.fullName AS userName
+                FROM Recipes r
+                JOIN Users u ON r.userId = u.userId
+                ORDER BY r.viewCount DESC;
+            `);
+
+        const recipeIds = topTrendingResult.recordset.map(r => r.recipeId);
+        if (recipeIds.length === 0) {
+            return { success: true, data: [], message: "No trending recipes found" };
+        }
+
+        const cookingStepsResult = await pool.request()
+            .query(`
+                SELECT recipeId, indexStep, content AS stepContent
+                FROM CookingSteps
+                WHERE recipeId IN (${recipeIds.join(',')})
+                ORDER BY recipeId, indexStep;
+            `);
+
+        const ingredientsResult = await pool.request()
+            .query(`
+                SELECT ri.recipeId, i.ingredientId, i.ingredientName, ri.weight, ri.unit
+                FROM RecipesIngredients ri
+                JOIN Ingredients i ON ri.ingredientId = i.ingredientId
+                WHERE ri.recipeId IN (${recipeIds.join(',')})
+                ORDER BY ri.recipeId;
+            `);
+
+        const commentsResult = await pool.request()
+            .query(`
+                SELECT uc.ucId, uc.recipeId, uc.userId, u.fullName, uc.content, uc.createdAt
+                FROM UsersComment uc
+                JOIN Users u ON uc.userId = u.userId
+                WHERE uc.recipeId IN (${recipeIds.join(',')})
+                ORDER BY uc.createdAt DESC;
+            `);
+
+        let likedRecipes = new Set();
+        if (userId) {
+            const likeResult = await pool.request()
+                .input('userId', sql.Int, userId)
+                .query(`
+                    SELECT recipeId 
+                    FROM UsersLike 
+                    WHERE userId = @userId AND recipeId IN (${recipeIds.join(',')});
+                `);
+            likedRecipes = new Set(likeResult.recordset.map(row => row.recipeId));
+        }
+
+        const recipes = topTrendingResult.recordset.map(recipe => {
+            const cookingSteps = cookingStepsResult.recordset.filter(
+                step => step.recipeId === recipe.recipeId
+            );
+            const ingredients = ingredientsResult.recordset.filter(
+                ing => ing.recipeId === recipe.recipeId
+            );
+            const comments = commentsResult.recordset.filter(
+                comment => comment.recipeId === recipe.recipeId
+            ).map(comment => ({
+                commentId: comment.ucId,
+                userId: comment.userId,
+                userName: comment.fullName,
+                content: comment.content,
+                createdAt: comment.createdAt
+            }));
+
+            return {
+                ...recipe,
+                cookingSteps: cookingSteps.map(step => ({
+                    indexStep: step.indexStep,
+                    stepContent: step.stepContent
+                })),
+                ingredients: ingredients.map(ingredient => ({
+                    ingredientId: ingredient.ingredientId,
+                    ingredientName: ingredient.ingredientName,
+                    weight: ingredient.weight,
+                    unit: ingredient.unit
+                })),
+                comments,
+                ...(userId && { isLiked: likedRecipes.has(recipe.recipeId) })
+            };
+        });
 
         return {
             success: true,
-            data: topTrendingResult,
+            data: recipes,
             message: "Get top trending successfully"
         };
     } catch (error) {
-        console.log("error: ", error);
+        console.log("error in getTopTrending:", error);
         throw error;
     }
-}
+};
