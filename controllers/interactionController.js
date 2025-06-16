@@ -40,8 +40,8 @@ exports.addComment = async (req, res) => {
     }
 
     try {
-        const result = await recipeModel.addComment(userId, recipeId, content);
-        return res.status(201).json({ result });
+        const result = await interactionModel.addComment(userId, recipeId, content);
+        return res.status(201).json(result);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: error.message || 'Internal Server Error' });

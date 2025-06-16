@@ -31,7 +31,7 @@ exports.likeRecipe = async (userId, recipeId) => {
         await transaction.commit();
         return { 
             success: true, 
-            data: { recipeId },
+            data: true,
             message: "Recipe liked successfully"
         };
     } catch (error) {
@@ -74,7 +74,7 @@ exports.addComment = async (userId, recipeId, content) => {
 
         return {
             success: true,
-            data: { commentId: commentResult.recordset[0].ucId },
+            data: true,
             message: "Comment added successfully"
         };
     } catch (error) {
