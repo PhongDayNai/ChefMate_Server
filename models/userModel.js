@@ -123,9 +123,14 @@ exports.getRecipesViewHistory = async (userId) => {
         .input('userId', sql.Int, userId)
         .query('SELECT * FROM UsersViewRecipesHistory WHERE UserId = @userId');
         
+        const data = {
+            userId: userId,
+            recipesViewHistory: result.recordset
+        }
+
         return {
             success: true,
-            data: result.recordset,
+            data: data,
             message: "Get recipes view history successfully"
         };
     } catch (error) {
