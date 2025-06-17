@@ -93,6 +93,15 @@ exports.createRecipe = async (recipeName, image, cookingTime, ration, ingredient
 
         const recipeId = recipeResult.recordset[0].recipeId;
 
+        await transaction.request()
+            .input('userId', sql.Int, userId)
+            .query(`
+                UPDATE Users
+                SET recipeCount = recipeCount + 1
+                WHERE userId = @userId
+            `);
+
+
         for (const ingredient of ingredients) {
             let ingredientId;
             const existingIngredient = await transaction.request()
