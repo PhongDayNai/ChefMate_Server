@@ -451,3 +451,26 @@ exports.getTopTrending = async (userId = null) => {
         throw error;
     }
 };
+
+exports.increaseViewCount = async (recipeId) => {
+    const pool = await poolPromise;
+
+    try {
+        await pool.request()
+            .input('recipeId', sql.Int, recipeId)
+            .query(`
+                UPDATE Recipes
+                SET viewCount = viewCount + 1
+                WHERE recipeId = @recipeId;
+            `);
+
+        return {
+            success: true,
+            data: true,
+            message: "Increase view count successfully"
+        };
+    } catch (error) {
+        console.log("error in increaseViewCount:", error);
+        throw error;
+    }
+};
