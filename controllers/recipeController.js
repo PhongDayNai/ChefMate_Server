@@ -4,7 +4,7 @@ const recipeModel = require('../models/recipeModel');
 exports.getAllRecipes = async (req, res) => {
     try {
         const result = await recipeModel.getAllRecipes();
-        return res.status(200).json({ result });
+        return res.status(200).json(result);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Internal Server Error' });
@@ -20,8 +20,14 @@ exports.createRecipe = async (req, res) => {
     }
 
     try {
-        const parsedIngredients = typeof ingredients === 'string' ? JSON.parse(ingredients) : ingredients;
+        const parsedIngredientsRaw = typeof ingredients === 'string' ? JSON.parse(ingredients) : ingredients;
         const parsedCookingSteps = typeof cookingSteps === 'string' ? JSON.parse(cookingSteps) : cookingSteps;
+
+        const parsedIngredients = parsedIngredientsRaw.map(ing => ({
+            ...ing,
+            ingredientName: normalizeText(ing.ingredientName),
+            unit: normalizeText(ing.unit)
+        }));
 
         if (!req.file) {
             return res.status(400).json({ error: 'Image is required' });
@@ -70,7 +76,7 @@ exports.searchRecipe = async (req, res) => {
 
     try {
         const result = await recipeModel.searchRecipe(recipeName, userId);
-        return res.status(200).json({ result });
+        return res.status(200).json(result);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Internal Server Error' });
@@ -96,7 +102,7 @@ exports.getDirectRecipe = async (req, res) => {
 
     try {
         const result = await recipeModel.getDirectRecipe(recipeId, userId);
-        return res.status(200).json({ result });
+        return res.status(200).json(result);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Internal Server Error' });
@@ -106,7 +112,7 @@ exports.getDirectRecipe = async (req, res) => {
 exports.getAllIngredients = async (req, res) => {
     try {
         const result = await recipeModel.getAllIngredients();
-        return res.status(200).json({ result });
+        return res.status(200).json(result);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Internal Server Error' });
@@ -138,3 +144,12 @@ exports.increaseViewCount = async (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
+
+function normalizeText(str) {
+    return str
+        .toLowerCase()
+        .split(' ')
+        .filter(word => word)
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ');
+}
