@@ -16,7 +16,7 @@
 | Lấy toàn bộ người dùng | Lấy danh sách công thức Top Trending |  |
 |  | Lấy danh sách nguyên liệu sẵn có |  |
 
-### User
+### a. User
 
 - [x]  Đăng nhập
 - [x]  Đăng ký
