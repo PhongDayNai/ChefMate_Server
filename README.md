@@ -9,12 +9,11 @@
 
 | User | Recipe | Interaction |
 | --- | --- | --- |
-| Đăng nhập | Lấy công thức nấu ăn xác định | Yêu thích công thức nấu ăn |
-| Đăng ký | Tìm kiếm công thức theo tên | Bình luận công thức nấu ăn |
-| Đổi mật khẩu | Tìm kiếm công thức theo tag |  |
-| Chỉnh sửa thông tin cá nhân | Tạo công thức nấu ăn mới |  |
-| Lấy toàn bộ người dùng | Lịch sử xem công thức nấu ăn |  |
-|  | Lấy danh sách công thức Top Trending |  |
+| Đăng nhập bằng số điện thoại hoặc email | Tìm kiếm công thức theo tên | Yêu thích công thức nấu ăn |
+| Đăng ký | Tìm kiếm công thức theo tag | Bình luận công thức nấu ăn |
+| Đổi mật khẩu | Tạo công thức nấu ăn mới |  |
+| Chỉnh sửa thông tin cá nhân | Lịch sử xem công thức nấu ăn |  |
+| Lấy toàn bộ người dùng | Lấy danh sách công thức Top Trending |  |
 |  | Lấy danh sách nguyên liệu sẵn có |  |
 |  | Lấy danh sách tag sẵn có |  |
 
@@ -123,3 +122,39 @@ CREATE TABLE UsersComment(
   createdAt DATE DEFAULT GETDATE()
 );
 ```
+
+## 3. Cách thực hiện
+
+- Khởi động SQL server
+    - Nếu bạn sử dụng Windows:
+        - Hãy mở lên bằng cách nhấn tổ hợp phím Windows + R
+        - Sau đó nhập …
+    - Nếu bạn sử dụng Linux (Distro Ubuntu):
+        
+        ```bash
+        sudo systemctl start mssql-server
+        ```
+        
+- Khởi động ExpressJS server
+
+```bash
+node server.js
+```
+
+> Ở bước này nếu trong terminal hiện dòng chữ “Server đang chạy tại [http://localhost:8080](http://localhost:8080/)” và “Đã kết nối SQL Server” là server đã chạy thành công tại localhost
+> 
+- Khởi động localtunnel chạy trên port bạn chọn
+
+```bash
+lt --port 8080
+```
+
+> Sau khi chạy lệnh này và có được trả về 1 đường dẫn thì là server đã được deploy tạm thời với đường link đó.
+> 
+
+<aside>
+💡
+
+Tips: Nếu thực hiện tải ảnh từ client nhưng không được thì các bạn hãy vào link trong terminal đó, thực hiện lấy mật khẩu và xác thực, vậy là sẽ giải quyết được vấn đề.
+
+</aside>
