@@ -13,23 +13,19 @@ exports.getAllUsers = async (req, res) => {
 };
 
 exports.createUser = async (req, res) => {
-    const { phone, password, fullName } = req.body;
-    console.log('req.body:', req)
-    console.log('password:', password)
-    console.log('fullName:', fullName)
-    console.log('phone:', phone)
+    const { phone, email, password, fullName } = req.body;
 
     try {
         const existingUser = await userModel.getUserByPhone(phone);
         console.log('Existing User:', existingUser);
 
         if (existingUser) {
-            return res.status(400).json({ error: 'Số điện thoại đã được sử dụng' });
+            return res.status(400).json({ error: 'Phone number is in use' });
         }
 
         const passwordHash = await bcrypt.hash(password, 10);
 
-        const newUser = await userModel.createUser(fullName, phone, passwordHash);
+        const newUser = await userModel.createUser(fullName, phone, email, passwordHash);
         console.log('New User:', newUser);
 
         const user = await userModel.getUserByPhone(phone);
@@ -50,26 +46,26 @@ exports.login = async (req, res) => {
     const { phone, password } = req.body;
 
     if (!phone || !password) {
-        return res.status(400).json({ error: 'Số điện thoại và mật khẩu là bắt buộc' });
+        return res.status(400).json({ error: 'Phone number and password are required' });
     }
     
     try {
         const user = await userModel.getUserByPhone(phone)
 
         if (!user) {
-            return res.status(401).json({ error: 'Số điện thoại không tồn tại' });
+            return res.status(401).json({ error: 'Phone number is not existed' });
         }
 
         console.log('User:', user);
         const isMatch = await bcrypt.compare(password, user.PasswordHash);
         if (!isMatch) {
-            return res.status(401).json({ error: 'Mật khẩu không chính xác' });
+            return res.status(401).json({ error: 'Password is incorrect' });
         }
 
         res.status(200).json(user);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: 'Có lỗi xảy ra khi đăng nhập' });
+        res.status(500).json({ error: 'There was an error logging in' });
     }
 };
 
@@ -80,7 +76,7 @@ exports.resetPassword = async (req, res) => {
         let existingUser = await userModel.getUserByPhone(phone);
 
         if (!user) {
-            return res.status(401).json({ error: 'Số điện thoại không tồn tại' });
+            return res.status(401).json({ error: 'Phone number is not existed' });
         }
 
         const passwordHash = await bcrypt.hash("1", 10);
@@ -91,7 +87,7 @@ exports.resetPassword = async (req, res) => {
         return res.status(201).json(user);
     } catch (error) {
         console.log("error: ", error);
-        return res.status(500).json({ error: 'Có lỗi khi reset mật khẩu' });
+        return res.status(500).json({ error: 'There was an error resetting password' });
     }
 };
 
@@ -102,7 +98,7 @@ exports.changePassword = async (req, res) => {
         let existingUser = await userModel.getUserByPhone(phone);
 
         if (!user) {
-            return res.status(401).json({ error: 'Số điện thoại không tồn tại' });
+            return res.status(401).json({ error: 'Phone number is not existed' });
         }
 
         const passwordHash = await bcrypt.hash(newPassword, 10);
@@ -113,7 +109,7 @@ exports.changePassword = async (req, res) => {
         return res.status(201).json(user);
     } catch (error) {
         console.log("error: ", error);
-        return res.status(500).json({ error: 'Có lỗi khi thay đổi mật khẩu' });
+        return res.status(500).json({ error: 'There was an error changing password' });
     }
 };
 
@@ -125,7 +121,7 @@ exports.updateUserInformation = async (req, res) => {
         return res.status(200).json(rsUser);
     } catch (error) {
         console.log("error: ", error);
-        return res.status(500).json({ error: 'Có lỗi khi thay đổi mật khẩu' });
+        return res.status(500).json({ error: 'There was an error updating user information' });
     }
 };
 
