@@ -9,6 +9,5 @@ router.post('/search', recipeController.searchRecipe);
 router.post('/direct', recipeController.getDirectRecipe);
 router.get('/ingredients', recipeController.getAllIngredients);
 router.get('/top-trending', recipeController.getTopTrending);
-router.post('/increase-view-count', recipeController.increaseViewCount);
 
 module.exports = router;

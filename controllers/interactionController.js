@@ -47,3 +47,19 @@ exports.addComment = async (req, res) => {
         res.status(500).json({ error: error.message || 'Internal Server Error' });
     }
 };
+
+exports.increaseViewCount = async (req, res) => {
+    const { recipeId } = req.body;
+
+    if (!recipeId || typeof recipeId !== 'number' || recipeId <= 0) {
+        return res.status(400).json({ error: 'recipeId is required and must be a positive number' });
+    }
+
+    try {
+        const result = await recipeModel.increaseViewCount(recipeId);
+        return res.status(200).json(result);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
