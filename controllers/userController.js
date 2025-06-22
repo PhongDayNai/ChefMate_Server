@@ -42,30 +42,86 @@ exports.createUser = async (req, res) => {
     }
 };
 
-exports.login = async (req, res) => {
-    const { phone, password } = req.body;
+// exports.login = async (req, res) => {
+//     const { phone, password } = req.body;
 
-    if (!phone || !password) {
-        return res.status(400).json({ error: 'Phone number and password are required' });
-    }
+//     if (!phone || !password) {
+//         return res.status(400).json({ error: 'Phone number and password are required' });
+//     }
     
+//     try {
+//         const user = await userModel.getUserByPhone(phone)
+
+//         if (!user) {
+//             return res.status(401).json({ error: 'Phone number is not existed' });
+//         }
+
+//         console.log('User:', user);
+//         const isMatch = await bcrypt.compare(password, user.passwordHash);
+//         if (!isMatch) {
+//             return res.status(401).json({ error: 'Password is incorrect' });
+//         }
+
+//         res.status(200).json({
+//             success: true,
+//             data: user,
+//             message: 'Login successfully'
+//         });
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).json({ error: 'There was an error logging in' });
+//     }
+// };
+
+exports.login = async (req, res) => {
+    const { identifier, password } = req.body;
+
+    if (!identifier || !password) {
+        return res.status(400).json({
+            success: false,
+            data: null,
+            message: 'Identifier (email or phone) and password are required'
+        });
+    }
+
     try {
-        const user = await userModel.getUserByPhone(phone)
+        console.log(`Login attempt with identifier: ${identifier}`);
+        const user = await userModel.getUserByIdentifier(identifier);
 
         if (!user) {
-            return res.status(401).json({ error: 'Phone number is not existed' });
+            console.log(`No user found with identifier: ${identifier}`);
+            return res.status(401).json({
+                success: false,
+                data: null,
+                message: 'Email or phone number does not exist'
+            });
         }
 
-        console.log('User:', user);
-        const isMatch = await bcrypt.compare(password, user.PasswordHash);
+        console.log('User found:', user);
+        const isMatch = await bcrypt.compare(password, user.passwordHash);
         if (!isMatch) {
-            return res.status(401).json({ error: 'Password is incorrect' });
+            console.log('Password mismatch for identifier:', identifier);
+            return res.status(401).json({
+                success: false,
+                data: null,
+                message: 'Password is incorrect'
+            });
         }
 
-        res.status(200).json(user);
+        const { passwordHash, ...safeUser } = user;
+        console.log(`Login successful for user: ${user.userId}`);
+        res.status(200).json({
+            success: true,
+            data: safeUser,
+            message: 'Login successfully'
+        });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'There was an error logging in' });
+        console.error(`Error during login for identifier ${identifier}:`, error);
+        res.status(500).json({
+            success: false,
+            data: null,
+            message: 'There was an error logging in'
+        });
     }
 };
 
