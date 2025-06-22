@@ -88,14 +88,31 @@ exports.increaseViewCount = async (recipeId) => {
     const pool = await poolPromise;
 
     try {
-        await pool.request()
+        if (!recipeId || recipeId <= 0) {
+            return {
+                success: false,
+                data: null,
+                message: "Invalid recipeId"
+            };
+        }
+
+        const result = await pool.request()
             .input('recipeId', sql.Int, recipeId)
             .query(`
                 UPDATE Recipes
                 SET viewCount = viewCount + 1
+                OUTPUT INSERTED.viewCount
                 WHERE recipeId = @recipeId;
             `);
-            
+
+        if (result.rowsAffected[0] === 0) {
+            return {
+                success: false,
+                data: null,
+                message: "Recipe not found"
+            };
+        }
+
         const newViewCount = result.recordset[0]?.viewCount;
 
         return {
@@ -105,6 +122,10 @@ exports.increaseViewCount = async (recipeId) => {
         };
     } catch (error) {
         console.log("error in increaseViewCount:", error);
-        throw error;
+        return {
+            success: false,
+            data: null,
+            message: "Failed to increase view count: " + error.message
+        };
     }
 };
