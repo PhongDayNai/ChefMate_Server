@@ -24,14 +24,16 @@ exports.likeRecipe = async (userId, recipeId) => {
             .input('recipeId', sql.Int, recipeId)
             .query("INSERT INTO UsersLike (userId, recipeId) VALUES (@userId, @recipeId)");
 
-        await transaction.request()
+        const updateResult = await transaction.request()
             .input('recipeId', sql.Int, recipeId)
             .query("UPDATE Recipes SET likeQuantity = likeQuantity + 1 WHERE recipeId = @recipeId");
+
+        const newLikeQuantity = updateResult.recordset[0]?.likeQuantity || 0;
 
         await transaction.commit();
         return { 
             success: true, 
-            data: true,
+            data: { count: newLikeQuantity },
             message: "Recipe liked successfully"
         };
     } catch (error) {
@@ -61,6 +63,8 @@ exports.addComment = async (userId, recipeId, content) => {
             .query("SELECT COUNT(*) AS recipeCount FROM Recipes WHERE recipeId = @recipeId");
         
         if (recipeCheck.recordset[0].recipeCount === 0) {
+            await transaction.rollback();
+            console.log(`addComment: Recipe ${recipeId} does not exist`);
             throw new Error("Recipe does not exist");
         }
 
@@ -70,11 +74,34 @@ exports.addComment = async (userId, recipeId, content) => {
             .input('content', sql.NVarChar, content)
             .query("INSERT INTO UsersComment (userId, recipeId, content) OUTPUT INSERTED.ucId VALUES (@userId, @recipeId, @content)");
 
+        const countResult = await transaction.request()
+            .input('recipeId', sql.Int, recipeId)
+            .query("SELECT COUNT(*) AS commentCount FROM UsersComment WHERE recipeId = @recipeId");
+
+        const newCommentCount = countResult.recordset[0].commentCount;
+
+        const commentsResult = await transaction.request()
+            .input('recipeId', sql.Int, recipeId)
+            .query(`
+                SELECT uc.ucId, uc.userId, u.fullName AS userName, uc.content, uc.createdAt
+                FROM UsersComment uc
+                JOIN Users u ON uc.userId = u.userId
+                WHERE uc.recipeId = @recipeId
+                ORDER BY uc.createdAt ASC
+            `);
+
+        const comments = commentsResult.recordset.map(comment => ({
+            commentId: comment.ucId,
+            userId: comment.userId,
+            userName: comment.userName,
+            content: comment.content,
+            createdAt: comment.createdAt.toISOString()
+        }));
         await transaction.commit();
 
         return {
             success: true,
-            data: true,
+            data: { count: newCommentCount, comments: comments },
             message: "Comment added successfully"
         };
     } catch (error) {
@@ -117,7 +144,7 @@ exports.increaseViewCount = async (recipeId) => {
 
         return {
             success: true,
-            data: newViewCount,
+            data: { count: newViewCount },
             message: "Increase view count successfully"
         };
     } catch (error) {
