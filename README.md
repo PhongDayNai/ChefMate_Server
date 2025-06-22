@@ -10,13 +10,15 @@
 | User | Recipe | Interaction |
 | --- | --- | --- |
 | Đăng nhập | Lấy công thức nấu ăn xác định | Yêu thích công thức nấu ăn |
-| Đăng ký | Tìm kiếm công thức nấu ăn | Bình luận công thức nấu ăn |
-| Đổi mật khẩu | Tạo công thức nấu ăn mới |  |
-| Chỉnh sửa thông tin cá nhân | Lịch sử xem công thức nấu ăn |  |
-| Lấy toàn bộ người dùng | Lấy danh sách công thức Top Trending |  |
+| Đăng ký | Tìm kiếm công thức theo tên | Bình luận công thức nấu ăn |
+| Đổi mật khẩu | Tìm kiếm công thức theo tag |  |
+| Chỉnh sửa thông tin cá nhân | Tạo công thức nấu ăn mới |  |
+| Lấy toàn bộ người dùng | Lịch sử xem công thức nấu ăn |  |
+|  | Lấy danh sách công thức Top Trending |  |
 |  | Lấy danh sách nguyên liệu sẵn có |  |
+|  | Lấy danh sách tag sẵn có |  |
 
-### a. User
+### User
 
 - [x]  Đăng nhập
 - [x]  Đăng ký
@@ -28,10 +30,12 @@
 
 - [x]  Lấy toàn bộ công thức nấu ăn
 - [x]  Lấy công thức nấu ăn xác định
-- [x]  Tìm kiếm công thức nấu ăn
+- [x]  Tìm kiếm công thức theo tên
+- [x]  Tìm kiếm công thức theo tag
 - [x]  Tạo công thức nấu ăn mới
 - [x]  Lấy danh sách công thức Top Trending
 - [x]  Lấy danh sách nguyên liệu sẵn có
+- [x]  Lấy danh sách tag sẵn có
 - [x]  Lịch sử xem công thức nấu ăn
 
 ### c. Interaction
@@ -65,6 +69,17 @@ CREATE TABLE Recipes(
   viewCount INT NOT NULL DEFAULT 0,
   userId INT FOREIGN KEY REFERENCES Users(userId),
   createdAt DATETIME DEFAULT GETDATE()
+);
+
+CREATE TABLE Tags(
+  tagId INT PRIMARY KEY IDENTITY(1,1),
+  tagName NVARCHAR(100) NOT NULL
+);
+
+CREATE TABLE RecipesTags(
+  rtId INT PRIMARY KEY IDENTITY(1,1),
+  recipeId INT FOREIGN KEY REFERENCES Recipes(recipeId),
+  tagId INT FOREIGN KEY REFERENCES Tags(tagId)
 );
 
 CREATE TABLE Ingredients(
