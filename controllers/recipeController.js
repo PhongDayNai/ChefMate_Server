@@ -7,21 +7,30 @@ exports.getAllRecipes = async (req, res) => {
         return res.status(200).json(result);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: 'Internal Server Error' });
+        return res.status(500).json({
+            success: false,
+            data: null,
+            message: `Failed to get recipes: ${error.message}`
+        });
     }
 };
 
 exports.createRecipe = async (req, res) => {
     console.log('req.file:', req.file);
-    const { recipeName, cookingTime, ration, ingredients, cookingSteps, userId } = req.body;
+    const { recipeName, cookingTime, ration, ingredients, cookingSteps, userId, tags } = req.body;
 
     if (!recipeName || !cookingTime || !ration || !ingredients || !cookingSteps || !userId) {
-        return res.status(400).json({ error: 'All fields are required' });
+        return res.status(400).json({
+            success: false,
+            data: null,
+            message: 'All fields (recipeName, cookingTime, ration, ingredients, cookingSteps, userId) are required'
+        });
     }
 
     try {
         const parsedIngredientsRaw = typeof ingredients === 'string' ? JSON.parse(ingredients) : ingredients;
         const parsedCookingSteps = typeof cookingSteps === 'string' ? JSON.parse(cookingSteps) : cookingSteps;
+        const parsedTags = tags ? (typeof tags === 'string' ? JSON.parse(tags) : tags) : [];
 
         const parsedIngredients = parsedIngredientsRaw.map(ing => ({
             ...ing,
@@ -29,12 +38,57 @@ exports.createRecipe = async (req, res) => {
             unit: normalizeText(ing.unit)
         }));
 
+        const normalizedTags = parsedTags.map(tag => ({
+            tagName: normalizeText(tag.tagName)
+        }));
+
         if (!req.file) {
-            return res.status(400).json({ error: 'Image is required' });
+            return res.status(400).json({
+                success: false,
+                data: null,
+                message: 'Image is required'
+            });
         }
 
-        console.log('req.file:', req.file);
-        console.log('req.body:', req.body);
+        if (!Array.isArray(parsedIngredients) || parsedIngredients.length === 0) {
+            return res.status(400).json({
+                success: false,
+                data: null,
+                message: 'Ingredients must be a non-empty array'
+            });
+        }
+        if (!Array.isArray(parsedCookingSteps) || parsedCookingSteps.length === 0) {
+            return res.status(400).json({
+                success: false,
+                data: null,
+                message: 'Cooking steps must be a non-empty array'
+            });
+        }
+        if (!Array.isArray(parsedTags)) {
+            return res.status(400).json({
+                success: false,
+                data: null,
+                message: 'Tags must be an array'
+            });
+        }
+        // if (typeof userId !== 'number' || userId <= 0) {
+        //     console.log('userId:', userId);
+        //     return res.status(400).json({
+        //         success: false,
+        //         data: null,
+        //         message: 'userId must be a positive number'
+        //     });
+        // }
+        const parsedUserId = parseInt(userId, 10);
+        if (isNaN(parsedUserId) || parsedUserId <= 0) {
+            console.log('Invalid userId:', userId, 'typeof:', typeof userId);
+            return res.status(400).json({
+                success: false,
+                data: null,
+                message: 'userId must be a positive number'
+            });
+        }
+
         console.log('parsedIngredients:', parsedIngredients);
         console.log('parsedCookingSteps:', parsedCookingSteps);
 
@@ -47,31 +101,46 @@ exports.createRecipe = async (req, res) => {
             ration,
             parsedIngredients,
             parsedCookingSteps,
-            userId
+            userId,
+            normalizedTags
         );
 
         res.status(201).json(newRecipe);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: 'Internal Server Error' });
+        return res.status(500).json({
+            success: false,
+            data: null,
+            message: `Failed to create recipe: ${error.message}`
+        });
     }
 };
 
 exports.searchRecipe = async (req, res) => {
-    console.log('req.body:', req.body);
-
     if (!req.body) {
-        return res.status(400).json({ error: 'Request body is missing' });
+        return res.status(400).json({
+            success: false,
+            data: null,
+            message: 'Request body is missing'
+        });
     }
 
     const { recipeName, userId } = req.body;
 
     if (!recipeName || typeof recipeName !== 'string') {
-        return res.status(400).json({ error: 'recipeName is required and must be a string' });
+        return res.status(400).json({
+            success: false,
+            data: null,
+            message: 'recipeName is required and must be a string'
+        });
     }
 
     if (userId && (typeof userId !== 'number' || userId <= 0)) {
-        return res.status(400).json({ error: 'userId must be a positive number if provided' });
+        return res.status(400).json({
+            success: false,
+            data: null,
+            message: 'userId must be a positive number if provided'
+        });
     }
 
     try {
@@ -79,33 +148,11 @@ exports.searchRecipe = async (req, res) => {
         return res.status(200).json(result);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: 'Internal Server Error' });
-    }
-};
-
-exports.getDirectRecipe = async (req, res) => {
-    console.log('req.body:', req.body);
-
-    if (!req.body) {
-        return res.status(400).json({ error: 'Request body is missing' });
-    }
-
-    const { recipeId, userId } = req.body;
-
-    if (!recipeId || typeof recipeId !== 'number' || recipeId <= 0) {
-        return res.status(400).json({ error: 'recipeId is required and must be a positive number' });
-    }
-
-    if (userId && (typeof userId !== 'number' || userId <= 0)) {
-        return res.status(400).json({ error: 'userId must be a positive number if provided' });
-    }
-
-    try {
-        const result = await recipeModel.getDirectRecipe(recipeId, userId);
-        return res.status(200).json(result);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Internal Server Error' });
+        return res.status(500).json({
+            success: false,
+            data: null,
+            message: `Failed to search recipes: ${error.message}`
+        });
     }
 };
 
@@ -115,17 +162,92 @@ exports.getAllIngredients = async (req, res) => {
         return res.status(200).json(result);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: 'Internal Server Error' });
+        return res.status(500).json({
+            success: false,
+            data: null,
+            message: `Failed to get ingredients: ${error.message}`
+        });
     }
 };
 
 exports.getTopTrending = async (req, res) => {
+    // const { userId } = req.body;
+
+    // if (userId !== undefined && (typeof userId !== 'number' || userId <= 0)) {
+    //     return res.status(400).json({
+    //         success: false,
+    //         data: null,
+    //         message: 'userId must be a positive number if provided'
+    //     });
+    // }
+    
     try {
+        // const result = await recipeModel.getTopTrending(userId || null);
         const result = await recipeModel.getTopTrending();
         return res.status(200).json(result);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: 'Internal Server Error' });
+        return res.status(500).json({
+            success: false,
+            data: null,
+            message: `Failed to get trending recipes: ${error.message}`
+        });
+    }
+};
+
+exports.getAllTags = async (req, res) => {
+    try {
+        const result = await recipeModel.getAllTags();
+        return res.status(200).json(result);
+    } catch (error) {
+        console.error("Error in getAllTags controller:", error);
+        return res.status(500).json({
+            success: false,
+            data: null,
+            message: `Failed to get tags: ${error.message}`
+        });
+    }
+};
+
+exports.searchRecipesByTag = async (req, res) => {
+    console.log('req.body:', req.body);
+
+    if (!req.body) {
+        return res.status(400).json({
+            success: false,
+            data: null,
+            message: 'Request body is missing'
+        });
+    }
+
+    const { tagName, userId } = req.body;
+
+    if (!tagName || typeof tagName !== 'string') {
+        return res.status(400).json({
+            success: false,
+            data: null,
+            message: 'tagName is required and must be a string'
+        });
+    }
+
+    if (userId && (typeof userId !== 'number' || userId <= 0)) {
+        return res.status(400).json({
+            success: false,
+            data: null,
+            message: 'userId must be a positive number if provided'
+        });
+    }
+
+    try {
+        const result = await recipeModel.searchRecipesByTag(normalizeText(tagName), userId);
+        return res.status(200).json(result);
+    } catch (error) {
+        console.error("Error in searchRecipesByTag controller:", error);
+        return res.status(500).json({
+            success: false,
+            data: null,
+            message: `Failed to search recipes by tag: ${error.message}`
+        });
     }
 };
 
