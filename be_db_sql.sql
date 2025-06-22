@@ -23,6 +23,17 @@ CREATE TABLE Recipes(
   createdAt DATETIME DEFAULT GETDATE()
 );
 
+CREATE TABLE Tags(
+  tagId INT PRIMARY KEY IDENTITY(1,1),
+  tagName NVARCHAR(100) NOT NULL
+);
+
+CREATE TABLE RecipesTags(
+  rtId INT PRIMARY KEY IDENTITY(1,1),
+  recipeId INT FOREIGN KEY REFERENCES Recipes(recipeId),
+  tagId INT FOREIGN KEY REFERENCES Tags(tagId)
+);
+
 CREATE TABLE Ingredients(
   ingredientId INT PRIMARY KEY IDENTITY(1,1),
   ingredientName NVARCHAR(100) NOT NULL
@@ -175,6 +186,8 @@ SELECT * FROM Ingredients;
 SELECT * FROM RecipesIngredients;
 SELECT * FROM CookingSteps;
 SELECT * FROM UsersViewRecipesHistory;
+
+DROP DATABASE ChefMateDB;
 
 DROP TABLE UsersComment;
 DROP TABLE UsersViewRecipesHistory;
