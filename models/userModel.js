@@ -89,6 +89,27 @@ exports.getUserByPhone = async (phone) => {
     return result.recordset.length > 0 ? result.recordset[0] : null;
 };
 
+exports.getUserByIdentifier = async (identifier) => {
+    const pool = await poolPromise;
+    try {
+        console.log(`Querying user with identifier: ${identifier}`);
+        const result = await pool.request()
+            .input('Identifier', sql.NVarChar, identifier)
+            .query('SELECT * FROM Users WHERE Phone = @Identifier OR Email = @Identifier');
+        
+        if (result.recordset.length > 0) {
+            console.log(`User found:`, result.recordset[0]);
+            return result.recordset[0];
+        } else {
+            console.log(`No user found with identifier: ${identifier}`);
+            return null;
+        }
+    } catch (error) {
+        console.error(`Error querying user with identifier ${identifier}:`, error);
+        throw error;
+    }
+};
+
 exports.updateUserInforamtion = async (userId, fullName, phone) => {
     const pool = await poolPromise;
     const existingPhone = await this.getUserByPhone(phone);
