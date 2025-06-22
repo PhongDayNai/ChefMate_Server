@@ -56,7 +56,7 @@ exports.increaseViewCount = async (req, res) => {
     }
 
     try {
-        const result = await recipeModel.increaseViewCount(recipeId);
+        const result = await interactionModel.increaseViewCount(recipeId);
         return res.status(200).json(result);
     } catch (error) {
         console.error(error);
