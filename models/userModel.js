@@ -11,13 +11,14 @@ exports.getAllUsers = async () => {
     };
 };
 
-exports.createUser = async (fullName, phone, passwordHash) => {
+exports.createUser = async (fullName, phone, email, passwordHash) => {
     const pool = await poolPromise;
     const result = await pool.request()
         .input('FullName', sql.NVarChar, fullName)
         .input('Phone', sql.NVarChar, phone)
+        .input('Email', sql.NVarChar, email)
         .input('PasswordHash', sql.NVarChar, passwordHash)
-        .query('INSERT INTO Users (FullName, Phone, PasswordHash) OUTPUT INSERTED.UserID VALUES (@FullName, @Phone, @PasswordHash)');
+        .query('INSERT INTO Users (fullName, phone, email, passwordHash) OUTPUT INSERTED.UserID VALUES (@FullName, @Phone, @Email, @PasswordHash)');
     
     return {
         success: true,
