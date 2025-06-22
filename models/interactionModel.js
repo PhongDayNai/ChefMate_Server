@@ -95,10 +95,12 @@ exports.increaseViewCount = async (recipeId) => {
                 SET viewCount = viewCount + 1
                 WHERE recipeId = @recipeId;
             `);
+            
+        const newViewCount = result.recordset[0]?.viewCount;
 
         return {
             success: true,
-            data: true,
+            data: newViewCount,
             message: "Increase view count successfully"
         };
     } catch (error) {
