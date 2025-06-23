@@ -9,11 +9,12 @@
 
 | User | Recipe | Interaction |
 | --- | --- | --- |
-| Đăng nhập bằng số điện thoại hoặc email | Tìm kiếm công thức theo tên | Yêu thích công thức nấu ăn |
-| Đăng ký | Tìm kiếm công thức theo tag | Bình luận công thức nấu ăn |
-| Đổi mật khẩu | Tạo công thức nấu ăn mới |  |
-| Chỉnh sửa thông tin cá nhân | Lịch sử xem công thức nấu ăn |  |
-| Lấy toàn bộ người dùng | Lấy danh sách công thức Top Trending |  |
+| Đăng nhập bằng số điện thoại hoặc email | Lấy toàn bộ công thức | Yêu thích công thức nấu ăn |
+| Đăng ký | Tìm kiếm công thức theo tên | Bình luận công thức nấu ăn |
+| Đổi mật khẩu | Tìm kiếm công thức theo tag | Tăng số lượt xem công thức |
+| Chỉnh sửa thông tin cá nhân | Tạo công thức nấu ăn mới |  |
+| Lấy toàn bộ người dùng | Lấy danh sách đăng công thức nấu ăn công khai của cá nhân |  |
+|  | Lấy danh sách công thức Top Trending |  |
 |  | Lấy danh sách nguyên liệu sẵn có |  |
 |  | Lấy danh sách tag sẵn có |  |
 
@@ -28,19 +29,19 @@
 ### b. Recipe
 
 - [x]  Lấy toàn bộ công thức nấu ăn
-- [x]  Lấy công thức nấu ăn xác định
 - [x]  Tìm kiếm công thức theo tên
 - [x]  Tìm kiếm công thức theo tag
 - [x]  Tạo công thức nấu ăn mới
+- [x]  Lấy danh sách đăng công thức nấu ăn công khai của cá nhân
 - [x]  Lấy danh sách công thức Top Trending
 - [x]  Lấy danh sách nguyên liệu sẵn có
 - [x]  Lấy danh sách tag sẵn có
-- [x]  Lịch sử xem công thức nấu ăn
 
 ### c. Interaction
 
 - [x]  Yêu thích công thức nấu ăn
 - [x]  Bình luận công thức nấu ăn
+- [x]  Tăng số lượt xem công thức
 
 ## 2. Cơ sở dữ liệu
 
@@ -99,13 +100,6 @@ CREATE TABLE CookingSteps(
   recipeId INT FOREIGN KEY REFERENCES Recipes(recipeId),
   indexStep INT NOT NULL,
   content NVARCHAR(4000) NOT NULL
-);
-
-CREATE TABLE UsersViewRecipesHistory(
-  uvrId INT PRIMARY KEY IDENTITY(1, 1),
-  userId INT FOREIGN KEY REFERENCES Users(userId),
-  recipeId INT FOREIGN KEY REFERENCES Recipes(recipeId),
-  createdAt DATETIME DEFAULT GETDATE()
 );
 
 CREATE TABLE UsersLike(
