@@ -1,5 +1,7 @@
 # Hệ thống ứng dụng công thức nấu ăn - ChefMate
 
+# [I. Client - Ứng dụng di động](https://github.com/PhongDayNai/ChefMate_Client)
+
 # II. Server - Máy chủ
 
 - Công nghệ: ExpressJS
