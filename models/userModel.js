@@ -37,7 +37,7 @@ exports.resetPassword = async (phone, passwordHash) => {
         const result = await transaction.request()
             .input('Phone', sql.NVarChar, phone)
             .input('PasswordHash', sql.NVarChar, passwordHash)
-            .query('UPDATE Users SET PasswordHash = @PasswordHash WHERE Phone = @Phone');
+            .query('UPDATE Users SET passwordHash = @PasswordHash WHERE Phone = @Phone');
 
         await transaction.commit();
 
@@ -64,7 +64,7 @@ exports.changePassword = async (phone, passwordHash) => {
         const result = await transaction.request()
             .input('Phone', sql.NVarChar, phone)
             .input('PasswordHash', sql.NVarChar, passwordHash)
-            .query('UPDATE Users SET PasswordHash = @PasswordHash WHERE Phone = @Phone');
+            .query('UPDATE Users SET passwordHash = @PasswordHash WHERE Phone = @Phone');
 
         await transaction.commit();
 
@@ -81,11 +81,21 @@ exports.changePassword = async (phone, passwordHash) => {
     };
 };
 
+exports.getPasswordHash = async (phone) => {
+    const pool = await poolPromise;
+    const result = await pool.request()
+        .input('Phone', sql.NVarChar, phone)
+        .query('SELECT passwordHash FROM Users WHERE Phone = @Phone');
+
+    return result.recordset.length > 0 ? result.recordset[0].passwordHash : null;
+};
+
 exports.getUserByPhone = async (phone) => {
     const pool = await poolPromise;
     const result = await pool.request()
         .input('Phone', sql.NVarChar, phone)
-        .query('SELECT * FROM Users WHERE Phone = @Phone');
+        .query('SELECT * FROM Users WHERE phone = @Phone');
+    
     return result.recordset.length > 0 ? result.recordset[0] : null;
 };
 
@@ -95,7 +105,7 @@ exports.getUserByIdentifier = async (identifier) => {
         console.log(`Querying user with identifier: ${identifier}`);
         const result = await pool.request()
             .input('Identifier', sql.NVarChar, identifier)
-            .query('SELECT * FROM Users WHERE Phone = @Identifier OR Email = @Identifier');
+            .query('SELECT * FROM Users WHERE phone = @Identifier OR email = @Identifier');
         
         if (result.recordset.length > 0) {
             console.log(`User found:`, result.recordset[0]);
@@ -110,7 +120,7 @@ exports.getUserByIdentifier = async (identifier) => {
     }
 };
 
-exports.updateUserInforamtion = async (userId, fullName, phone) => {
+exports.updateUserInforamtion = async (userId, fullName, phone, email) => {
     const pool = await poolPromise;
     const existingPhone = await this.getUserByPhone(phone);
 
@@ -121,17 +131,19 @@ exports.updateUserInforamtion = async (userId, fullName, phone) => {
             message: 'This phone is already exist'
         };
     } else {
-        const result = await pool.request()
+        await pool.request()
             .input('userId', sql.Int, userId)
             .input('fullName', sql.NVarChar, fullName)
             .input('phone', sql.NVarChar, phone)
-            .query("UPDATE Users SET fullName = @fullName, phone = @phone WHERE userId = @userId");
+            .input('email', sql.NVarChar, email)
+            .query("UPDATE Users SET fullName = @fullName, phone = @phone, email = @email WHERE userId = @userId");
         
         const user = await this.getUserByPhone(phone);
+        const { passwordHash, ...safeUser } = user;
 
         return {
             success: true,
-            user: user,
+            user: safeUser,
             message: "Update user information successfully"
         };
     };
@@ -143,7 +155,7 @@ exports.getRecipesViewHistory = async (userId) => {
     try {
         const result = await pool.request()
         .input('userId', sql.Int, userId)
-        .query('SELECT * FROM UsersViewRecipesHistory WHERE UserId = @userId');
+        .query('SELECT * FROM UsersViewRecipesHistory WHERE userId = @userId');
         
         const data = {
             userId: userId,

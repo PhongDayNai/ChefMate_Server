@@ -42,37 +42,6 @@ exports.createUser = async (req, res) => {
     }
 };
 
-// exports.login = async (req, res) => {
-//     const { phone, password } = req.body;
-
-//     if (!phone || !password) {
-//         return res.status(400).json({ error: 'Phone number and password are required' });
-//     }
-    
-//     try {
-//         const user = await userModel.getUserByPhone(phone)
-
-//         if (!user) {
-//             return res.status(401).json({ error: 'Phone number is not existed' });
-//         }
-
-//         console.log('User:', user);
-//         const isMatch = await bcrypt.compare(password, user.passwordHash);
-//         if (!isMatch) {
-//             return res.status(401).json({ error: 'Password is incorrect' });
-//         }
-
-//         res.status(200).json({
-//             success: true,
-//             data: user,
-//             message: 'Login successfully'
-//         });
-//     } catch (error) {
-//         console.error(error);
-//         res.status(500).json({ error: 'There was an error logging in' });
-//     }
-// };
-
 exports.login = async (req, res) => {
     const { identifier, password } = req.body;
 
@@ -97,7 +66,6 @@ exports.login = async (req, res) => {
             });
         }
 
-        console.log('User found:', user);
         const isMatch = await bcrypt.compare(password, user.passwordHash);
         if (!isMatch) {
             console.log('Password mismatch for identifier:', identifier);
@@ -140,7 +108,11 @@ exports.resetPassword = async (req, res) => {
         user = await userModel.getUserByPhone(phone);
 
         console.log("User: ", user);
-        return res.status(201).json(user);
+        return res.status(201).json({
+            success: true,
+            data: user,
+            message: 'Reset password successfully'
+        });
     } catch (error) {
         console.log("error: ", error);
         return res.status(500).json({ error: 'There was an error resetting password' });
@@ -148,32 +120,50 @@ exports.resetPassword = async (req, res) => {
 };
 
 exports.changePassword = async (req, res) => {
-    const { phone, newPassword } = req.body;
+    const { phone, currentPassword, newPassword } = req.body;
 
     try {
         let existingUser = await userModel.getUserByPhone(phone);
 
-        if (!user) {
+        if (!existingUser) {
             return res.status(401).json({ error: 'Phone number is not existed' });
         }
 
-        const passwordHash = await bcrypt.hash(newPassword, 10);
-        const rsUser = await userModel.resetPassword(phone, passwordHash);
-        user = await userModel.getUserByPhone(phone);
+        const isMatch = await bcrypt.compare(currentPassword, existingUser.passwordHash);
 
-        console.log("User: ", user);
-        return res.status(201).json(user);
+        if (!isMatch) {
+            return res.status(401).json({ 
+                success: false,
+                data: null,
+                message: 'Current password is incorrect' 
+            });
+        }
+
+        const newPasswordHash = await bcrypt.hash(newPassword, 10);
+        await userModel.changePassword(phone, newPasswordHash);
+        const user = await userModel.getUserByPhone(phone);
+
+        const { passwordHash, ...safeUser } = user;
+        return res.status(201).json({
+            success: true,
+            data: safeUser,
+            message: 'Change password successfully'
+        });
     } catch (error) {
         console.log("error: ", error);
-        return res.status(500).json({ error: 'There was an error changing password' });
+        return res.status(500).json({ 
+            success: false,
+            data: null,
+            message: 'There was an error changing password' 
+        });
     }
 };
 
 exports.updateUserInformation = async (req, res) => {
-    const { userId, fullName, phone } = req.body;
+    const { userId, fullName, phone, email } = req.body;
 
     try {
-        const rsUser = await userModel.updateUserInforamtion(userId, fullName, phone);
+        const rsUser = await userModel.updateUserInforamtion(userId, fullName, phone, email);
         return res.status(200).json(rsUser);
     } catch (error) {
         console.log("error: ", error);
@@ -189,6 +179,10 @@ exports.getRecipesViewHistory = async (req, res) => {
         return res.status(200).json(recipesViewHistory);
     } catch (error) {
         console.error("error: ", error);
-        return res.status(400).json({ error: error.message });
+        return res.status(400).json({ 
+            success: false,
+            data: null,
+            message: error.message 
+        });
     }
 };
