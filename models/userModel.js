@@ -45,7 +45,7 @@ exports.resetPassword = async (phone, passwordHash) => {
 
         return { 
             success: true,
-            user: user,
+            data: user,
             message: "Reset password successfully"
         };
     } catch (error) {
@@ -72,7 +72,7 @@ exports.changePassword = async (phone, passwordHash) => {
 
         return { 
             success: true,
-            user: user,
+            data: user,
             message: "Change password successfully"
         };
     } catch (error) {
@@ -143,32 +143,8 @@ exports.updateUserInforamtion = async (userId, fullName, phone, email) => {
 
         return {
             success: true,
-            user: safeUser,
+            data: safeUser,
             message: "Update user information successfully"
         };
-    };
-};
-
-exports.getRecipesViewHistory = async (userId) => {
-    const pool = await poolPromise;
-    
-    try {
-        const result = await pool.request()
-        .input('userId', sql.Int, userId)
-        .query('SELECT * FROM UsersViewRecipesHistory WHERE userId = @userId');
-        
-        const data = {
-            userId: userId,
-            recipesViewHistory: result.recordset
-        }
-
-        return {
-            success: true,
-            data: data,
-            message: "Get recipes view history successfully"
-        };
-    } catch (error) {
-        console.log("error: ", error);
-        throw error;
     };
 };
