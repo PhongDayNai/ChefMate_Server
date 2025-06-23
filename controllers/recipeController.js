@@ -242,6 +242,30 @@ exports.searchRecipesByTag = async (req, res) => {
     }
 };
 
+exports.getRecipesByUserId = async (req, res) => {
+    const { userId } = req.body;
+
+    if (!userId || typeof userId !== 'number' || userId <= 0) {
+        return res.status(400).json({
+            success: false,
+            data: null,
+            message: 'userId is required and must be a positive number'
+        });
+    }
+
+    try {
+        const result = await recipeModel.getRecipesByUserId(userId);
+        return res.status(200).json(result);
+    } catch (error) {
+        console.error("Error in getRecipesByUserId controller:", error);
+        return res.status(500).json({
+            success: false,
+            data: null,
+            message: `Failed to get recipes: ${error.message}`
+        });
+    }
+};
+
 function normalizeText(str) {
     return str
         .toLowerCase()
@@ -249,4 +273,4 @@ function normalizeText(str) {
         .filter(word => word)
         .map(word => word.charAt(0).toUpperCase() + word.slice(1))
         .join(' ');
-}
+};
