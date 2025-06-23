@@ -171,19 +171,10 @@ exports.getAllIngredients = async (req, res) => {
 };
 
 exports.getTopTrending = async (req, res) => {
-    // const { userId } = req.body;
+    const { userId } = req.body;
 
-    // if (userId !== undefined && (typeof userId !== 'number' || userId <= 0)) {
-    //     return res.status(400).json({
-    //         success: false,
-    //         data: null,
-    //         message: 'userId must be a positive number if provided'
-    //     });
-    // }
-    
     try {
-        // const result = await recipeModel.getTopTrending(userId || null);
-        const result = await recipeModel.getTopTrending();
+        const result = await recipeModel.getTopTrending(userId || null);
         return res.status(200).json(result);
     } catch (error) {
         console.error(error);
