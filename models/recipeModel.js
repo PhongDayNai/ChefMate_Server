@@ -496,6 +496,7 @@ exports.getTopTrending = async (userId = null) => {
         throw error;
     }
 };
+
 exports.getAllTags = async () => {
     const pool = await poolPromise;
 
