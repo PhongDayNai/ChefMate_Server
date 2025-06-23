@@ -10,5 +10,6 @@ router.get('/ingredients', recipeController.getAllIngredients);
 router.post('/top-trending', recipeController.getTopTrending);
 router.get('/tags', recipeController.getAllTags);
 router.post('/search-by-tag', recipeController.searchRecipesByTag);
+router.post('/user-recipes', recipeController.getRecipesByUserId);
 
 module.exports = router;

@@ -358,8 +358,6 @@ exports.getAllIngredients = async () => {
         const ingredientsResult = await pool.request()
             .query("SELECT * FROM Ingredients;");
 
-        console.log('ingredientsResult:', ingredientsResult.recordset);
-
         return {
             success: true,
             data: ingredientsResult.recordset,
@@ -662,5 +660,142 @@ exports.searchRecipesByTag = async (tagName, userId = null) => {
             data: null,
             message: `Failed to search recipes: ${error.message}`
         };
+    }
+};
+
+exports.getRecipesByUserId = async (userId) => {
+    const pool = await poolPromise;
+
+    try {
+        if (!userId || typeof userId !== 'number' || userId <= 0) {
+            throw new Error('userId must be a positive number');
+        }
+
+        const recipesResult = await pool.request()
+            .input('userId', sql.Int, userId)
+            .query(`
+                SELECT 
+                    r.recipeId, r.recipeName, r.image, r.cookingTime, r.ration,
+                    r.viewCount, r.likeQuantity, r.createdAt,
+                    u.fullName AS userName
+                FROM Recipes r
+                JOIN Users u ON r.userId = u.userId
+                WHERE r.userId = @userId
+                ORDER BY r.createdAt DESC;
+            `);
+
+        const recipeIds = recipesResult.recordset.map(r => r.recipeId);
+        if (recipeIds.length === 0) {
+            return {
+                success: true,
+                data: [],
+                message: "No recipes found for this user"
+            };
+        }
+
+        const cookingStepsResult = await pool.request()
+            .query(`
+                SELECT recipeId, indexStep, content AS stepContent
+                FROM CookingSteps
+                WHERE recipeId IN (${recipeIds.join(',')})
+                ORDER BY recipeId, indexStep;
+            `);
+
+        const ingredientsResult = await pool.request()
+            .query(`
+                SELECT ri.recipeId, i.ingredientId, i.ingredientName, ri.weight, ri.unit
+                FROM RecipesIngredients ri
+                JOIN Ingredients i ON ri.ingredientId = i.ingredientId
+                WHERE ri.recipeId IN (${recipeIds.join(',')})
+                ORDER BY ri.recipeId;
+            `);
+
+        const commentsResult = await pool.request()
+            .query(`
+                SELECT uc.ucId, uc.recipeId, uc.userId, u.fullName, uc.content, uc.createdAt
+                FROM UsersComment uc
+                JOIN Users u ON uc.userId = u.userId
+                WHERE uc.recipeId IN (${recipeIds.join(',')})
+                ORDER BY uc.createdAt ASC;
+            `);
+
+        const tagsResult = await pool.request()
+            .query(`
+                SELECT rt.recipeId, t.tagId, t.tagName
+                FROM RecipesTags rt
+                JOIN Tags t ON rt.tagId = t.tagId
+                WHERE rt.recipeId IN (${recipeIds.join(',')})
+                ORDER BY rt.recipeId;
+            `);
+
+        const likeResult = await pool.request()
+            .input('userId', sql.Int, userId)
+            .query(`
+                SELECT recipeId 
+                FROM UsersLike 
+                WHERE userId = @userId AND recipeId IN (${recipeIds.join(',')});
+            `);
+        const likedRecipes = new Set(likeResult.recordset.map(row => row.recipeId));
+
+        const recipes = recipesResult.recordset.map(recipe => {
+            const cookingSteps = cookingStepsResult.recordset
+                .filter(step => step.recipeId === recipe.recipeId)
+                .map(step => ({
+                    indexStep: step.indexStep,
+                    stepContent: step.stepContent
+                }));
+
+            const ingredients = ingredientsResult.recordset
+                .filter(ing => ing.recipeId === recipe.recipeId)
+                .map(ing => ({
+                    ingredientId: ing.ingredientId,
+                    ingredientName: ing.ingredientName,
+                    weight: ing.weight,
+                    unit: ing.unit
+                }));
+
+            const comments = commentsResult.recordset
+                .filter(c => c.recipeId === recipe.recipeId)
+                .map(comment => ({
+                    commentId: comment.ucId,
+                    userId: comment.userId,
+                    userName: comment.fullName,
+                    content: comment.content,
+                    createdAt: comment.createdAt
+                }));
+
+            const tags = tagsResult.recordset
+                .filter(t => t.recipeId === recipe.recipeId)
+                .map(tag => ({
+                    tagId: tag.tagId,
+                    tagName: tag.tagName
+                }));
+
+            return {
+                recipeId: recipe.recipeId,
+                image: recipe.image,
+                recipeName: recipe.recipeName,
+                userName: recipe.userName,
+                likeQuantity: recipe.likeQuantity,
+                viewCount: recipe.viewCount,
+                cookingTime: recipe.cookingTime,
+                ration: recipe.ration,
+                ingredients,
+                cookingSteps,
+                comments,
+                tags,
+                isLiked: likedRecipes.has(recipe.recipeId),
+                createdAt: recipe.createdAt
+            };
+        });
+
+        return {
+            success: true,
+            data: recipes,
+            message: "Recipes retrieved successfully"
+        };
+    } catch (error) {
+        console.error("Error in getRecipesByUserId:", error);
+        throw error;
     }
 };
