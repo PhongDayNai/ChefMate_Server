@@ -77,3 +77,23 @@ exports.getAllComments = async (req, res) => {
         });
     }
 };
+
+exports.deleteComment = async (req, res) => {
+    const { commentId } = req.body;
+
+    if (!commentId) {
+        return res.status(400).json({ error: 'commentId is required' });
+    }
+
+    try {
+        const result = await interactionModel.deleteComment(commentId);
+        return res.status(200).json(result);
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            success: false,
+            data: null,
+            message: `Failed to delete comment: ${error.message}`
+        });
+    }
+};
