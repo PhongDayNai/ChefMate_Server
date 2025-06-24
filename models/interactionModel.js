@@ -203,3 +203,25 @@ exports.getAllComments = async () => {
         throw error;
     }
 };
+
+exports.deleteComment = async (commentId) => {
+    const pool = await poolPromise;
+
+    try {
+        await pool.request()
+            .input('commentId', sql.Int, commentId)
+            .query(`
+                DELETE FROM UsersComment
+                WHERE ucId = @commentId;
+            `);
+
+        return {
+            success: true,
+            data: true,
+            message: "Delete comment successfully"
+        };
+    } catch (error) {
+        console.error("Error in deleteComment:", error);
+        throw error;
+    }
+};

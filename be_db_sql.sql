@@ -74,6 +74,7 @@ SELECT * FROM Recipes;
 SELECT * FROM Ingredients;
 SELECT * FROM RecipesIngredients;
 SELECT * FROM CookingSteps;
+SELECT * FROM UsersComment;
 
 DROP DATABASE ChefMateDB;
 
