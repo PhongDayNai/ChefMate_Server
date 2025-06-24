@@ -37,6 +37,14 @@ exports.getAllRecipes = async () => {
             ORDER BY ri.recipeId;
         `);
 
+        const commentsResult = await pool.request()
+            .query(`
+                SELECT uc.ucId, uc.recipeId, uc.userId, u.fullName, uc.content, uc.createdAt
+                FROM UsersComment uc
+                JOIN Users u ON uc.userId = u.userId
+                ORDER BY uc.createdAt DESC;
+            `);
+
         const tagsResult = await pool.request().query(`
             SELECT 
                 rt.recipeId,
@@ -56,6 +64,10 @@ exports.getAllRecipes = async () => {
                 ingredient => ingredient.recipeId === recipe.recipeId
             );
 
+            const comments = commentsResult.recordset.filter(
+                c => c.recipeId === recipe.recipeId
+            );
+
             const tags = tagsResult.recordset.filter(
                 tag => tag.recipeId === recipe.recipeId
             );
@@ -71,6 +83,13 @@ exports.getAllRecipes = async () => {
                     ingredientName: ingredient.ingredientName,
                     weight: ingredient.weight,
                     unit: ingredient.unit
+                })),
+                comments: comments.map(comment => ({
+                    commentId: comment.ucId,
+                    userId: comment.userId,
+                    userName: comment.fullName,
+                    content: comment.content,
+                    createdAt: comment.createdAt
                 })),
                 tags: tags.map(tag => ({
                     tagId: tag.tagId,
