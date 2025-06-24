@@ -5,5 +5,6 @@ const interactionController = require('../controllers/interactionController');
 router.post('/like', interactionController.likeRecipe);
 router.post('/comment', interactionController.addComment);
 router.post('/increase-view-count', interactionController.increaseViewCount);
+router.get('/comments', interactionController.getAllComments);
 
 module.exports = router;

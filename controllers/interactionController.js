@@ -63,3 +63,17 @@ exports.increaseViewCount = async (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
+
+exports.getAllComments = async (req, res) => {
+    try {
+        const result = await interactionModel.getAllComments();
+        return res.status(200).json(result);
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            success: false,
+            data: null,
+            message: `Failed to get comments: ${error.message}`
+        });
+    }
+};
