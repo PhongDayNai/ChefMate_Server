@@ -4,18 +4,33 @@
 
 # II. Server - Máy chủ
 
-- Công nghệ: ExpressJS
-- Cơ sở dữ liệu: SQL Server
+## 1. Công nghệ
 
-## 1. Tính năng
+- **ExpressJS**: Framework xây dựng RESTful API.
+- **SQL Server**: Quản trị cơ sở dữ liệu quan hệ.
+
+## 2. Kiến trúc: Mô hình MVC API
+
+- **Models**:
+    - **Chức năng**: Định nghĩa cấu trúc dữ liệu và tương tác với cơ sở dữ liệu.
+    - **Vai trò**: Đảm bảo dữ liệu xử lý nhất quán, không phụ thuộc vào yêu cầu client.
+- **Controllers**:
+    - **Chức năng**: Xử lý yêu cầu HTTP (GET, POST, PUT, DELETE), gọi Model để thực hiện logic và trả về JSON.
+    - **Vai trò**: Trung gian giữa client và Model, định dạng phản hồi đúng cách.
+- **Routes**:
+    - **Chức năng**: Định nghĩa endpoint API (URL) và ánh xạ tới hàm trong Controllers.
+    - **Vai trò**: Tổ chức điểm truy cập API, hỗ trợ mở rộng và bảo trì.
+- **Cơ sở dữ liệu**: Microsoft SQL Server lưu trữ, quản lý và truy xuất dữ liệu hiệu quả, tích hợp tốt với MVC API.
+
+## 3. Tính năng
 
 | User | Recipe | Interaction |
 | --- | --- | --- |
 | Đăng nhập bằng số điện thoại hoặc email | Lấy toàn bộ công thức | Yêu thích công thức nấu ăn |
 | Đăng ký | Tìm kiếm công thức theo tên | Bình luận công thức nấu ăn |
 | Đổi mật khẩu | Tìm kiếm công thức theo tag | Tăng số lượt xem công thức |
-| Chỉnh sửa thông tin cá nhân | Tạo công thức nấu ăn mới |  |
-| Lấy toàn bộ người dùng | Lấy danh sách đăng công thức nấu ăn công khai của cá nhân |  |
+| Chỉnh sửa thông tin cá nhân | Tạo công thức nấu ăn mới | Lấy tất cả bình luận |
+| Lấy toàn bộ người dùng | Lấy danh sách đăng công thức nấu ăn công khai của cá nhân | Xóa bình luận |
 |  | Lấy danh sách công thức Top Trending |  |
 |  | Lấy danh sách nguyên liệu sẵn có |  |
 |  | Lấy danh sách tag sẵn có |  |
@@ -44,8 +59,10 @@
 - [x]  Yêu thích công thức nấu ăn
 - [x]  Bình luận công thức nấu ăn
 - [x]  Tăng số lượt xem công thức
+- [x]  Lấy tất cả bình luận
+- [x]  Xóa bình luận
 
-## 2. Cơ sở dữ liệu
+## 4. Cơ sở dữ liệu
 
 ```sql
 CREATE DATABASE ChefMateDB;
@@ -119,7 +136,7 @@ CREATE TABLE UsersComment(
 );
 ```
 
-## 3. Cách thực hiện
+## 5. Cách thực hiện
 
 - Khởi động SQL server
     - Nếu bạn sử dụng Windows:
@@ -154,3 +171,5 @@ lt --port 8080
 Tips: Nếu thực hiện tải ảnh từ client nhưng không được thì các bạn hãy vào link trong terminal đó, thực hiện lấy mật khẩu và xác thực, vậy là sẽ giải quyết được vấn đề.
 
 </aside>
+
+# [III. Client - Admin Web](https://github.com/PhongDayNai/ChefMate_Admin_Web)
