@@ -156,3 +156,50 @@ exports.increaseViewCount = async (recipeId) => {
         };
     }
 };
+
+exports.getAllComments = async () => {
+    const pool = await poolPromise;
+
+    try {
+        const commentsResult = await pool.request().query(`
+            SELECT 
+                uc.ucId,
+                uc.recipeId,
+                uc.userId AS commentUserId,
+                u1.fullName AS commentUserName,
+                uc.content,
+                uc.createdAt,
+                r.userId AS recipeUserId,
+                u2.fullName AS recipeUserName
+            FROM UsersComment uc
+            JOIN Users u1 ON uc.userId = u1.userId
+            JOIN Recipes r ON uc.recipeId = r.recipeId
+            JOIN Users u2 ON r.userId = u2.userId
+            ORDER BY uc.createdAt DESC;
+        `);
+
+        const comments = commentsResult.recordset.map(comment => ({
+            commentId: comment.ucId,
+            recipeId: comment.recipeId,
+            commentUser: {
+                userId: comment.commentUserId,
+                fullName: comment.commentUserName
+            },
+            content: comment.content,
+            createdAt: comment.createdAt,
+            recipeUser: {
+                userId: comment.recipeUserId,
+                fullName: comment.recipeUserName
+            }
+        }));
+
+        return {
+            success: true,
+            data: comments,
+            message: "Get all comments successfully"
+        };
+    } catch (error) {
+        console.error("Error in getAllComments:", error);
+        throw error;
+    }
+};

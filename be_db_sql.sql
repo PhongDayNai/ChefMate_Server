@@ -69,66 +69,6 @@ CREATE TABLE UsersComment(
 );
 
 
--- Lấy thông tin từ recipeId
-SELECT 
-    r.recipeId,
-    r.recipeName,
-    r.image,
-    r.likeQuantity
-FROM Recipes r
-WHERE r.recipeId = 1;
-
-SELECT 
-    cs.indexStep,
-    cs.content AS stepContent
-FROM Recipes r
-LEFT JOIN CookingSteps cs ON r.recipeId = cs.recipeId
-WHERE r.recipeId = 1
-ORDER BY cs.indexStep;
-
-SELECT 
-    i.ingredientId,
-    i.ingredientName,
-    ri.weight,
-    ri.unit
-FROM Recipes r
-LEFT JOIN RecipesIngredients ri ON r.recipeId = ri.recipeId
-LEFT JOIN Ingredients i ON ri.ingredientId = i.ingredientId
-WHERE r.recipeId = 1;
-
-
--- Lấy thông tin tựa như recipeName
-SELECT 
-    r.recipeId,
-    r.recipeName,
-    r.image,
-    r.likeQuantity
-FROM Recipes r
-WHERE r.recipeName COLLATE SQL_Latin1_General_CP1_CI_AI LIKE '%' + 'ga' COLLATE SQL_Latin1_General_CP1_CI_AI + '%';
-
-SELECT 
-    r.recipeId,
-    cs.indexStep,
-    cs.content AS stepContent
-FROM Recipes r
-LEFT JOIN CookingSteps cs ON r.recipeId = cs.recipeId
-WHERE r.recipeName COLLATE SQL_Latin1_General_CP1_CI_AI LIKE '%' + 'ga' COLLATE SQL_Latin1_General_CP1_CI_AI + '%'
-ORDER BY cs.indexStep;
-
-SELECT 
-    r.recipeId,
-    i.ingredientId,
-    i.ingredientName,
-    ri.weight,
-    ri.unit
-FROM Recipes r
-LEFT JOIN RecipesIngredients ri ON r.recipeId = ri.recipeId
-LEFT JOIN Ingredients i ON ri.ingredientId = i.ingredientId
-WHERE r.recipeName COLLATE SQL_Latin1_General_CP1_CI_AI LIKE '%' + 'ga' COLLATE SQL_Latin1_General_CP1_CI_AI + '%'
-ORDER BY r.recipeId;
-
-
--- Kiểm tra thông tin bảng
 SELECT * FROM Users;
 SELECT * FROM Recipes;
 SELECT * FROM Ingredients;
