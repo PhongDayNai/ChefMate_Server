@@ -818,3 +818,34 @@ exports.getRecipesByUserId = async (userId) => {
         throw error;
     }
 };
+
+exports.getRecipeGrowthByMonth = async () => {
+    const pool = await poolPromise;
+
+    try {
+        const result = await pool.request().query(`
+            SELECT 
+                YEAR(createdAt) AS year,
+                MONTH(createdAt) AS month,
+                COUNT(*) AS recipeCount
+            FROM Recipes
+            GROUP BY YEAR(createdAt), MONTH(createdAt)
+            ORDER BY YEAR(createdAt) DESC, MONTH(createdAt) DESC;
+        `);
+
+        const report = result.recordset.map(row => ({
+            year: row.year,
+            month: row.month,
+            recipeCount: row.recipeCount
+        }));
+
+        return {
+            success: true,
+            data: report,
+            message: "Recipe growth report retrieved successfully"
+        };
+    } catch (error) {
+        console.error("Error in getRecipeGrowthByMonth:", error);
+        throw new Error(`Database query failed: ${error.message}`);
+    }
+};
