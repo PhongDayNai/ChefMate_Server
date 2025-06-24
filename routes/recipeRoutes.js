@@ -11,5 +11,6 @@ router.post('/top-trending', recipeController.getTopTrending);
 router.get('/tags', recipeController.getAllTags);
 router.post('/search-by-tag', recipeController.searchRecipesByTag);
 router.post('/user-recipes', recipeController.getRecipesByUserId);
+router.get('/growth-report', recipeController.getRecipeGrowthByMonth);
 
 module.exports = router;
