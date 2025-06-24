@@ -266,6 +266,20 @@ exports.getRecipesByUserId = async (req, res) => {
     }
 };
 
+exports.getRecipeGrowthByMonth = async (req, res) => {
+    try {
+        const result = await recipeModel.getRecipeGrowthByMonth();
+        return res.status(200).json(result);
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            success: false,
+            data: null,
+            message: `Failed to get recipe growth report: ${error.message}`
+        });
+    }
+};
+
 function normalizeText(str) {
     return str
         .toLowerCase()
