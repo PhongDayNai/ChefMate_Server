@@ -64,6 +64,8 @@
 
 ## 4. Cơ sở dữ liệu
 
+<img width="852" height="540" alt="image" src="https://github.com/user-attachments/assets/3172ba07-46dc-4192-afa2-fb8d799a8ce2" />
+
 ```sql
 CREATE DATABASE ChefMateDB;
 
