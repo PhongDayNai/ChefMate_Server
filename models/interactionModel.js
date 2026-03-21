@@ -1,167 +1,175 @@
-const { poolPromise, sql } = require('../config/dbConfig');
+const { pool } = require('../config/dbConfig');
 
 exports.likeRecipe = async (userId, recipeId) => {
-    const pool = await poolPromise;
-    const transaction = pool.transaction();
+    const conn = await pool.getConnection();
 
     try {
-        await transaction.begin();
+        await conn.beginTransaction();
 
-        const checkLikeResult = await transaction.request()
-            .input('userId', sql.Int, userId)
-            .input('recipeId', sql.Int, recipeId)
-            .query("SELECT COUNT(*) AS likeCount FROM UsersLike WHERE userId = @userId AND recipeId = @recipeId");
+        const [checkRows] = await conn.query(
+            'SELECT COUNT(*) AS likeCount FROM UsersLike WHERE userId = ? AND recipeId = ?',
+            [userId, recipeId]
+        );
 
-        const likeCount = checkLikeResult.recordset[0].likeCount;
+        const likeCount = Number(checkRows[0]?.likeCount || 0);
 
         if (likeCount > 0) {
-            await transaction.rollback();
-            return { success: false, message: "User has already liked this recipe" };
+            await conn.rollback();
+            return { success: false, message: 'User has already liked this recipe' };
         }
 
-        await transaction.request()
-            .input('userId', sql.Int, userId)
-            .input('recipeId', sql.Int, recipeId)
-            .query("INSERT INTO UsersLike (userId, recipeId) VALUES (@userId, @recipeId)");
+        await conn.query(
+            'INSERT INTO UsersLike (userId, recipeId) VALUES (?, ?)',
+            [userId, recipeId]
+        );
 
-        const updateResult = await transaction.request()
-            .input('recipeId', sql.Int, recipeId)
-            .query("UPDATE Recipes SET likeQuantity = likeQuantity + 1 WHERE recipeId = @recipeId");
+        await conn.query(
+            'UPDATE Recipes SET likeQuantity = likeQuantity + 1 WHERE recipeId = ?',
+            [recipeId]
+        );
 
-        const newLikeQuantity = updateResult.recordset[0]?.likeQuantity || 0;
+        const [countRows] = await conn.query(
+            'SELECT likeQuantity FROM Recipes WHERE recipeId = ? LIMIT 1',
+            [recipeId]
+        );
 
-        await transaction.commit();
-        return { 
-            success: true, 
+        const newLikeQuantity = Number(countRows[0]?.likeQuantity || 0);
+
+        await conn.commit();
+        return {
+            success: true,
             data: { count: newLikeQuantity },
-            message: "Recipe liked successfully"
+            message: 'Recipe liked successfully'
         };
     } catch (error) {
-        await transaction.rollback();
-        console.error("Error in likeRecipe:", error);
-        throw new Error("Failed to like recipe");
+        await conn.rollback();
+        console.error('Error in likeRecipe:', error);
+        throw new Error('Failed to like recipe');
+    } finally {
+        conn.release();
     }
 };
 
 exports.addComment = async (userId, recipeId, content) => {
-    const pool = await poolPromise;
-    const transaction = pool.transaction();
+    const conn = await pool.getConnection();
 
     try {
-        await transaction.begin();
+        await conn.beginTransaction();
 
-        const userCheck = await transaction.request()
-            .input('userId', sql.Int, userId)
-            .query("SELECT COUNT(*) AS userCount FROM Users WHERE userId = @userId");
-        
-        if (userCheck.recordset[0].userCount === 0) {
-            throw new Error("User does not exist");
+        const [userRows] = await conn.query(
+            'SELECT COUNT(*) AS userCount FROM Users WHERE userId = ?',
+            [userId]
+        );
+
+        if (Number(userRows[0]?.userCount || 0) === 0) {
+            throw new Error('User does not exist');
         }
 
-        const recipeCheck = await transaction.request()
-            .input('recipeId', sql.Int, recipeId)
-            .query("SELECT COUNT(*) AS recipeCount FROM Recipes WHERE recipeId = @recipeId");
-        
-        if (recipeCheck.recordset[0].recipeCount === 0) {
-            await transaction.rollback();
-            console.log(`addComment: Recipe ${recipeId} does not exist`);
-            throw new Error("Recipe does not exist");
+        const [recipeRows] = await conn.query(
+            'SELECT COUNT(*) AS recipeCount FROM Recipes WHERE recipeId = ?',
+            [recipeId]
+        );
+
+        if (Number(recipeRows[0]?.recipeCount || 0) === 0) {
+            await conn.rollback();
+            throw new Error('Recipe does not exist');
         }
 
-        const commentResult = await transaction.request()
-            .input('userId', sql.Int, userId)
-            .input('recipeId', sql.Int, recipeId)
-            .input('content', sql.NVarChar, content)
-            .query("INSERT INTO UsersComment (userId, recipeId, content) OUTPUT INSERTED.ucId VALUES (@userId, @recipeId, @content)");
+        await conn.query(
+            'INSERT INTO UsersComment (userId, recipeId, content) VALUES (?, ?, ?)',
+            [userId, recipeId, content]
+        );
 
-        const countResult = await transaction.request()
-            .input('recipeId', sql.Int, recipeId)
-            .query("SELECT COUNT(*) AS commentCount FROM UsersComment WHERE recipeId = @recipeId");
+        const [countRows] = await conn.query(
+            'SELECT COUNT(*) AS commentCount FROM UsersComment WHERE recipeId = ?',
+            [recipeId]
+        );
 
-        const newCommentCount = countResult.recordset[0].commentCount;
+        const newCommentCount = Number(countRows[0]?.commentCount || 0);
 
-        const commentsResult = await transaction.request()
-            .input('recipeId', sql.Int, recipeId)
-            .query(`
-                SELECT uc.ucId, uc.userId, u.fullName AS userName, uc.content, uc.createdAt
-                FROM UsersComment uc
-                JOIN Users u ON uc.userId = u.userId
-                WHERE uc.recipeId = @recipeId
-                ORDER BY uc.createdAt ASC
-            `);
+        const [commentsRows] = await conn.query(
+            `SELECT uc.ucId, uc.userId, u.fullName AS userName, uc.content, uc.createdAt
+             FROM UsersComment uc
+             JOIN Users u ON uc.userId = u.userId
+             WHERE uc.recipeId = ?
+             ORDER BY uc.createdAt ASC`,
+            [recipeId]
+        );
 
-        const comments = commentsResult.recordset.map(comment => ({
-            commentId: comment.ucId,
-            userId: comment.userId,
+        const comments = commentsRows.map(comment => ({
+            commentId: Number(comment.ucId),
+            userId: Number(comment.userId),
             userName: comment.userName,
             content: comment.content,
-            createdAt: comment.createdAt.toISOString()
+            createdAt: comment.createdAt instanceof Date
+                ? comment.createdAt.toISOString()
+                : comment.createdAt
         }));
-        await transaction.commit();
+
+        await conn.commit();
 
         return {
             success: true,
-            data: { count: newCommentCount, comments: comments },
-            message: "Comment added successfully"
+            data: { count: newCommentCount, comments },
+            message: 'Comment added successfully'
         };
     } catch (error) {
-        await transaction.rollback();
-        console.error("Error in addComment:", error);
+        await conn.rollback();
+        console.error('Error in addComment:', error);
         throw error;
+    } finally {
+        conn.release();
     }
 };
 
 exports.increaseViewCount = async (recipeId) => {
-    const pool = await poolPromise;
-
     try {
         if (!recipeId || recipeId <= 0) {
             return {
                 success: false,
                 data: null,
-                message: "Invalid recipeId"
+                message: 'Invalid recipeId'
             };
         }
 
-        const result = await pool.request()
-            .input('recipeId', sql.Int, recipeId)
-            .query(`
-                UPDATE Recipes
-                SET viewCount = viewCount + 1
-                OUTPUT INSERTED.viewCount
-                WHERE recipeId = @recipeId;
-            `);
+        const [updateResult] = await pool.query(
+            'UPDATE Recipes SET viewCount = viewCount + 1 WHERE recipeId = ?',
+            [recipeId]
+        );
 
-        if (result.rowsAffected[0] === 0) {
+        if (Number(updateResult.affectedRows || 0) === 0) {
             return {
                 success: false,
                 data: null,
-                message: "Recipe not found"
+                message: 'Recipe not found'
             };
         }
 
-        const newViewCount = result.recordset[0]?.viewCount;
+        const [rows] = await pool.query(
+            'SELECT viewCount FROM Recipes WHERE recipeId = ? LIMIT 1',
+            [recipeId]
+        );
+
+        const newViewCount = Number(rows[0]?.viewCount || 0);
 
         return {
             success: true,
             data: { count: newViewCount },
-            message: "Increase view count successfully"
+            message: 'Increase view count successfully'
         };
     } catch (error) {
-        console.log("error in increaseViewCount:", error);
+        console.log('error in increaseViewCount:', error);
         return {
             success: false,
             data: null,
-            message: "Failed to increase view count: " + error.message
+            message: 'Failed to increase view count: ' + error.message
         };
     }
 };
 
 exports.getAllComments = async () => {
-    const pool = await poolPromise;
-
     try {
-        const commentsResult = await pool.request().query(`
+        const [rows] = await pool.query(`
             SELECT 
                 uc.ucId,
                 uc.recipeId,
@@ -175,20 +183,20 @@ exports.getAllComments = async () => {
             JOIN Users u1 ON uc.userId = u1.userId
             JOIN Recipes r ON uc.recipeId = r.recipeId
             JOIN Users u2 ON r.userId = u2.userId
-            ORDER BY uc.createdAt DESC;
+            ORDER BY uc.createdAt DESC
         `);
 
-        const comments = commentsResult.recordset.map(comment => ({
-            commentId: comment.ucId,
-            recipeId: comment.recipeId,
+        const comments = rows.map(comment => ({
+            commentId: Number(comment.ucId),
+            recipeId: Number(comment.recipeId),
             commentUser: {
-                userId: comment.commentUserId,
+                userId: Number(comment.commentUserId),
                 fullName: comment.commentUserName
             },
             content: comment.content,
             createdAt: comment.createdAt,
             recipeUser: {
-                userId: comment.recipeUserId,
+                userId: Number(comment.recipeUserId),
                 fullName: comment.recipeUserName
             }
         }));
@@ -196,32 +204,28 @@ exports.getAllComments = async () => {
         return {
             success: true,
             data: comments,
-            message: "Get all comments successfully"
+            message: 'Get all comments successfully'
         };
     } catch (error) {
-        console.error("Error in getAllComments:", error);
+        console.error('Error in getAllComments:', error);
         throw error;
     }
 };
 
 exports.deleteComment = async (commentId) => {
-    const pool = await poolPromise;
-
     try {
-        await pool.request()
-            .input('commentId', sql.Int, commentId)
-            .query(`
-                DELETE FROM UsersComment
-                WHERE ucId = @commentId;
-            `);
+        await pool.query(
+            'DELETE FROM UsersComment WHERE ucId = ?',
+            [commentId]
+        );
 
         return {
             success: true,
             data: true,
-            message: "Delete comment successfully"
+            message: 'Delete comment successfully'
         };
     } catch (error) {
-        console.error("Error in deleteComment:", error);
+        console.error('Error in deleteComment:', error);
         throw error;
     }
 };

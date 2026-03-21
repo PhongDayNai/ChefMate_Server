@@ -29,11 +29,12 @@ exports.createUser = async (req, res) => {
         console.log('New User:', newUser);
 
         const user = await userModel.getUserByPhone(phone);
-        console.log('User:', user);
+        const { passwordHash: _, ...safeUser } = user || {};
+        console.log('User created:', safeUser?.userId);
 
         res.status(201).json({
             success: true,
-            data: user,
+            data: safeUser,
             message: 'User created successfully'
         });
     } catch (error) {
@@ -97,15 +98,15 @@ exports.resetPassword = async (req, res) => {
     const { phone } = req.body;
 
     try {
-        let existingUser = await userModel.getUserByPhone(phone);
+        const existingUser = await userModel.getUserByPhone(phone);
 
-        if (!user) {
+        if (!existingUser) {
             return res.status(401).json({ error: 'Phone number is not existed' });
         }
 
         const passwordHash = await bcrypt.hash("1", 10);
-        const rsUser = await userModel.resetPassword(phone, passwordHash);
-        user = await userModel.getUserByPhone(phone);
+        await userModel.resetPassword(phone, passwordHash);
+        const user = await userModel.getUserByPhone(phone);
 
         console.log("User: ", user);
         return res.status(201).json({

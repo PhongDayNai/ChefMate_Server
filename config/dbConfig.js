@@ -1,28 +1,27 @@
 require('dotenv').config();
-const sql = require('mssql');
+const mysql = require('mysql2/promise');
 
-const config = {
-    user: process.env.DB_USER || 'sa',
-    password: process.env.DB_PASSWORD || '1234',
-    server: process.env.DB_SERVER || 'localhost',
-    database: process.env.DB_NAME || '',
-    options: {
-        encrypt: true,
-        trustServerCertificate: true
-    }
-};
+const pool = mysql.createPool({
+    host: process.env.DB_HOST || '127.0.0.1',
+    port: Number(process.env.DB_PORT || 3306),
+    user: process.env.DB_USER || 'root',
+    password: process.env.DB_PASSWORD || '',
+    database: process.env.DB_NAME || 'chefmate_db',
+    waitForConnections: true,
+    connectionLimit: Number(process.env.DB_CONNECTION_LIMIT || 10),
+    queueLimit: 0,
+    charset: 'utf8mb4'
+});
 
-const poolPromise = new sql.ConnectionPool(config)
-  .connect()
-  .then(pool => {
-    console.log('Đã kết nối SQL Server');
-    return pool;
-  })
-  .catch(err => {
-    console.error('Lỗi kết nối SQL Server', err);
-  });
+pool.getConnection()
+    .then((conn) => {
+        console.log('Đã kết nối MySQL');
+        conn.release();
+    })
+    .catch((err) => {
+        console.error('Lỗi kết nối MySQL', err);
+    });
 
 module.exports = {
-  sql, 
-  poolPromise
+    pool
 };
