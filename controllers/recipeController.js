@@ -244,8 +244,9 @@ exports.searchRecipesByTag = async (req, res) => {
 
 exports.getRecipesByUserId = async (req, res) => {
     const { userId } = req.body;
+    const parsedUserId = parseInt(userId, 10);
 
-    if (!userId || typeof userId !== 'number' || userId <= 0) {
+    if (isNaN(parsedUserId) || parsedUserId <= 0) {
         return res.status(400).json({
             success: false,
             data: null,
@@ -254,7 +255,7 @@ exports.getRecipesByUserId = async (req, res) => {
     }
 
     try {
-        const result = await recipeModel.getRecipesByUserId(userId);
+        const result = await recipeModel.getRecipesByUserId(parsedUserId);
         return res.status(200).json(result);
     } catch (error) {
         console.error("Error in getRecipesByUserId controller:", error);
