@@ -1,0 +1,71 @@
+{
+  "info": {
+    "name": "ChefMate Local Smoke",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Users - Register",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"phone\": \"0901234567\",\n  \"email\": \"chefmate.test@example.com\",\n  \"password\": \"123456\",\n  \"fullName\": \"ChefMate Postman\"\n}"
+        },
+        "url": "{{baseUrl}}/api/users/register"
+      }
+    },
+    {
+      "name": "Users - Login",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"identifier\": \"0901234567\",\n  \"password\": \"123456\"\n}"
+        },
+        "url": "{{baseUrl}}/api/users/login"
+      }
+    },
+    {
+      "name": "Recipes - Create (multipart)",
+      "request": {
+        "method": "POST",
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            { "key": "recipeName", "value": "Trung chien postman", "type": "text" },
+            { "key": "cookingTime", "value": "15m", "type": "text" },
+            { "key": "ration", "value": "2", "type": "text" },
+            { "key": "userId", "value": "1", "type": "text" },
+            { "key": "ingredients", "value": "[{\"ingredientName\":\"trung ga\",\"weight\":2,\"unit\":\"qua\"}]", "type": "text" },
+            { "key": "cookingSteps", "value": "[{\"content\":\"dap trung\"},{\"content\":\"chien\"}]", "type": "text" },
+            { "key": "tags", "value": "[{\"tagName\":\"Bua sang\"}]", "type": "text" },
+            { "key": "image", "type": "file", "src": "/absolute/path/to/image.png" }
+          ]
+        },
+        "url": "{{baseUrl}}/api/recipes/create"
+      }
+    },
+    {
+      "name": "Recipes - All",
+      "request": { "method": "GET", "url": "{{baseUrl}}/api/recipes/all" }
+    },
+    {
+      "name": "Interactions - Like",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"userId\": 1,\n  \"recipeId\": 1\n}"
+        },
+        "url": "{{baseUrl}}/api/interactions/like"
+      }
+    }
+  ],
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080" }
+  ]
+}
