@@ -1,150 +1,173 @@
-const { poolPromise, sql } = require('../config/dbConfig');
+const { pool } = require('../config/dbConfig');
 
 exports.getAllUsers = async () => {
-    const pool = await poolPromise;
-    const result = await pool.request().query('SELECT * FROM Users');
-    
+    const [rows] = await pool.query(
+        'SELECT userId, fullName, phone, email, followCount, recipeCount, createdAt FROM Users'
+    );
+
     return {
         success: true,
-        data: result.recordset,
-        message: "Get all users successfully"
+        data: rows,
+        message: 'Get all users successfully'
     };
 };
 
 exports.createUser = async (fullName, phone, email, passwordHash) => {
-    const pool = await poolPromise;
-    const result = await pool.request()
-        .input('FullName', sql.NVarChar, fullName)
-        .input('Phone', sql.NVarChar, phone)
-        .input('Email', sql.NVarChar, email)
-        .input('PasswordHash', sql.NVarChar, passwordHash)
-        .query('INSERT INTO Users (fullName, phone, email, passwordHash) OUTPUT INSERTED.UserID VALUES (@FullName, @Phone, @Email, @PasswordHash)');
-    
+    const [result] = await pool.query(
+        'INSERT INTO Users (fullName, phone, email, passwordHash) VALUES (?, ?, ?, ?)',
+        [fullName, phone, email, passwordHash]
+    );
+
     return {
         success: true,
-        data: result.recordset[0],
-        message: "User created successfully"
+        data: { userId: result.insertId },
+        message: 'User created successfully'
     };
 };
 
 exports.resetPassword = async (phone, passwordHash) => {
-    const pool = await poolPromise;
-    let user = await this.getUserByPhone(phone);
-    const transaction = pool.transaction();
+    const conn = await pool.getConnection();
     try {
-        await transaction.begin();
+        await conn.beginTransaction();
 
-        const result = await transaction.request()
-            .input('Phone', sql.NVarChar, phone)
-            .input('PasswordHash', sql.NVarChar, passwordHash)
-            .query('UPDATE Users SET passwordHash = @PasswordHash WHERE Phone = @Phone');
+        await conn.query(
+            'UPDATE Users SET passwordHash = ? WHERE phone = ?',
+            [passwordHash, phone]
+        );
 
-        await transaction.commit();
+        await conn.commit();
 
-        user = await this.getUserByPhone(phone);
-
-        return { 
+        const user = await this.getUserByPhone(phone);
+        return {
             success: true,
             data: user,
-            message: "Reset password successfully"
+            message: 'Reset password successfully'
         };
     } catch (error) {
-        console.log("error: ", error);
+        await conn.rollback();
         throw error;
-    };
-};
-
-exports.changePassword = async (phone, passwordHash) => {
-    const pool = await poolPromise;
-    let user = await this.getUserByPhone(phone);
-    const transaction = pool.transaction();
-    try {
-        await transaction.begin();
-
-        const result = await transaction.request()
-            .input('Phone', sql.NVarChar, phone)
-            .input('PasswordHash', sql.NVarChar, passwordHash)
-            .query('UPDATE Users SET passwordHash = @PasswordHash WHERE Phone = @Phone');
-
-        await transaction.commit();
-
-        user = await this.getUserByPhone(phone);
-
-        return { 
-            success: true,
-            data: user,
-            message: "Change password successfully"
-        };
-    } catch (error) {
-        console.log("error: ", error);
-        throw error;
-    };
-};
-
-exports.getPasswordHash = async (phone) => {
-    const pool = await poolPromise;
-    const result = await pool.request()
-        .input('Phone', sql.NVarChar, phone)
-        .query('SELECT passwordHash FROM Users WHERE Phone = @Phone');
-
-    return result.recordset.length > 0 ? result.recordset[0].passwordHash : null;
-};
-
-exports.getUserByPhone = async (phone) => {
-    const pool = await poolPromise;
-    const result = await pool.request()
-        .input('Phone', sql.NVarChar, phone)
-        .query('SELECT * FROM Users WHERE phone = @Phone');
-    
-    return result.recordset.length > 0 ? result.recordset[0] : null;
-};
-
-exports.getUserByIdentifier = async (identifier) => {
-    const pool = await poolPromise;
-    try {
-        console.log(`Querying user with identifier: ${identifier}`);
-        const result = await pool.request()
-            .input('Identifier', sql.NVarChar, identifier)
-            .query('SELECT * FROM Users WHERE phone = @Identifier OR email = @Identifier');
-        
-        if (result.recordset.length > 0) {
-            console.log(`User found:`, result.recordset[0]);
-            return result.recordset[0];
-        } else {
-            console.log(`No user found with identifier: ${identifier}`);
-            return null;
-        }
-    } catch (error) {
-        console.error(`Error querying user with identifier ${identifier}:`, error);
-        throw error;
+    } finally {
+        conn.release();
     }
 };
 
-exports.updateUserInforamtion = async (userId, fullName, phone, email) => {
-    const pool = await poolPromise;
+exports.changePassword = async (phone, passwordHash) => {
+    const conn = await pool.getConnection();
+    try {
+        await conn.beginTransaction();
+
+        await conn.query(
+            'UPDATE Users SET passwordHash = ? WHERE phone = ?',
+            [passwordHash, phone]
+        );
+
+        await conn.commit();
+
+        const user = await this.getUserByPhone(phone);
+        return {
+            success: true,
+            data: user,
+            message: 'Change password successfully'
+        };
+    } catch (error) {
+        await conn.rollback();
+        throw error;
+    } finally {
+        conn.release();
+    }
+};
+
+exports.getPasswordHash = async (phone) => {
+    const [rows] = await pool.query(
+        'SELECT passwordHash FROM Users WHERE phone = ?',
+        [phone]
+    );
+
+    return rows.length > 0 ? rows[0].passwordHash : null;
+};
+
+exports.getUserByPhone = async (phone) => {
+    const [rows] = await pool.query(
+        'SELECT * FROM Users WHERE phone = ?',
+        [phone]
+    );
+
+    return rows.length > 0 ? rows[0] : null;
+};
+
+exports.getUserByIdentifier = async (identifier) => {
+    const [rows] = await pool.query(
+        'SELECT * FROM Users WHERE phone = ? OR email = ?',
+        [identifier, identifier]
+    );
+
+    return rows.length > 0 ? rows[0] : null;
+};
+
+exports.updateUserInformation = async (userId, fullName, phone, email) => {
     const existingPhone = await this.getUserByPhone(phone);
 
-    if (existingPhone !== null && existingPhone.userId !== userId) {
+    if (existingPhone !== null && Number(existingPhone.userId) !== Number(userId)) {
         return {
             success: false,
             data: null,
             message: 'This phone is already exist'
         };
-    } else {
-        await pool.request()
-            .input('userId', sql.Int, userId)
-            .input('fullName', sql.NVarChar, fullName)
-            .input('phone', sql.NVarChar, phone)
-            .input('email', sql.NVarChar, email)
-            .query("UPDATE Users SET fullName = @fullName, phone = @phone, email = @email WHERE userId = @userId");
-        
-        const user = await this.getUserByPhone(phone);
-        const { passwordHash, ...safeUser } = user;
+    }
 
+    await pool.query(
+        'UPDATE Users SET fullName = ?, phone = ?, email = ? WHERE userId = ?',
+        [fullName, phone, email, userId]
+    );
+
+    const user = await this.getUserByPhone(phone);
+    if (!user) {
         return {
-            success: true,
-            data: safeUser,
-            message: "Update user information successfully"
+            success: false,
+            data: null,
+            message: 'User not found after update'
         };
+    }
+
+    const { passwordHash, ...safeUser } = user;
+
+    return {
+        success: true,
+        data: safeUser,
+        message: 'Update user information successfully'
+    };
+};
+
+// Keep backward compatibility for typo used in controller
+exports.updateUserInforamtion = exports.updateUserInformation;
+
+exports.getRecipesViewHistory = async (userId) => {
+    const parsedUserId = Number(userId);
+    if (!parsedUserId || parsedUserId <= 0) {
+        throw new Error('userId must be a positive number');
+    }
+
+    const [rows] = await pool.query(
+        `SELECT 
+            r.recipeId,
+            r.recipeName,
+            r.image,
+            r.cookingTime,
+            r.ration,
+            r.viewCount,
+            r.likeQuantity,
+            r.createdAt,
+            u.fullName AS userName
+         FROM Recipes r
+         JOIN Users u ON r.userId = u.userId
+         WHERE r.userId = ?
+         ORDER BY r.viewCount DESC, r.createdAt DESC`,
+        [parsedUserId]
+    );
+
+    return {
+        success: true,
+        data: rows,
+        message: 'Get recipes view history successfully'
     };
 };

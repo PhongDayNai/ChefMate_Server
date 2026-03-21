@@ -101,7 +101,7 @@ exports.createRecipe = async (req, res) => {
             ration,
             parsedIngredients,
             parsedCookingSteps,
-            userId,
+            parsedUserId,
             normalizedTags
         );
 
