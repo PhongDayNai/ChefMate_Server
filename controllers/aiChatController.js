@@ -1,7 +1,7 @@
 const aiChatModel = require('../models/aiChatModel');
 
 exports.createSession = async (req, res) => {
-    const { userId, title, activeRecipeId } = req.body || {};
+    const { userId, title, activeRecipeId, firstMessage } = req.body || {};
 
     if (!userId || Number(userId) <= 0) {
         return res.status(400).json({
@@ -15,7 +15,8 @@ exports.createSession = async (req, res) => {
         const result = await aiChatModel.createSession({
             userId: Number(userId),
             title,
-            activeRecipeId: activeRecipeId ? Number(activeRecipeId) : null
+            activeRecipeId: activeRecipeId ? Number(activeRecipeId) : null,
+            firstMessage: firstMessage || ''
         });
 
         return res.status(201).json(result);
