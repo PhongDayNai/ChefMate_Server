@@ -512,6 +512,37 @@ exports.createSession = async ({ userId, title, activeRecipeId = null }) => {
     };
 };
 
+exports.getSessionsByUser = async ({ userId, limit = 50 }) => {
+    const parsedUserId = Number(userId);
+    if (!parsedUserId || parsedUserId <= 0) {
+        throw new Error('userId must be a positive number');
+    }
+
+    const parsedLimit = Math.min(Math.max(Number(limit) || 50, 1), 200);
+
+    const [rows] = await pool.query(
+        `SELECT chatSessionId, userId, title, activeRecipeId, createdAt, updatedAt
+         FROM ChatSessions
+         WHERE userId = ?
+         ORDER BY updatedAt DESC
+         LIMIT ?`,
+        [parsedUserId, parsedLimit]
+    );
+
+    return {
+        success: true,
+        data: rows.map(r => ({
+            chatSessionId: Number(r.chatSessionId),
+            userId: Number(r.userId),
+            title: r.title,
+            activeRecipeId: r.activeRecipeId ? Number(r.activeRecipeId) : null,
+            createdAt: r.createdAt,
+            updatedAt: r.updatedAt
+        })),
+        message: 'Get chat sessions successfully'
+    };
+};
+
 exports.getSessionHistory = async ({ userId, chatSessionId }) => {
     const session = await getChatSessionById(chatSessionId, userId);
     if (!session) {

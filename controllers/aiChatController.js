@@ -29,6 +29,31 @@ exports.createSession = async (req, res) => {
     }
 };
 
+exports.getSessionsByUser = async (req, res) => {
+    const userId = Number(req.query.userId || req.body?.userId);
+    const limit = Number(req.query.limit || req.body?.limit || 50);
+
+    if (!userId || userId <= 0) {
+        return res.status(400).json({
+            success: false,
+            data: null,
+            message: 'userId is required and must be a positive number'
+        });
+    }
+
+    try {
+        const result = await aiChatModel.getSessionsByUser({ userId, limit });
+        return res.status(200).json(result);
+    } catch (error) {
+        console.error('Error in getSessionsByUser:', error);
+        return res.status(500).json({
+            success: false,
+            data: null,
+            message: `Failed to get sessions: ${error.message}`
+        });
+    }
+};
+
 exports.getSessionHistory = async (req, res) => {
     const userId = Number(req.query.userId || req.body?.userId);
     const chatSessionId = Number(req.params.sessionId || req.query.sessionId || req.body?.chatSessionId);
