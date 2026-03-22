@@ -374,17 +374,21 @@ exports.getTrendingFeed = async ({ userId = null, page = 1, limit = 20, period =
             listParams
         );
 
-        let likedRecipes = new Set();
-        if (userId && rows.length > 0) {
-            const recipeIds = rows.map(r => Number(r.recipeId));
-            const { placeholders, params } = makeInClauseParams(recipeIds);
-            const [likedRows] = await pool.query(
-                `SELECT recipeId
-                 FROM UsersLike
-                 WHERE userId = ? AND recipeId IN (${placeholders})`,
-                [userId, ...params]
+        const recipeIds = rows.map(r => Number(r.recipeId));
+
+        let items = [];
+        if (recipeIds.length > 0) {
+            const related = await fetchRecipeRelatedData(recipeIds, userId);
+            items = rows.map(recipe =>
+                mapRecipePayload(
+                    recipe,
+                    related.cookingStepsRows,
+                    related.ingredientsRows,
+                    related.commentsRows,
+                    related.tagsRows,
+                    related.likedRecipes
+                )
             );
-            likedRecipes = new Set(likedRows.map(r => Number(r.recipeId)));
         }
 
         const total = Number(countRow.total || 0);
@@ -393,19 +397,7 @@ exports.getTrendingFeed = async ({ userId = null, page = 1, limit = 20, period =
         return {
             success: true,
             data: {
-                items: rows.map(r => ({
-                    recipeId: Number(r.recipeId),
-                    recipeName: r.recipeName,
-                    image: r.image,
-                    userName: r.userName,
-                    cookingTime: r.cookingTime,
-                    ration: Number(r.ration),
-                    viewCount: Number(r.viewCount || 0),
-                    likeQuantity: Number(r.likeQuantity || 0),
-                    trendScore: Number(r.trendScore || 0),
-                    isLiked: likedRecipes.has(Number(r.recipeId)),
-                    createdAt: r.createdAt
-                })),
+                items,
                 pagination: {
                     page: parsedPage,
                     limit: parsedLimit,
