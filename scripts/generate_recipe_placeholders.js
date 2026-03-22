@@ -49,7 +49,7 @@ function escapeXml(str = '') {
     .replace(/'/g, '&apos;');
 }
 
-function createSvg({ recipeName, seed }) {
+function createSvg({ recipeName, seed, subtitle = 'ChefMate Placeholder' }) {
   const c1 = colorFromHash(seed);
   const c2 = colorFromHash2(seed);
   const initials = initialsFromName(recipeName);
@@ -77,7 +77,7 @@ function createSvg({ recipeName, seed }) {
 
   <text x="600" y="330" text-anchor="middle" font-size="160" font-family="Arial, Helvetica, sans-serif" fill="#fff" font-weight="700">${initials}</text>
   <text x="600" y="460" text-anchor="middle" font-size="44" font-family="Arial, Helvetica, sans-serif" fill="#fff" font-weight="600">${title}</text>
-  <text x="600" y="520" text-anchor="middle" font-size="28" font-family="Arial, Helvetica, sans-serif" fill="rgba(255,255,255,0.88)">ChefMate Placeholder</text>
+  <text x="600" y="520" text-anchor="middle" font-size="28" font-family="Arial, Helvetica, sans-serif" fill="rgba(255,255,255,0.88)">${escapeXml(subtitle)}</text>
 </svg>`;
 }
 
@@ -100,7 +100,11 @@ async function main() {
     const abs = path.join(OUTPUT_DIR, fileName);
     const dbPath = `/images/placeholders/${fileName}`;
 
-    const svg = createSvg({ recipeName, seed });
+    const svg = createSvg({
+      recipeName,
+      seed,
+      subtitle: 'Ảnh tạm thời – đang cập nhật ảnh món'
+    });
     fs.writeFileSync(abs, svg, 'utf8');
 
     await pool.query('UPDATE Recipes SET image = ? WHERE recipeId = ?', [dbPath, recipeId]);
