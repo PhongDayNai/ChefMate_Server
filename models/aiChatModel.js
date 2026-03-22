@@ -1,5 +1,7 @@
 const { pool } = require('../config/dbConfig');
 
+const DEFAULT_RECOMMENDATION_LIMIT = 10;
+
 const COMMON_MISSING_INGREDIENTS = new Set([
     'hành', 'hành lá', 'hành tím', 'hành khô', 'tỏi', 'ớt', 'tiêu', 'muối', 'đường', 'nước mắm',
     'hạt nêm', 'dầu ăn', 'dầu oliu', 'bột ngọt', 'bột canh', 'rau mùi', 'ngò rí', 'gừng', 'chanh'
@@ -215,11 +217,22 @@ async function setActiveRecipe({ chatSessionId, userId, recipeId = null }) {
     );
 }
 
-async function getRecipeRecommendationsFromPantry({ userId, limit = 10 }) {
+function resolveRecommendationLimit(limit) {
+    const parsed = Number(limit);
+    if (!Number.isFinite(parsed) || parsed <= 0) {
+        return DEFAULT_RECOMMENDATION_LIMIT;
+    }
+
+    return Math.min(Math.floor(parsed), 50);
+}
+
+async function getRecipeRecommendationsFromPantry({ userId, limit }) {
     const parsedUserId = Number(userId);
     if (!parsedUserId || parsedUserId <= 0) {
         throw new Error('userId must be a positive number');
     }
+
+    const finalLimit = resolveRecommendationLimit(limit);
 
     const { exactMap: pantryExactMap, nameMap: pantryNameMap } = await getPantryMapByUser(parsedUserId);
 
@@ -318,17 +331,25 @@ async function getRecipeRecommendationsFromPantry({ userId, limit = 10 }) {
 
     const sortedReady = readyToCook
         .sort((a, b) => b.completionRate - a.completionRate)
-        .slice(0, limit);
+        .slice(0, finalLimit);
 
-    const remainLimit = Math.max(limit - sortedReady.length, 0);
+    const remainLimit = Math.max(finalLimit - sortedReady.length, 0);
 
     const sortedAlmost = almostReady
         .sort((a, b) => b.completionRate - a.completionRate)
         .slice(0, remainLimit);
 
+    const mergedRecommendations = [...sortedReady, ...sortedAlmost].map((item, index) => ({
+        index: index + 1,
+        recommendationType: index < sortedReady.length ? 'ready_to_cook' : 'almost_ready',
+        ...item
+    }));
+
     return {
         success: true,
         data: {
+            recommendationLimit: finalLimit,
+            recommendations: mergedRecommendations,
             readyToCook: sortedReady,
             almostReady: sortedAlmost
         },
