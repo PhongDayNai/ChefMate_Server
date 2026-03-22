@@ -319,47 +319,122 @@ exports.getAllIngredients = async () => {
     }
 };
 
-exports.getTopTrending = async (userId = null) => {
+function resolvePeriodDays(period = 'all') {
+    const p = String(period || 'all').toLowerCase();
+    if (p === '7d') return 7;
+    if (p === '30d') return 30;
+    if (p === '90d') return 90;
+    return null;
+}
+
+exports.getTrendingFeed = async ({ userId = null, page = 1, limit = 20, period = 'all' } = {}) => {
     try {
-        const [topRows] = await pool.query(
+        const parsedPage = Math.max(Number(page) || 1, 1);
+        const parsedLimit = Math.min(Math.max(Number(limit) || 20, 1), 50);
+        const offset = (parsedPage - 1) * parsedLimit;
+        const periodDays = resolvePeriodDays(period);
+
+        const periodClause = periodDays
+            ? 'WHERE r.createdAt >= DATE_SUB(NOW(), INTERVAL ? DAY)'
+            : '';
+        const countParams = periodDays ? [periodDays] : [];
+
+        const [[countRow]] = await pool.query(
+            `SELECT COUNT(*) AS total
+             FROM Recipes r
+             ${periodClause}`,
+            countParams
+        );
+
+        const listParams = periodDays
+            ? [periodDays, parsedLimit, offset]
+            : [parsedLimit, offset];
+
+        const [rows] = await pool.query(
             `SELECT 
-                r.recipeId, 
-                r.recipeName, 
-                r.image, 
-                r.cookingTime, 
-                r.ration, 
-                r.viewCount, 
+                r.recipeId,
+                r.recipeName,
+                r.image,
+                r.cookingTime,
+                r.ration,
+                r.viewCount,
                 r.likeQuantity,
-                r.userId,
                 r.createdAt,
-                u.fullName AS userName
+                u.fullName AS userName,
+                ROUND(
+                    (r.viewCount * 0.60) +
+                    (r.likeQuantity * 2.00) +
+                    GREATEST(0, 20 - TIMESTAMPDIFF(DAY, r.createdAt, NOW()))
+                , 2) AS trendScore
              FROM Recipes r
              JOIN Users u ON r.userId = u.userId
-             ORDER BY r.viewCount DESC
-             LIMIT 30`
+             ${periodClause}
+             ORDER BY trendScore DESC, r.recipeId DESC
+             LIMIT ? OFFSET ?`,
+            listParams
         );
 
-        const recipeIds = topRows.map(r => Number(r.recipeId));
-        if (recipeIds.length === 0) {
-            return { success: true, data: [], message: 'No trending recipes found' };
+        let likedRecipes = new Set();
+        if (userId && rows.length > 0) {
+            const recipeIds = rows.map(r => Number(r.recipeId));
+            const { placeholders, params } = makeInClauseParams(recipeIds);
+            const [likedRows] = await pool.query(
+                `SELECT recipeId
+                 FROM UsersLike
+                 WHERE userId = ? AND recipeId IN (${placeholders})`,
+                [userId, ...params]
+            );
+            likedRecipes = new Set(likedRows.map(r => Number(r.recipeId)));
         }
 
-        const related = await fetchRecipeRelatedData(recipeIds, userId);
-
-        const recipes = topRows.map(recipe =>
-            mapRecipePayload(
-                recipe,
-                related.cookingStepsRows,
-                related.ingredientsRows,
-                related.commentsRows,
-                related.tagsRows,
-                related.likedRecipes
-            )
-        );
+        const total = Number(countRow.total || 0);
+        const totalPages = Math.max(Math.ceil(total / parsedLimit), 1);
 
         return {
             success: true,
-            data: recipes,
+            data: {
+                items: rows.map(r => ({
+                    recipeId: Number(r.recipeId),
+                    recipeName: r.recipeName,
+                    image: r.image,
+                    userName: r.userName,
+                    cookingTime: r.cookingTime,
+                    ration: Number(r.ration),
+                    viewCount: Number(r.viewCount || 0),
+                    likeQuantity: Number(r.likeQuantity || 0),
+                    trendScore: Number(r.trendScore || 0),
+                    isLiked: likedRecipes.has(Number(r.recipeId)),
+                    createdAt: r.createdAt
+                })),
+                pagination: {
+                    page: parsedPage,
+                    limit: parsedLimit,
+                    total,
+                    totalPages,
+                    hasMore: parsedPage < totalPages
+                },
+                period: periodDays ? `${periodDays}d` : 'all'
+            },
+            message: 'Get trending feed successfully'
+        };
+    } catch (error) {
+        console.log('error in getTrendingFeed:', error);
+        throw error;
+    }
+};
+
+exports.getTopTrending = async (userId = null) => {
+    try {
+        const result = await exports.getTrendingFeed({
+            userId,
+            page: 1,
+            limit: 30,
+            period: 'all'
+        });
+
+        return {
+            success: true,
+            data: result.data.items,
             message: 'Get top trending successfully'
         };
     } catch (error) {
