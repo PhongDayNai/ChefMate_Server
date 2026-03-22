@@ -9,6 +9,7 @@ router.post('/search', recipeController.searchRecipe);
 router.get('/ingredients', recipeController.getAllIngredients);
 router.post('/top-trending', recipeController.getTopTrending);
 router.get('/trending', recipeController.getTrendingFeed);
+router.get('/trending-v2', recipeController.getTrendingV2);
 router.get('/tags', recipeController.getAllTags);
 router.post('/search-by-tag', recipeController.searchRecipesByTag);
 router.post('/user-recipes', recipeController.getRecipesByUserId);
