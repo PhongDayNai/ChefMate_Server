@@ -3,7 +3,7 @@
   "info": {
     "title": "ChefMate Server API",
     "version": "2.0.0",
-    "description": "Tài liệu đầy đủ API ChefMate (legacy + mới), gồm flow sử dụng, phân trang, AI chat, pantry, diet notes và xử lý lỗi.\n\n## Quickstart Flow\n1) Lấy diet notes + pantry\n2) Lấy recommendations từ pantry\n3) Tạo session (hoặc để messages auto-create)\n4) Chọn active recipe\n5) Chat với AI\n6) Load lại sessions + history\n"
+    "description": "Tài liệu API ChefMate (full): legacy + tính năng mới.\n\nBao gồm flow sử dụng end-to-end, request/response mẫu, phân trang feed, quản lý session chat, pantry, diet notes và chiến lược xử lý lỗi."
   },
   "servers": [
     {
@@ -1596,7 +1596,137 @@
         "maxRetries": 3,
         "strategy": "exponential backoff nhẹ (3s, 5s, 8s)"
       }
-    }
+    },
+    "flowMatrix": {
+      "F1_AuthAndProfile": {
+        "purpose": "Đăng ký/đăng nhập/cập nhật thông tin người dùng",
+        "preconditions": [
+          "Không cần session"
+        ],
+        "steps": [
+          "POST /api/users/register",
+          "POST /api/users/login",
+          "POST /api/users/update-user-information"
+        ],
+        "expected": "Nhận userId để dùng cho mọi flow còn lại",
+        "errorBranches": [
+          "401 đăng nhập sai",
+          "400 dữ liệu thiếu/không hợp lệ"
+        ]
+      },
+      "F2_DietNotesAndPantrySetup": {
+        "purpose": "Thiết lập dị ứng/hạn chế + nguyên liệu hiện có",
+        "preconditions": [
+          "Có userId"
+        ],
+        "steps": [
+          "GET /api/user-diet-notes",
+          "POST /api/user-diet-notes/upsert",
+          "GET /api/pantry",
+          "POST /api/pantry/upsert"
+        ],
+        "expected": "Context cá nhân hóa đầy đủ cho recommend/chat",
+        "errorBranches": [
+          "400 userId sai",
+          "500 DB/network lỗi"
+        ]
+      },
+      "F3_Recommendations": {
+        "purpose": "Lấy danh sách món phù hợp pantry",
+        "preconditions": [
+          "Pantry đã có dữ liệu hoặc chấp nhận rỗng"
+        ],
+        "steps": [
+          "POST /api/ai-chat/recommendations-from-pantry"
+        ],
+        "expected": "Trả recommendations có index + recommendationType",
+        "errorBranches": [
+          "Danh sách rỗng khi pantry trống hoặc bị filter dị ứng"
+        ]
+      },
+      "F4_SessionBasedChat": {
+        "purpose": "Chat theo phiên có lưu lịch sử",
+        "preconditions": [
+          "Có userId"
+        ],
+        "steps": [
+          "POST /api/ai-chat/sessions",
+          "PATCH /api/ai-chat/sessions/active-recipe",
+          "POST /api/ai-chat/messages",
+          "GET /api/ai-chat/sessions/{id}"
+        ],
+        "expected": "Message đầu có intro Bepes, title có thể auto bằng AI",
+        "errorBranches": [
+          "404 session không thuộc user",
+          "503 AI_SERVER_BUSY"
+        ]
+      },
+      "F5_AutoSessionChat": {
+        "purpose": "Cho phép chat ngay khi chưa có sessionId",
+        "preconditions": [
+          "Có userId"
+        ],
+        "steps": [
+          "POST /api/ai-chat/messages (không truyền chatSessionId)"
+        ],
+        "expected": "Server tự tạo session + auto-title + intro Bepes + trả assistantMessage",
+        "errorBranches": [
+          "503 AI_SERVER_BUSY -> retry theo policy"
+        ]
+      },
+      "F6_SessionManagement": {
+        "purpose": "Quản lý danh sách phiên chat cho UI lịch sử",
+        "preconditions": [
+          "Có userId"
+        ],
+        "steps": [
+          "GET /api/ai-chat/sessions?page&limit",
+          "PATCH /api/ai-chat/sessions/title",
+          "DELETE /api/ai-chat/sessions/{id}"
+        ],
+        "expected": "Phân trang ổn định, đổi tên/xóa phiên thành công",
+        "errorBranches": [
+          "404 session không tồn tại hoặc không thuộc user"
+        ]
+      },
+      "F7_TrendingFeedInfiniteScroll": {
+        "purpose": "Feed thịnh hành có cuộn vô hạn",
+        "preconditions": [
+          "Không bắt buộc userId; có userId để trả isLiked"
+        ],
+        "steps": [
+          "GET /api/recipes/trending-v2?page=1&limit=20&period=7d",
+          "Dùng pagination.hasMore để gọi trang tiếp theo"
+        ],
+        "expected": "items payload tương thích v1 + pagination metadata",
+        "errorBranches": [
+          "Nếu dùng client cũ tiếp tục giữ /api/recipes/top-trending"
+        ]
+      },
+      "F8_RecipeAndInteractionLegacy": {
+        "purpose": "Tương thích client cũ",
+        "preconditions": [
+          "Client legacy"
+        ],
+        "steps": [
+          "POST /api/recipes/top-trending",
+          "POST /api/interactions/like",
+          "POST /api/interactions/comment"
+        ],
+        "expected": "Contract cũ không đổi shape",
+        "errorBranches": [
+          "Không migrate gấp; nâng dần sang v2"
+        ]
+      }
+    },
+    "clientIntegrationChecklist": [
+      "Luôn lưu userId sau login/register",
+      "Đọc sessionId từ create session hoặc từ response messages auto-create",
+      "Render recommendations theo data.recommendations (không tự sort lại index)",
+      "Bắt 503 AI_SERVER_BUSY và retry tối đa 3 lần",
+      "Với feed mới dùng /recipes/trending-v2, không dùng top-trending cho infinite scroll",
+      "Tất cả API session cần đúng cặp sessionId + userId"
+    ]
   },
   "externalDocs": {
     "description": "Swagger UI trực quan",
