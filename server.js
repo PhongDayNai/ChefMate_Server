@@ -8,6 +8,7 @@ const recipeRoutes = require('./routes/recipeRoutes');
 const interactionRoutes = require('./routes/interactionRoutes');
 const pantryRoutes = require('./routes/pantryRoutes');
 const aiChatRoutes = require('./routes/aiChatRoutes');
+const userDietRoutes = require('./routes/userDietRoutes');
 
 const app = express();
 
@@ -23,6 +24,7 @@ app.use('/api/recipes', recipeRoutes);
 app.use('/api/interactions', interactionRoutes);
 app.use('/api/pantry', pantryRoutes);
 app.use('/api/ai-chat', aiChatRoutes);
+app.use('/api/user-diet-notes', userDietRoutes);
 
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
