@@ -1,8 +1,36 @@
 USE chefmate_db;
 
-ALTER TABLE RecipesIngredients
-  ADD COLUMN IF NOT EXISTS isMain TINYINT(1) NOT NULL DEFAULT 0 AFTER unit,
-  ADD COLUMN IF NOT EXISTS isCommon TINYINT(1) NOT NULL DEFAULT 0 AFTER isMain;
+SET @has_isMain := (
+  SELECT COUNT(*)
+  FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE()
+    AND TABLE_NAME = 'RecipesIngredients'
+    AND COLUMN_NAME = 'isMain'
+);
+SET @sql_isMain := IF(
+  @has_isMain = 0,
+  'ALTER TABLE RecipesIngredients ADD COLUMN isMain TINYINT(1) NOT NULL DEFAULT 0 AFTER unit',
+  'SELECT 1'
+);
+PREPARE stmt FROM @sql_isMain;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+SET @has_isCommon := (
+  SELECT COUNT(*)
+  FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE()
+    AND TABLE_NAME = 'RecipesIngredients'
+    AND COLUMN_NAME = 'isCommon'
+);
+SET @sql_isCommon := IF(
+  @has_isCommon = 0,
+  'ALTER TABLE RecipesIngredients ADD COLUMN isCommon TINYINT(1) NOT NULL DEFAULT 0 AFTER isMain',
+  'SELECT 1'
+);
+PREPARE stmt FROM @sql_isCommon;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
 
 CREATE TABLE IF NOT EXISTS PantryItems (
   pantryItemId INT PRIMARY KEY AUTO_INCREMENT,
