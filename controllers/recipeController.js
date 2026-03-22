@@ -207,6 +207,32 @@ exports.getTrendingFeed = async (req, res) => {
     }
 };
 
+exports.getTrendingV2 = async (req, res) => {
+    const userId = Number(req.query.userId || req.body?.userId || 0) || null;
+    const page = Number(req.query.page || req.body?.page || 1);
+    const limit = Number(req.query.limit || req.body?.limit || 20);
+    const period = String(req.query.period || req.body?.period || 'all');
+
+    try {
+        const result = await recipeModel.getTrendingFeed({ userId, page, limit, period });
+        return res.status(200).json({
+            success: true,
+            data: {
+                ...result.data,
+                apiVersion: 'v2'
+            },
+            message: 'Get trending v2 successfully'
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            success: false,
+            data: null,
+            message: `Failed to get trending v2: ${error.message}`
+        });
+    }
+};
+
 exports.getAllTags = async (req, res) => {
     try {
         const result = await recipeModel.getAllTags();
