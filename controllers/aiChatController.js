@@ -31,6 +31,7 @@ exports.createSession = async (req, res) => {
 
 exports.getSessionsByUser = async (req, res) => {
     const userId = Number(req.query.userId || req.body?.userId);
+    const page = Number(req.query.page || req.body?.page || 1);
     const limit = Number(req.query.limit || req.body?.limit || 50);
 
     if (!userId || userId <= 0) {
@@ -42,7 +43,7 @@ exports.getSessionsByUser = async (req, res) => {
     }
 
     try {
-        const result = await aiChatModel.getSessionsByUser({ userId, limit });
+        const result = await aiChatModel.getSessionsByUser({ userId, page, limit });
         return res.status(200).json(result);
     } catch (error) {
         console.error('Error in getSessionsByUser:', error);
@@ -91,6 +92,91 @@ exports.getSessionHistory = async (req, res) => {
             success: false,
             data: null,
             message: `Failed to get session history: ${error.message}`
+        });
+    }
+};
+
+exports.deleteSession = async (req, res) => {
+    const userId = Number(req.query.userId || req.body?.userId);
+    const chatSessionId = Number(req.params.id || req.params.sessionId || req.body?.chatSessionId);
+
+    if (!userId || userId <= 0) {
+        return res.status(400).json({
+            success: false,
+            data: null,
+            message: 'userId is required and must be a positive number'
+        });
+    }
+
+    if (!chatSessionId || chatSessionId <= 0) {
+        return res.status(400).json({
+            success: false,
+            data: null,
+            message: 'chatSessionId is required and must be a positive number'
+        });
+    }
+
+    try {
+        const result = await aiChatModel.deleteSession({ userId, chatSessionId });
+        if (!result.success) {
+            return res.status(404).json(result);
+        }
+        return res.status(200).json(result);
+    } catch (error) {
+        console.error('Error in deleteSession:', error);
+        return res.status(500).json({
+            success: false,
+            data: null,
+            message: `Failed to delete session: ${error.message}`
+        });
+    }
+};
+
+exports.updateSessionTitle = async (req, res) => {
+    const { userId, chatSessionId, title } = req.body || {};
+
+    if (!userId || Number(userId) <= 0) {
+        return res.status(400).json({
+            success: false,
+            data: null,
+            message: 'userId is required and must be a positive number'
+        });
+    }
+
+    if (!chatSessionId || Number(chatSessionId) <= 0) {
+        return res.status(400).json({
+            success: false,
+            data: null,
+            message: 'chatSessionId is required and must be a positive number'
+        });
+    }
+
+    if (!title || !String(title).trim()) {
+        return res.status(400).json({
+            success: false,
+            data: null,
+            message: 'title is required'
+        });
+    }
+
+    try {
+        const result = await aiChatModel.updateSessionTitle({
+            userId: Number(userId),
+            chatSessionId: Number(chatSessionId),
+            title: String(title)
+        });
+
+        if (!result.success) {
+            return res.status(404).json(result);
+        }
+
+        return res.status(200).json(result);
+    } catch (error) {
+        console.error('Error in updateSessionTitle:', error);
+        return res.status(500).json({
+            success: false,
+            data: null,
+            message: `Failed to update session title: ${error.message}`
         });
     }
 };

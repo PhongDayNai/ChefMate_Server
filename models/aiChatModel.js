@@ -512,34 +512,124 @@ exports.createSession = async ({ userId, title, activeRecipeId = null }) => {
     };
 };
 
-exports.getSessionsByUser = async ({ userId, limit = 50 }) => {
+exports.getSessionsByUser = async ({ userId, page = 1, limit = 50 }) => {
     const parsedUserId = Number(userId);
     if (!parsedUserId || parsedUserId <= 0) {
         throw new Error('userId must be a positive number');
     }
 
+    const parsedPage = Math.max(Number(page) || 1, 1);
     const parsedLimit = Math.min(Math.max(Number(limit) || 50, 1), 200);
+    const offset = (parsedPage - 1) * parsedLimit;
+
+    const [[countRow]] = await pool.query(
+        'SELECT COUNT(*) AS total FROM ChatSessions WHERE userId = ?',
+        [parsedUserId]
+    );
 
     const [rows] = await pool.query(
         `SELECT chatSessionId, userId, title, activeRecipeId, createdAt, updatedAt
          FROM ChatSessions
          WHERE userId = ?
          ORDER BY updatedAt DESC
-         LIMIT ?`,
-        [parsedUserId, parsedLimit]
+         LIMIT ? OFFSET ?`,
+        [parsedUserId, parsedLimit, offset]
     );
+
+    const total = Number(countRow.total || 0);
+    const totalPages = Math.max(Math.ceil(total / parsedLimit), 1);
 
     return {
         success: true,
-        data: rows.map(r => ({
-            chatSessionId: Number(r.chatSessionId),
-            userId: Number(r.userId),
-            title: r.title,
-            activeRecipeId: r.activeRecipeId ? Number(r.activeRecipeId) : null,
-            createdAt: r.createdAt,
-            updatedAt: r.updatedAt
-        })),
+        data: {
+            items: rows.map(r => ({
+                chatSessionId: Number(r.chatSessionId),
+                userId: Number(r.userId),
+                title: r.title,
+                activeRecipeId: r.activeRecipeId ? Number(r.activeRecipeId) : null,
+                createdAt: r.createdAt,
+                updatedAt: r.updatedAt
+            })),
+            pagination: {
+                page: parsedPage,
+                limit: parsedLimit,
+                total,
+                totalPages
+            }
+        },
         message: 'Get chat sessions successfully'
+    };
+};
+
+exports.deleteSession = async ({ userId, chatSessionId }) => {
+    const parsedUserId = Number(userId);
+    const parsedSessionId = Number(chatSessionId);
+
+    if (!parsedUserId || parsedUserId <= 0) {
+        throw new Error('userId must be a positive number');
+    }
+
+    if (!parsedSessionId || parsedSessionId <= 0) {
+        throw new Error('chatSessionId must be a positive number');
+    }
+
+    const [result] = await pool.query(
+        'DELETE FROM ChatSessions WHERE chatSessionId = ? AND userId = ?',
+        [parsedSessionId, parsedUserId]
+    );
+
+    if (!result.affectedRows) {
+        return {
+            success: false,
+            data: null,
+            message: 'Chat session not found'
+        };
+    }
+
+    return {
+        success: true,
+        data: { chatSessionId: parsedSessionId },
+        message: 'Delete chat session successfully'
+    };
+};
+
+exports.updateSessionTitle = async ({ userId, chatSessionId, title }) => {
+    const parsedUserId = Number(userId);
+    const parsedSessionId = Number(chatSessionId);
+
+    if (!parsedUserId || parsedUserId <= 0) {
+        throw new Error('userId must be a positive number');
+    }
+
+    if (!parsedSessionId || parsedSessionId <= 0) {
+        throw new Error('chatSessionId must be a positive number');
+    }
+
+    if (!title || !String(title).trim()) {
+        throw new Error('title is required');
+    }
+
+    const [result] = await pool.query(
+        `UPDATE ChatSessions
+         SET title = ?, updatedAt = CURRENT_TIMESTAMP
+         WHERE chatSessionId = ? AND userId = ?`,
+        [String(title).trim(), parsedSessionId, parsedUserId]
+    );
+
+    if (!result.affectedRows) {
+        return {
+            success: false,
+            data: null,
+            message: 'Chat session not found'
+        };
+    }
+
+    const updated = await getChatSessionById(parsedSessionId, parsedUserId);
+
+    return {
+        success: true,
+        data: updated,
+        message: 'Update chat session title successfully'
     };
 };
 
