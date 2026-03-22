@@ -425,16 +425,45 @@ exports.getTrendingFeed = async ({ userId = null, page = 1, limit = 20, period =
 
 exports.getTopTrending = async (userId = null) => {
     try {
-        const result = await exports.getTrendingFeed({
-            userId,
-            page: 1,
-            limit: 30,
-            period: 'all'
-        });
+        const [topRows] = await pool.query(
+            `SELECT 
+                r.recipeId, 
+                r.recipeName, 
+                r.image, 
+                r.cookingTime, 
+                r.ration, 
+                r.viewCount, 
+                r.likeQuantity,
+                r.userId,
+                r.createdAt,
+                u.fullName AS userName
+             FROM Recipes r
+             JOIN Users u ON r.userId = u.userId
+             ORDER BY r.viewCount DESC
+             LIMIT 30`
+        );
+
+        const recipeIds = topRows.map(r => Number(r.recipeId));
+        if (recipeIds.length === 0) {
+            return { success: true, data: [], message: 'No trending recipes found' };
+        }
+
+        const related = await fetchRecipeRelatedData(recipeIds, userId);
+
+        const recipes = topRows.map(recipe =>
+            mapRecipePayload(
+                recipe,
+                related.cookingStepsRows,
+                related.ingredientsRows,
+                related.commentsRows,
+                related.tagsRows,
+                related.likedRecipes
+            )
+        );
 
         return {
             success: true,
-            data: result.data.items,
+            data: recipes,
             message: 'Get top trending successfully'
         };
     } catch (error) {
