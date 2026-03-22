@@ -1,19 +1,24 @@
 # ChefMate Server API Client Guide (Cũ + Mới)
 
-> Tài liệu này dành cho phía client (mobile/web) để tích hợp toàn bộ API hiện có.
+> Tài liệu cho phía client (mobile/web) tích hợp toàn bộ API hiện có, gồm legacy + Pantry + AI Chat + User Diet Notes.
 
 ## 1) Tổng quan
 
 - **Base URL local (docker):** `http://127.0.0.1:8000`
 - **Tiền tố API:** `/api`
 - **Content-Type:** `application/json` (trừ upload ảnh dùng `multipart/form-data`)
-- **Auth:** hiện tại **chưa có JWT token middleware** ở server (client tự quản lý `userId` theo phiên đăng nhập)
+- **Auth:** hiện tại **chưa có JWT middleware** (client tự quản lý `userId` theo phiên đăng nhập)
+
+### AI backend mặc định
+- `AI_CHAT_API_URL` hiện dùng: `https://your-ai-api-url.com`
+- `AI_CHAT_MODEL` mặc định: `gemma3:4b`
+- `AI_CHAT_TIMEOUT_MS` mặc định: `20000` (khuyến nghị nâng 30000-45000 nếu mạng không ổn định)
 
 ---
 
 ## 2) Chuẩn response
 
-Phần lớn endpoint trả theo format:
+Phần lớn endpoint trả dạng:
 
 ```json
 {
@@ -23,7 +28,7 @@ Phần lớn endpoint trả theo format:
 }
 ```
 
-Một số endpoint cũ có thể trả khác format (`{ error: "..." }`).
+Một số endpoint cũ có thể trả khác format (`{ "error": "..." }`).
 
 ---
 
@@ -37,7 +42,6 @@ Lấy toàn bộ user.
 ### `POST /api/users/register`
 Tạo tài khoản.
 
-Body:
 ```json
 {
   "fullName": "Nguyen Van A",
@@ -50,7 +54,6 @@ Body:
 ### `POST /api/users/login`
 Đăng nhập bằng email hoặc phone.
 
-Body:
 ```json
 {
   "identifier": "0912345678",
@@ -59,19 +62,15 @@ Body:
 ```
 
 ### `POST /api/users/forgot-password`
-Reset password theo phone (server hiện reset về mặc định nội bộ).
+Reset password theo phone.
 
-Body:
 ```json
-{
-  "phone": "0912345678"
-}
+{ "phone": "0912345678" }
 ```
 
 ### `POST /api/users/change-password`
 Đổi mật khẩu.
 
-Body:
 ```json
 {
   "phone": "0912345678",
@@ -81,21 +80,17 @@ Body:
 ```
 
 ### `GET /api/users/recipes-view-history`
-Lấy lịch sử xem công thức của user.
+Lấy lịch sử xem công thức.
 
-> Lưu ý: controller đọc từ `req.body.userId` dù route là GET.
+> Lưu ý legacy: controller đọc `userId` từ body dù là GET.
 
-Body:
 ```json
-{
-  "userId": 1
-}
+{ "userId": 1 }
 ```
 
 ### `POST /api/users/update-user-information`
 Cập nhật profile user.
 
-Body:
 ```json
 {
   "userId": 1,
@@ -113,7 +108,7 @@ Body:
 Lấy tất cả công thức.
 
 ### `POST /api/recipes/create` (multipart)
-Tạo công thức mới + upload ảnh.
+Tạo công thức + upload ảnh.
 
 Form-data:
 - `image`: file ảnh
@@ -134,51 +129,29 @@ Ví dụ `ingredients`:
 ```
 
 ### `POST /api/recipes/search`
-Tìm công thức theo tên.
-
-Body:
 ```json
-{
-  "recipeName": "phở",
-  "userId": 1
-}
+{ "recipeName": "phở", "userId": 1 }
 ```
 
 ### `GET /api/recipes/ingredients`
 Lấy danh sách nguyên liệu.
 
 ### `POST /api/recipes/top-trending`
-Lấy top công thức trending.
-
-Body:
 ```json
-{
-  "userId": 1
-}
+{ "userId": 1 }
 ```
 
 ### `GET /api/recipes/tags`
 Lấy toàn bộ tag.
 
 ### `POST /api/recipes/search-by-tag`
-Tìm theo tag.
-
-Body:
 ```json
-{
-  "tagName": "Việt Nam",
-  "userId": 1
-}
+{ "tagName": "Việt Nam", "userId": 1 }
 ```
 
 ### `POST /api/recipes/user-recipes`
-Lấy công thức theo user.
-
-Body:
 ```json
-{
-  "userId": 1
-}
+{ "userId": 1 }
 ```
 
 ### `GET /api/recipes/growth-report`
@@ -189,64 +162,40 @@ Báo cáo tăng trưởng công thức theo tháng.
 ## 3.3 Interactions - `/api/interactions`
 
 ### `POST /api/interactions/like`
-Like/unlike công thức.
-
-Body:
 ```json
-{
-  "userId": 1,
-  "recipeId": 100
-}
+{ "userId": 1, "recipeId": 100 }
 ```
 
 ### `POST /api/interactions/comment`
-Thêm bình luận.
-
-Body:
 ```json
-{
-  "userId": 1,
-  "recipeId": 100,
-  "content": "Món này ngon"
-}
+{ "userId": 1, "recipeId": 100, "content": "Món này ngon" }
 ```
 
 ### `POST /api/interactions/increase-view-count`
-Tăng lượt xem.
-
-Body:
 ```json
-{
-  "recipeId": 100
-}
+{ "recipeId": 100 }
 ```
 
 ### `GET /api/interactions/comments`
 Lấy toàn bộ bình luận.
 
 ### `DELETE /api/interactions/comment`
-Xóa bình luận.
-
-Body:
 ```json
-{
-  "commentId": 12
-}
+{ "commentId": 12 }
 ```
 
 ---
 
-## 4) API mới (Pantry + AI Chat)
+## 4) API mới
 
-## 4.1 Pantry - `/api/pantry`
+## 4.1 Pantry (Tủ lạnh) - `/api/pantry`
 
 ### `GET /api/pantry?userId={id}`
-Lấy toàn bộ nguyên liệu trong tủ lạnh theo user.
+Lấy nguyên liệu tủ lạnh theo user.
 
 ### `POST /api/pantry/upsert`
-Thêm mới/cập nhật nguyên liệu tủ lạnh (theo `userId + ingredient + unit`).
+Thêm/cập nhật item tủ lạnh (key logic: `userId + ingredient + unit`).
 
-Body:
 ```json
 {
   "userId": 1,
@@ -258,24 +207,54 @@ Body:
 ```
 
 ### `DELETE /api/pantry/delete`
-Xóa item trong tủ lạnh.
-
-Body:
 ```json
-{
-  "userId": 1,
-  "pantryItemId": 10
-}
+{ "userId": 1, "pantryItemId": 10 }
 ```
 
 ---
 
-## 4.2 AI Chat - `/api/ai-chat`
+## 4.2 User Diet Notes (Dị ứng / Hạn chế / Ghi chú sức khỏe) - `/api/user-diet-notes`
+
+> Dùng để lưu note ăn uống cá nhân theo từng user: dị ứng, đang kiêng, preference, health note.
+
+### `GET /api/user-diet-notes?userId={id}`
+Lấy toàn bộ notes của user.
+
+### `POST /api/user-diet-notes/upsert`
+Tạo mới hoặc cập nhật note.
+
+```json
+{
+  "userId": 1,
+  "noteType": "allergy",
+  "label": "Hải sản",
+  "keywords": ["shrimp", "prawn", "fish", "salmon", "tôm", "cá", "mực"],
+  "instruction": "Không dùng nguyên liệu hải sản",
+  "isActive": true,
+  "startAt": null,
+  "endAt": null
+}
+```
+
+- `noteType` hợp lệ: `allergy | restriction | preference | health_note`
+- `keywords` là mảng từ khóa để lọc recipe/recommend.
+
+### `DELETE /api/user-diet-notes/delete`
+```json
+{ "userId": 1, "noteId": 3 }
+```
+
+### Diet notes đang ảnh hưởng gì?
+- Được inject vào context chat AI mỗi lượt.
+- `recommendations-from-pantry` sẽ lọc bỏ món vi phạm note `allergy`/`restriction`.
+
+---
+
+## 4.3 AI Chat - `/api/ai-chat`
 
 ### `POST /api/ai-chat/sessions`
 Tạo phiên chat.
 
-Body:
 ```json
 {
   "userId": 1,
@@ -285,12 +264,11 @@ Body:
 ```
 
 ### `GET /api/ai-chat/sessions/:sessionId?userId={id}`
-Lấy lịch sử chat của phiên.
+Lấy lịch sử chat.
 
 ### `PATCH /api/ai-chat/sessions/active-recipe`
-Đổi món đang nấu trong phiên chat.
+Đổi món đang nấu trong session.
 
-Body:
 ```json
 {
   "userId": 1,
@@ -299,25 +277,22 @@ Body:
 }
 ```
 
-Đặt `recipeId = null` để bỏ món đang chọn.
+Đặt `recipeId = null` để bỏ món hiện tại.
 
 ### `POST /api/ai-chat/recommendations-from-pantry`
 Gợi ý món theo tủ lạnh.
 
-Body:
 ```json
-{
-  "userId": 1,
-  "limit": 10
-}
+{ "userId": 1, "limit": 10 }
 ```
 
-**Logic trả kết quả:**
-1. Ưu tiên món `ready_to_cook` (Đủ để nấu ngay)
-2. Nếu chưa đủ limit thì thêm `almost_ready` (Còn thiếu 1 chút)
-3. Có index tuần tự từ 1..N
+Logic:
+1. Ưu tiên `ready_to_cook`
+2. Nếu chưa đủ limit thì thêm `almost_ready`
+3. Có `index` tuần tự từ 1..N
+4. Tự loại món vi phạm `allergy/restriction` nếu có note đang hiệu lực
 
-Response (rút gọn):
+Response rút gọn:
 ```json
 {
   "success": true,
@@ -331,16 +306,6 @@ Response (rút gọn):
         "recipeName": "Phở bò",
         "completionRate": 100,
         "missing": []
-      },
-      {
-        "index": 2,
-        "recommendationType": "almost_ready",
-        "recipeId": 101,
-        "recipeName": "Bún bò",
-        "completionRate": 92,
-        "missing": [
-          {"ingredientName":"Hành lá","need":20,"have":0,"unit":"g","isMain":false,"isCommon":true}
-        ]
       }
     ],
     "readyToCook": [],
@@ -350,22 +315,23 @@ Response (rút gọn):
 ```
 
 ### `POST /api/ai-chat/messages`
-Gửi tin nhắn đến AI (có lưu history).
+Gửi message chat AI (có lưu history).
 
-Body:
 ```json
 {
   "userId": 1,
   "chatSessionId": 3,
   "message": "Hãy đề xuất món phù hợp nguyên liệu hiện có",
   "model": "gemma3:4b",
-  "stream": false,
+  "stream": true,
   "activeRecipeId": 120
 }
 ```
 
-- Nếu `chatSessionId` không gửi -> server tự tạo session mới.
-- Nếu AI server lỗi -> trả `503` + `code = AI_SERVER_BUSY`.
+Ghi chú:
+- Nếu thiếu `chatSessionId` -> server tự tạo session.
+- Nếu `stream=true`: server gọi AI dạng stream, **gom chunk** và trả về một `assistantMessage` hoàn chỉnh cho client.
+- Nếu AI lỗi/bận: trả `503` + `code=AI_SERVER_BUSY`.
 
 Ví dụ lỗi AI bận:
 ```json
@@ -381,24 +347,25 @@ Ví dụ lỗi AI bận:
 
 ---
 
-## 5) Gợi ý tích hợp cho client
+## 5) Luồng tích hợp khuyến nghị cho client
 
-## 5.1 Luồng đề xuất món theo tủ lạnh
+### 5.1 Luồng cơ bản AI nấu ăn
 1. `GET /api/pantry?userId=...`
-2. `POST /api/ai-chat/recommendations-from-pantry`
-3. Render `data.recommendations` theo `index` + badge `recommendationType`
-4. User chọn món -> `PATCH /api/ai-chat/sessions/active-recipe`
-5. Chat tiếp bằng `POST /api/ai-chat/messages`
+2. (Tuỳ chọn) setup note dị ứng/hạn chế: `POST /api/user-diet-notes/upsert`
+3. `POST /api/ai-chat/recommendations-from-pantry`
+4. Render `data.recommendations` theo `index` + badge type
+5. User chọn món -> `PATCH /api/ai-chat/sessions/active-recipe`
+6. Chat tiếp -> `POST /api/ai-chat/messages`
 
-## 5.2 Mapping type hiển thị
+### 5.2 Mapping type cho UI
 - `ready_to_cook` -> **Đủ để nấu ngay**
 - `almost_ready` -> **Còn thiếu 1 chút**
 
-## 5.3 Retry cho AI bận
+### 5.3 Retry khi AI bận
 Khi nhận `503 + AI_SERVER_BUSY`:
-- hiển thị message fallback
-- bật nút “Thử lại” sau 3–5 giây
-- nên retry tối đa 2–3 lần
+- Hiển thị fallback message
+- Nút “Thử lại” sau 3–5s
+- Retry tối đa 2–3 lần
 
 ---
 
@@ -433,6 +400,10 @@ GET    /api/pantry
 POST   /api/pantry/upsert
 DELETE /api/pantry/delete
 
+GET    /api/user-diet-notes
+POST   /api/user-diet-notes/upsert
+DELETE /api/user-diet-notes/delete
+
 POST   /api/ai-chat/sessions
 GET    /api/ai-chat/sessions/:sessionId
 PATCH  /api/ai-chat/sessions/active-recipe
@@ -444,12 +415,9 @@ POST   /api/ai-chat/messages
 
 ## 7) Ghi chú kỹ thuật
 
-- Biến môi trường AI:
-  - `AI_CHAT_API_URL`
-  - `AI_CHAT_MODEL`
-  - `AI_CHAT_TIMEOUT_MS`
-- Nếu cần đổi số món mặc định recommend: chỉnh 1 chỗ ở `DEFAULT_RECOMMENDATION_LIMIT` trong `models/aiChatModel.js`.
+- Đổi số món mặc định recommend: chỉnh 1 chỗ `DEFAULT_RECOMMENDATION_LIMIT` trong `models/aiChatModel.js`.
+- DB đang lưu persistent qua docker volume `mysql_data`.
 
 ---
 
-Nếu cần, có thể tách thêm 1 file **OpenAPI/Swagger** để client generate SDK tự động (TypeScript/Kotlin) từ schema API.
+Nếu cần, bước tiếp theo có thể xuất thêm **OpenAPI/Swagger** để FE generate SDK (TS/Kotlin) tự động.
