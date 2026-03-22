@@ -18,76 +18,108 @@ function toTitleCase(str = '') {
         .join(' ');
 }
 
-function detectUnitAndWeight(measureRaw = '') {
-    const s = normalizeSpaces(measureRaw).toLowerCase();
+function parseMixedFraction(s = '') {
+    const normalized = s.trim();
 
-    const numberMatch = s.match(/\d+(?:[\.,]\d+)?/);
-    const fractionMatch = s.match(/(\d+)\s*\/\s*(\d+)/);
+    const mixedMatch = normalized.match(/(\d+)\s+(\d+)\/(\d+)/);
+    if (mixedMatch) {
+        const whole = Number(mixedMatch[1]);
+        const num = Number(mixedMatch[2]);
+        const den = Number(mixedMatch[3]);
+        if (den !== 0) return whole + num / den;
+    }
 
-    let weight = 1;
-
+    const fractionMatch = normalized.match(/(\d+)\/(\d+)/);
     if (fractionMatch) {
         const num = Number(fractionMatch[1]);
         const den = Number(fractionMatch[2]);
-        if (den !== 0) weight = num / den;
-    } else if (numberMatch) {
-        weight = Number(numberMatch[0].replace(',', '.'));
-        if (!Number.isFinite(weight)) weight = 1;
+        if (den !== 0) return num / den;
     }
 
-    let unit = 'portion';
+    const numberMatch = normalized.match(/\d+(?:[\.,]\d+)?/);
+    if (numberMatch) {
+        const n = Number(numberMatch[0].replace(',', '.'));
+        if (Number.isFinite(n)) return n;
+    }
+
+    return 1;
+}
+
+function detectUnitAndWeight(measureRaw = '') {
+    const s = normalizeSpaces(measureRaw).toLowerCase();
+
+    let weight = parseMixedFraction(s);
+    let unit = 'piece';
 
     const map = [
-        [/\bkg\b|kilogram/, 'kg'],
-        [/\bg\b|gram/, 'g'],
-        [/\bml\b/, 'ml'],
-        [/\bl\b|litre|liter/, 'l'],
-        [/tablespoon|tbsp|tbs/, 'tbsp'],
-        [/teaspoon|tsp/, 'tsp'],
-        [/cup/, 'cup'],
-        [/clove/, 'clove'],
-        [/slice/, 'slice'],
-        [/bunch/, 'bunch'],
-        [/pinch/, 'pinch'],
-        [/pack|packet/, 'pack'],
-        [/piece|small|large|medium|head/, 'piece']
+        [/\bkg\b|kilogram/, { unit: 'g', factor: 1000 }],
+        [/\bg\b|gram/, { unit: 'g', factor: 1 }],
+        [/\bml\b/, { unit: 'ml', factor: 1 }],
+        [/\bl\b|litre|liter/, { unit: 'ml', factor: 1000 }],
+        [/tablespoon|tbsp|tbs/, { unit: 'tbsp', factor: 1 }],
+        [/teaspoon|tsp/, { unit: 'tsp', factor: 1 }],
+        [/cup/, { unit: 'cup', factor: 1 }],
+        [/clove/, { unit: 'clove', factor: 1 }],
+        [/slice/, { unit: 'slice', factor: 1 }],
+        [/bunch/, { unit: 'bunch', factor: 1 }],
+        [/pinch/, { unit: 'pinch', factor: 1 }],
+        [/pack|packet/, { unit: 'pack', factor: 1 }],
+        [/oz\b/, { unit: 'g', factor: 28.35 }],
+        [/lb\b|pound/, { unit: 'g', factor: 453.59 }],
+        [/juice|zest|to serve|garnish|handful|sprig|dash/, { unit: 'to taste', factor: 1 }],
+        [/piece|small|large|medium|head/, { unit: 'piece', factor: 1 }]
     ];
 
-    for (const [regex, u] of map) {
+    for (const [regex, rule] of map) {
         if (regex.test(s)) {
-            unit = u;
+            unit = rule.unit;
+            weight = Number((weight * rule.factor).toFixed(2));
             break;
         }
     }
 
-    if (!numberMatch && !fractionMatch) {
-        if (/to serve|garnish|handful|sprig|dash/.test(s)) {
-            weight = 1;
-            unit = 'to taste';
-        }
+    if (!Number.isFinite(weight) || weight <= 0) {
+        weight = 1;
     }
 
     return { weight, unit };
 }
 
-function isMainIngredient(nameRaw = '') {
+function isMainIngredient(nameRaw = '', categoryRaw = '') {
     const name = normalizeSpaces(nameRaw).toLowerCase();
+    const category = normalizeSpaces(categoryRaw).toLowerCase();
 
-    const mainKeywords = [
-        'beef', 'pork', 'chicken', 'salmon', 'prawn', 'shrimp', 'fish', 'tofu', 'trout', 'lamb',
-        'rice noodles', 'noodles', 'rice', 'egg', 'cabbage', 'broccoli', 'potato', 'pumpkin', 'tempeh'
+    const proteinKeywords = [
+        'beef', 'pork', 'chicken', 'salmon', 'prawn', 'shrimp', 'fish', 'trout', 'lamb', 'turkey', 'tofu', 'tempeh'
+    ];
+    const stapleKeywords = [
+        'rice noodles', 'noodles', 'rice', 'pasta', 'potato', 'egg', 'cabbage', 'broccoli', 'pumpkin'
     ];
 
-    return mainKeywords.some(k => name.includes(k));
+    const categoryHints = {
+        beef: ['beef', 'steak', 'minced beef'],
+        pork: ['pork', 'ham', 'bacon'],
+        chicken: ['chicken'],
+        seafood: ['prawn', 'shrimp', 'salmon', 'fish', 'trout', 'sea bass', 'squid'],
+        vegetarian: ['tofu', 'tempeh', 'eggplant', 'broccoli', 'cabbage', 'mushroom'],
+        vegan: ['tofu', 'tempeh', 'eggplant', 'broccoli', 'cabbage', 'mushroom']
+    };
+
+    const byCategory = Object.entries(categoryHints).some(([k, arr]) => {
+        if (!category.includes(k)) return false;
+        return arr.some(item => name.includes(item));
+    });
+
+    return byCategory || proteinKeywords.some(k => name.includes(k)) || stapleKeywords.some(k => name.includes(k));
 }
 
 function isCommonIngredient(nameRaw = '') {
     const name = normalizeSpaces(nameRaw).toLowerCase();
 
     const commonKeywords = [
-        'salt', 'sugar', 'pepper', 'soy sauce', 'fish sauce', 'oil', 'garlic', 'ginger',
+        'salt', 'sugar', 'pepper', 'soy sauce', 'fish sauce', 'oyster sauce', 'oil', 'garlic', 'ginger',
         'chilli', 'chili', 'onion', 'spring onions', 'scallions', 'vinegar', 'lime', 'lemon',
-        'sesame', 'honey', 'coriander', 'mint', 'basil', 'water'
+        'sesame', 'honey', 'coriander', 'mint', 'basil', 'water', 'stock', 'broth', 'sauce', 'paste'
     ];
 
     return commonKeywords.some(k => name.includes(k));
@@ -238,7 +270,7 @@ async function upsertRecipe(conn, recipe) {
                 ingredientId,
                 weight,
                 unit,
-                isMainIngredient(ingredientName) ? 1 : 0,
+                isMainIngredient(ingredientName, category) ? 1 : 0,
                 isCommonIngredient(ingredientName) ? 1 : 0
             ]
         );

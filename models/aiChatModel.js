@@ -112,12 +112,17 @@ async function getPantryMapByUser(userId) {
         [parsedUserId]
     );
 
-    const map = new Map();
+    const exactMap = new Map();
+    const nameMap = new Map();
 
     for (const row of rows) {
-        const key = `${normalizeIngredientName(row.ingredientName)}|${String(row.unit || '').trim().toLowerCase()}`;
-        const oldVal = map.get(key) || 0;
-        map.set(key, oldVal + Number(row.quantity || 0));
+        const normalizedName = normalizeIngredientName(row.ingredientName);
+        const normalizedUnit = String(row.unit || '').trim().toLowerCase();
+        const key = `${normalizedName}|${normalizedUnit}`;
+        const qty = Number(row.quantity || 0);
+
+        exactMap.set(key, (exactMap.get(key) || 0) + qty);
+        nameMap.set(normalizedName, (nameMap.get(normalizedName) || 0) + qty);
     }
 
     return {
@@ -126,7 +131,8 @@ async function getPantryMapByUser(userId) {
             quantity: Number(r.quantity),
             unit: r.unit
         })),
-        map
+        exactMap,
+        nameMap
     };
 }
 
@@ -215,7 +221,7 @@ async function getRecipeRecommendationsFromPantry({ userId, limit = 10 }) {
         throw new Error('userId must be a positive number');
     }
 
-    const { map: pantryMap } = await getPantryMapByUser(parsedUserId);
+    const { exactMap: pantryExactMap, nameMap: pantryNameMap } = await getPantryMapByUser(parsedUserId);
 
     const [recipeRows] = await pool.query(
         `SELECT recipeId, recipeName, image, cookingTime, ration, likeQuantity, viewCount
@@ -259,8 +265,11 @@ async function getRecipeRecommendationsFromPantry({ userId, limit = 10 }) {
 
         for (const ing of ingredients) {
             const unit = String(ing.unit || '').trim().toLowerCase();
-            const key = `${normalizeIngredientName(ing.ingredientName)}|${unit}`;
-            const current = pantryMap.get(key) || 0;
+            const normalizedName = normalizeIngredientName(ing.ingredientName);
+            const key = `${normalizedName}|${unit}`;
+            const currentExact = pantryExactMap.get(key) || 0;
+            const currentByName = pantryNameMap.get(normalizedName) || 0;
+            const current = Math.max(currentExact, currentByName);
             const required = Number(ing.weight || 0);
             const tolerance = required * 0.1;
 
