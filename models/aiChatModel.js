@@ -39,112 +39,253 @@ function stripVietnameseDiacritics(text = '') {
         .replace(/Đ/g, 'D');
 }
 
+const INGREDIENT_PHRASE_NORMALIZERS = [
+    // thịt heo + bộ phận
+    [/\b(thit\s+lon|thit\s+heo|pork|pig\s*meat|swine)\b/g, 'thit heo'],
+    [/\b(ba\s*chi|ba\s*roi|ba\s*r\s*i|belly|pork\s*belly)\b/g, 'ba chi'],
+    [/\b(suon\s*non|suon\s*s\s*n|suon\s*heo|pork\s*rib|spare\s*ribs?)\b/g, 'suon heo'],
+    [/\b(chan\s*gio|gio\s*heo|gio\s*lon|mong\s*gio|heo\s*trotter|pork\s*hock)\b/g, 'chan gio heo'],
+    [/\b(thit\s*nac|nac\s*dam|nac\s*vai|ham)\b/g, 'nac heo'],
+
+    // thịt bò/gà/vịt/dê/cừu/trâu
+    [/\b(beef|veal|thit\s*bo)\b/g, 'thit bo'],
+    [/\b(chicken|hen|thit\s*ga)\b/g, 'thit ga'],
+    [/\b(duck|thit\s*vit)\b/g, 'thit vit'],
+    [/\b(goat|mutton|thit\s*de)\b/g, 'thit de'],
+    [/\b(lamb|thit\s*cuu)\b/g, 'thit cuu'],
+    [/\b(buffalo|thit\s*trau)\b/g, 'thit trau'],
+
+    // cá/hải sản
+    [/\b(fish\s*sauce)\b/g, 'nuoc mam'],
+    [/\b(shrimp|prawn|tom\s*su|tom\s*the|tom\s*dat)\b/g, 'tom'],
+    [/\b(crab|cua\s*bien|cua\s*dong)\b/g, 'cua'],
+    [/\b(squid|calamari|muc\s*ong|muc\s*la)\b/g, 'muc'],
+    [/\b(octopus|bach\s*tuoc)\b/g, 'bach tuoc'],
+    [/\b(clam|ngheu|ngao)\b/g, 'ngheu'],
+    [/\b(oyster|hau)\b/g, 'hau'],
+    [/\b(salmon)\b/g, 'ca hoi'],
+    [/\b(tuna)\b/g, 'ca ngu'],
+    [/\b(mackerel)\b/g, 'ca thu'],
+
+    // rau củ quả / gia vị
+    [/\b(scallion|green\s*onion|spring\s*onion|hanh\s*la)\b/g, 'hanh la'],
+    [/\b(shallot|hanh\s*tim|hanh\s*cu)\b/g, 'hanh tim'],
+    [/\b(onion|hanh\s*tay)\b/g, 'hanh tay'],
+    [/\b(garlic|toi)\b/g, 'toi'],
+    [/\b(ginger|gung)\b/g, 'gung'],
+    [/\b(chili|chilli|ot\s*hiem|ot\s*chi\s*thien)\b/g, 'ot'],
+    [/\b(pepper|tieu)\b/g, 'tieu'],
+    [/\b(coriander|cilantro|ngo\s*ri|rau\s*mui)\b/g, 'ngo ri'],
+    [/\b(lemongrass|sa\s*re)\b/g, 'sa re'],
+    [/\b(kafir\s*lime\s*leaf|la\s*chanh)\b/g, 'la chanh'],
+    [/\b(turmeric|nghe)\b/g, 'nghe'],
+    [/\b(galangal|rieng)\b/g, 'rieng'],
+
+    [/\b(potato|khoai\s*tay)\b/g, 'khoai tay'],
+    [/\b(sweet\s*potato|khoai\s*lang)\b/g, 'khoai lang'],
+    [/\b(taro|khoai\s*mon|khoai\s*so)\b/g, 'khoai mon'],
+    [/\b(cassava|s\s*n|khoai\s*mi)\b/g, 'san'],
+    [/\b(tomato|ca\s*chua)\b/g, 'ca chua'],
+    [/\b(cucumber|dua\s*leo|dua\s*chuot)\b/g, 'dua leo'],
+    [/\b(eggplant|aubergine|ca\s*tim)\b/g, 'ca tim'],
+    [/\b(pumpkin|bi\s*do)\b/g, 'bi do'],
+    [/\b(gourd|bi\s*xanh|bi\s*dao)\b/g, 'bi xanh'],
+    [/\b(chayote|su\s*su)\b/g, 'su su'],
+    [/\b(carrot|ca\s*rot)\b/g, 'ca rot'],
+    [/\b(cabbage|bap\s*cai)\b/g, 'bap cai'],
+    [/\b(cauliflower|sup\s*lo\s*trang|bong\s*cai\s*trang)\b/g, 'sup lo trang'],
+    [/\b(broccoli|sup\s*lo\s*xanh|bong\s*cai\s*xanh)\b/g, 'sup lo xanh'],
+    [/\b(water\s*spinach|rau\s*muong)\b/g, 'rau muong'],
+    [/\b(spinach|rau\s*bo\s*xo?i?)\b/g, 'rau bo xoi'],
+    [/\b(kale)\b/g, 'cai kale'],
+    [/\b(mushroom|nam)\b/g, 'nam'],
+
+    // đậu, hạt, tinh bột
+    [/\b(egg|trung\s*ga|trung\s*vit)\b/g, 'trung'],
+    [/\b(tofu|bean\s*curd|dau\s*hu)\b/g, 'dau hu'],
+    [/\b(soy\s*bean|dau\s*nanh)\b/g, 'dau nanh'],
+    [/\b(green\s*bean|mung\s*bean|dau\s*xanh)\b/g, 'dau xanh'],
+    [/\b(red\s*bean|adzuki|dau\s*do)\b/g, 'dau do'],
+    [/\b(peanut|groundnut|lac|dau\s*phong)\b/g, 'dau phong'],
+    [/\b(sesame|me\s*trang|vung)\b/g, 'me'],
+
+    // chất lỏng / sốt / gia vị cơ bản
+    [/\b(soy\s*sauce|x\s*i\s*dau|xidau|nuoc\s*tuong)\b/g, 'nuoc tuong'],
+    [/\b(oyster\s*sauce|dau\s*hao)\b/g, 'dau hao'],
+    [/\b(cooking\s*oil|vegetable\s*oil|dau\s*an)\b/g, 'dau an'],
+    [/\b(olive\s*oil|dau\s*oliu)\b/g, 'dau oliu'],
+    [/\b(vinegar|giam)\b/g, 'giam'],
+    [/\b(sugar|duong)\b/g, 'duong'],
+    [/\b(salt|muoi)\b/g, 'muoi'],
+    [/\b(msg|bot\s*ngot)\b/g, 'bot ngot'],
+    [/\b(seasoning\s*powder|hat\s*nem)\b/g, 'hat nem'],
+    [/\b(broth|stock|nuoc\s*dung)\b/g, 'nuoc dung']
+];
+
 const INGREDIENT_TOKEN_SYNONYMS = new Map([
-    // động vật / protein
-    ['lon', 'heo'], ['pork', 'heo'], ['pig', 'heo'], ['swine', 'heo'],
+    ['lon', 'heo'], ['pig', 'heo'], ['pork', 'heo'], ['swine', 'heo'],
     ['beef', 'bo'], ['veal', 'bo'],
     ['chicken', 'ga'], ['hen', 'ga'],
     ['duck', 'vit'],
-    ['shrimp', 'tom'], ['prawn', 'tom'],
+    ['goat', 'de'], ['mutton', 'de'],
+    ['lamb', 'cuu'],
+    ['buffalo', 'trau'],
+    ['shrimp', 'tom'], ['prawn', 'tom'], ['tep', 'tom'],
     ['crab', 'cua'],
     ['squid', 'muc'], ['calamari', 'muc'],
+    ['octopus', 'bachtuoc'],
     ['fish', 'ca'],
 
-    // rau củ / gia vị
-    ['scallion', 'hanhla'], ['green', 'xanh'], ['onion', 'hanh'],
+    ['scallion', 'hanhla'], ['spring', 'hanhla'],
     ['shallot', 'hanhtim'],
+    ['onion', 'hanhtay'],
     ['garlic', 'toi'],
     ['ginger', 'gung'],
-    ['chilli', 'ot'], ['chili', 'ot'], ['pepper', 'tieu'],
+    ['chili', 'ot'], ['chilli', 'ot'],
+    ['pepper', 'tieu'],
     ['coriander', 'ngori'], ['cilantro', 'ngori'],
     ['lemongrass', 'sare'],
-    ['potato', 'khoaitay'],
-    ['tomato', 'cachua'],
-    ['cucumber', 'dualeo'],
-    ['eggplant', 'catim'],
 
-    // chất lỏng / xốt
+    ['potato', 'khoaitay'], ['tomato', 'cachua'], ['cucumber', 'dualeo'],
+    ['eggplant', 'catim'], ['aubergine', 'catim'],
+    ['pumpkin', 'bido'], ['carrot', 'carot'],
+    ['cabbage', 'bapcai'], ['broccoli', 'suploxanh'], ['cauliflower', 'suplotrang'],
+    ['spinach', 'rauboxoi'], ['kale', 'ka'], ['mushroom', 'nam'],
+
+    ['tofu', 'dauhu'], ['bean', 'dau'], ['soy', 'dau'],
+    ['egg', 'trung'],
+
     ['sauce', 'sauce'],
-    ['soy', 'xidau'],
-    ['broth', 'nuocdung'], ['stock', 'nuocdung']
+    ['stock', 'nuocdung'], ['broth', 'nuocdung']
+]);
+
+const INGREDIENT_STOPWORDS = new Set([
+    'tuoi', 'song', 'dong', 'lanh', 'nguyen', 'con', 'mieng', 'thai', 'lat', 'xay', 'bam',
+    'rut', 'xuong', 'bo', 'da', 'co', 'xu', 'ly'
 ]);
 
 const INGREDIENT_CANONICAL_RULES = [
-    { all: ['nuoc', 'mam'], canonical: 'nuoc mam' },
-    { all: ['xidau'], canonical: 'nuoc tuong' },
-    { all: ['nuoc', 'tuong'], canonical: 'nuoc tuong' },
-    { all: ['fish', 'sauce'], canonical: 'nuoc mam' },
-    { all: ['soy', 'sauce'], canonical: 'nuoc tuong' },
-
-    { all: ['hanhla'], canonical: 'hanh la' },
-    { all: ['hanh', 'la'], canonical: 'hanh la' },
-    { all: ['hanhtim'], canonical: 'hanh tim' },
-    { all: ['shallot'], canonical: 'hanh tim' },
-
-    { all: ['ngori'], canonical: 'ngo ri' },
-    { all: ['rau', 'mui'], canonical: 'ngo ri' },
-
-    { all: ['khoaitay'], canonical: 'khoai tay' },
-    { all: ['cachua'], canonical: 'ca chua' },
-    { all: ['dualeo'], canonical: 'dua leo' },
-
+    // heo và bộ phận
     { all: ['chan', 'gio', 'heo'], canonical: 'chan gio heo' },
     { all: ['mong', 'gio', 'heo'], canonical: 'chan gio heo' },
     { all: ['gio', 'heo'], canonical: 'chan gio heo' },
-
+    { all: ['ba', 'chi'], canonical: 'ba chi heo' },
+    { all: ['suon', 'heo'], canonical: 'suon heo' },
+    { all: ['nac', 'heo'], canonical: 'nac heo' },
     { all: ['thit', 'heo'], canonical: 'thit heo' },
+
+    // thịt khác
     { all: ['thit', 'bo'], canonical: 'thit bo' },
     { all: ['thit', 'ga'], canonical: 'thit ga' },
     { all: ['thit', 'vit'], canonical: 'thit vit' },
+    { all: ['thit', 'de'], canonical: 'thit de' },
+    { all: ['thit', 'cuu'], canonical: 'thit cuu' },
+    { all: ['thit', 'trau'], canonical: 'thit trau' },
 
+    // cá/hải sản
     { all: ['ca', 'hoi'], canonical: 'ca hoi' },
     { all: ['ca', 'thu'], canonical: 'ca thu' },
-    { all: ['ca', 'ngu'], canonical: 'ca ngu' }
+    { all: ['ca', 'ngu'], canonical: 'ca ngu' },
+    { all: ['tom'], canonical: 'tom' },
+    { all: ['cua'], canonical: 'cua' },
+    { all: ['muc'], canonical: 'muc' },
+    { all: ['bach', 'tuoc'], canonical: 'bach tuoc' },
+    { all: ['ngheu'], canonical: 'ngheu' },
+    { all: ['hau'], canonical: 'hau' },
+
+    // rau củ
+    { all: ['hanh', 'la'], canonical: 'hanh la' },
+    { all: ['hanh', 'tim'], canonical: 'hanh tim' },
+    { all: ['hanh', 'tay'], canonical: 'hanh tay' },
+    { all: ['toi'], canonical: 'toi' },
+    { all: ['gung'], canonical: 'gung' },
+    { all: ['ot'], canonical: 'ot' },
+    { all: ['ngo', 'ri'], canonical: 'ngo ri' },
+    { all: ['sa', 're'], canonical: 'sa re' },
+    { all: ['khoai', 'tay'], canonical: 'khoai tay' },
+    { all: ['khoai', 'lang'], canonical: 'khoai lang' },
+    { all: ['khoai', 'mon'], canonical: 'khoai mon' },
+    { all: ['ca', 'chua'], canonical: 'ca chua' },
+    { all: ['dua', 'leo'], canonical: 'dua leo' },
+    { all: ['ca', 'tim'], canonical: 'ca tim' },
+    { all: ['bi', 'do'], canonical: 'bi do' },
+    { all: ['bap', 'cai'], canonical: 'bap cai' },
+    { all: ['sup', 'lo', 'xanh'], canonical: 'sup lo xanh' },
+    { all: ['sup', 'lo', 'trang'], canonical: 'sup lo trang' },
+    { all: ['rau', 'muong'], canonical: 'rau muong' },
+    { all: ['rau', 'bo', 'xoi'], canonical: 'rau bo xoi' },
+
+    // đạm thực vật
+    { all: ['trung'], canonical: 'trung' },
+    { all: ['dau', 'hu'], canonical: 'dau hu' },
+    { all: ['dau', 'nanh'], canonical: 'dau nanh' },
+    { all: ['dau', 'xanh'], canonical: 'dau xanh' },
+    { all: ['dau', 'do'], canonical: 'dau do' },
+    { all: ['dau', 'phong'], canonical: 'dau phong' },
+    { all: ['me'], canonical: 'me' },
+
+    // gia vị / chất lỏng
+    { all: ['nuoc', 'mam'], canonical: 'nuoc mam' },
+    { all: ['nuoc', 'tuong'], canonical: 'nuoc tuong' },
+    { all: ['dau', 'hao'], canonical: 'dau hao' },
+    { all: ['dau', 'an'], canonical: 'dau an' },
+    { all: ['dau', 'oliu'], canonical: 'dau oliu' },
+    { all: ['duong'], canonical: 'duong' },
+    { all: ['muoi'], canonical: 'muoi' },
+    { all: ['hat', 'nem'], canonical: 'hat nem' },
+    { all: ['bot', 'ngot'], canonical: 'bot ngot' },
+    { all: ['giam'], canonical: 'giam' },
+    { all: ['nuoc', 'dung'], canonical: 'nuoc dung' }
 ];
 
 function canonicalizeIngredientName(name = '') {
-    const base = stripVietnameseDiacritics(normalizeIngredientName(name))
+    let base = stripVietnameseDiacritics(normalizeIngredientName(name))
         .replace(/[^a-z0-9\s]/g, ' ')
         .replace(/\s+/g, ' ')
         .trim();
 
     if (!base) return '';
 
+    for (const [regex, replacement] of INGREDIENT_PHRASE_NORMALIZERS) {
+        base = base.replace(regex, replacement);
+    }
+
     let tokens = base.split(' ').filter(Boolean);
 
-    tokens = tokens.map(token => INGREDIENT_TOKEN_SYNONYMS.get(token) || token);
+    tokens = tokens
+        .map(token => INGREDIENT_TOKEN_SYNONYMS.get(token) || token)
+        .filter(token => !INGREDIENT_STOPWORDS.has(token));
 
-    // hợp nhất cụm phổ biến thành token chuẩn
+    // gom cụm từ đa token thành cụm chuẩn
     const joined = ` ${tokens.join(' ')} `;
 
-    if (joined.includes(' hanh la ') || joined.includes(' scallion ')) {
-        tokens = tokens.filter(t => t !== 'hanh' && t !== 'la' && t !== 'scallion');
-        tokens.push('hanhla');
+    if (joined.includes(' hanh la ')) {
+        tokens = tokens.filter(t => !['hanh', 'la'].includes(t));
+        tokens.push('hanh', 'la');
     }
-
-    if (joined.includes(' hanh tim ') || joined.includes(' shallot ')) {
-        tokens = tokens.filter(t => t !== 'hanh' && t !== 'tim' && t !== 'shallot');
-        tokens.push('hanhtim');
+    if (joined.includes(' hanh tim ')) {
+        tokens = tokens.filter(t => !['hanh', 'tim'].includes(t));
+        tokens.push('hanh', 'tim');
     }
-
-    if (joined.includes(' ngo ri ') || joined.includes(' rau mui ') || joined.includes(' coriander ') || joined.includes(' cilantro ')) {
-        tokens = tokens.filter(t => !['ngo', 'ri', 'rau', 'mui', 'coriander', 'cilantro'].includes(t));
-        tokens.push('ngori');
+    if (joined.includes(' hanh tay ')) {
+        tokens = tokens.filter(t => !['hanh', 'tay'].includes(t));
+        tokens.push('hanh', 'tay');
     }
-
-    if (joined.includes(' khoai tay ') || joined.includes(' potato ')) {
-        tokens = tokens.filter(t => !['khoai', 'tay', 'potato'].includes(t));
-        tokens.push('khoaitay');
+    if (joined.includes(' sa re ')) {
+        tokens = tokens.filter(t => !['sa', 're'].includes(t));
+        tokens.push('sa', 're');
     }
-
-    if (joined.includes(' ca chua ') || joined.includes(' tomato ')) {
-        tokens = tokens.filter(t => !['ca', 'chua', 'tomato'].includes(t));
-        tokens.push('cachua');
+    if (joined.includes(' khoai tay ')) {
+        tokens = tokens.filter(t => !['khoai', 'tay'].includes(t));
+        tokens.push('khoai', 'tay');
     }
-
-    if (joined.includes(' dua leo ') || joined.includes(' dua chuot ') || joined.includes(' cucumber ')) {
-        tokens = tokens.filter(t => !['dua', 'leo', 'chuot', 'cucumber'].includes(t));
-        tokens.push('dualeo');
+    if (joined.includes(' ca chua ')) {
+        tokens = tokens.filter(t => !['ca', 'chua'].includes(t));
+        tokens.push('ca', 'chua');
+    }
+    if (joined.includes(' dua leo ') || joined.includes(' dua chuot ')) {
+        tokens = tokens.filter(t => !['dua', 'leo', 'chuot'].includes(t));
+        tokens.push('dua', 'leo');
     }
 
     // loại trùng token để ổn định key so khớp
@@ -152,9 +293,7 @@ function canonicalizeIngredientName(name = '') {
 
     for (const rule of INGREDIENT_CANONICAL_RULES) {
         const matched = rule.all.every(token => tokens.includes(token));
-        if (matched) {
-            return rule.canonical;
-        }
+        if (matched) return rule.canonical;
     }
 
     return tokens.join(' ');
