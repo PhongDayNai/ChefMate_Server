@@ -58,6 +58,8 @@ CREATE TABLE IF NOT EXISTS RecipesIngredients (
   ingredientId INT NOT NULL,
   weight INT NOT NULL,
   unit VARCHAR(20) NOT NULL,
+  isMain TINYINT(1) NOT NULL DEFAULT 0,
+  isCommon TINYINT(1) NOT NULL DEFAULT 0,
   CONSTRAINT fk_recipe_ingredient_recipe FOREIGN KEY (recipeId) REFERENCES Recipes(recipeId)
     ON UPDATE CASCADE ON DELETE CASCADE,
   CONSTRAINT fk_recipe_ingredient_ingredient FOREIGN KEY (ingredientId) REFERENCES Ingredients(ingredientId)
@@ -94,4 +96,45 @@ CREATE TABLE IF NOT EXISTS UsersComment (
     ON UPDATE CASCADE ON DELETE CASCADE,
   CONSTRAINT fk_users_comment_recipe FOREIGN KEY (recipeId) REFERENCES Recipes(recipeId)
     ON UPDATE CASCADE ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS PantryItems (
+  pantryItemId INT PRIMARY KEY AUTO_INCREMENT,
+  userId INT NOT NULL,
+  ingredientId INT NOT NULL,
+  quantity DECIMAL(10,2) NOT NULL DEFAULT 0,
+  unit VARCHAR(20) NOT NULL,
+  expiresAt DATETIME NULL,
+  createdAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updatedAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT fk_pantry_user FOREIGN KEY (userId) REFERENCES Users(userId)
+    ON UPDATE CASCADE ON DELETE CASCADE,
+  CONSTRAINT fk_pantry_ingredient FOREIGN KEY (ingredientId) REFERENCES Ingredients(ingredientId)
+    ON UPDATE CASCADE ON DELETE RESTRICT,
+  UNIQUE KEY uq_pantry_user_ingredient_unit (userId, ingredientId, unit)
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS ChatSessions (
+  chatSessionId INT PRIMARY KEY AUTO_INCREMENT,
+  userId INT NOT NULL,
+  title VARCHAR(255) NOT NULL DEFAULT 'Phiên chat nấu ăn',
+  activeRecipeId INT NULL,
+  createdAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updatedAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT fk_chat_session_user FOREIGN KEY (userId) REFERENCES Users(userId)
+    ON UPDATE CASCADE ON DELETE CASCADE,
+  CONSTRAINT fk_chat_session_active_recipe FOREIGN KEY (activeRecipeId) REFERENCES Recipes(recipeId)
+    ON UPDATE CASCADE ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS ChatMessages (
+  chatMessageId INT PRIMARY KEY AUTO_INCREMENT,
+  chatSessionId INT NOT NULL,
+  role ENUM('system', 'user', 'assistant') NOT NULL,
+  content TEXT NOT NULL,
+  metaJson JSON NULL,
+  createdAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_chat_message_session FOREIGN KEY (chatSessionId) REFERENCES ChatSessions(chatSessionId)
+    ON UPDATE CASCADE ON DELETE CASCADE,
+  INDEX idx_chat_messages_session_created (chatSessionId, createdAt)
 ) ENGINE=InnoDB;

@@ -23,7 +23,9 @@ function mapRecipePayload(recipe, cookingStepsRows, ingredientsRows, commentsRow
             ingredientId: Number(ing.ingredientId),
             ingredientName: ing.ingredientName,
             weight: Number(ing.weight),
-            unit: ing.unit
+            unit: ing.unit,
+            isMain: Number(ing.isMain || 0) === 1,
+            isCommon: Number(ing.isCommon || 0) === 1
         }));
 
     const comments = commentsRows
@@ -73,7 +75,7 @@ async function fetchRecipeRelatedData(recipeIds, userId = null) {
     );
 
     const [ingredientsRows] = await pool.query(
-        `SELECT ri.recipeId, i.ingredientId, i.ingredientName, ri.weight, ri.unit
+        `SELECT ri.recipeId, i.ingredientId, i.ingredientName, ri.weight, ri.unit, ri.isMain, ri.isCommon
          FROM RecipesIngredients ri
          JOIN Ingredients i ON ri.ingredientId = i.ingredientId
          WHERE ri.recipeId IN (${placeholders})
@@ -195,8 +197,16 @@ exports.createRecipe = async (recipeName, image, cookingTime, ration, ingredient
             }
 
             await conn.query(
-                'INSERT INTO RecipesIngredients (recipeId, ingredientId, weight, unit) VALUES (?, ?, ?, ?)',
-                [recipeId, ingredientId, ingredient.weight, ingredient.unit]
+                `INSERT INTO RecipesIngredients (recipeId, ingredientId, weight, unit, isMain, isCommon)
+                 VALUES (?, ?, ?, ?, ?, ?)`,
+                [
+                    recipeId,
+                    ingredientId,
+                    ingredient.weight,
+                    ingredient.unit,
+                    ingredient.isMain ? 1 : 0,
+                    ingredient.isCommon ? 1 : 0
+                ]
             );
         }
 
