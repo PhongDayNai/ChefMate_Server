@@ -3,25 +3,54 @@
   "info": {
     "title": "ChefMate Server API",
     "version": "2.0.0",
-    "description": "Tài liệu đầy đủ API ChefMate (legacy + mới), gồm flow sử dụng, pagination, AI chat, pantry, diet notes và xử lý lỗi."
+    "description": "Tài liệu đầy đủ API ChefMate (legacy + mới), gồm flow sử dụng, phân trang, AI chat, pantry, diet notes và xử lý lỗi.\n\n## Quickstart Flow\n1) Lấy diet notes + pantry\n2) Lấy recommendations từ pantry\n3) Tạo session (hoặc để messages auto-create)\n4) Chọn active recipe\n5) Chat với AI\n6) Load lại sessions + history\n"
   },
   "servers": [
-    { "url": "https://api.example.com", "description": "Production" },
-    { "url": "http://127.0.0.1:8000", "description": "Local Docker" }
+    {
+      "url": "https://api.example.com",
+      "description": "Production"
+    },
+    {
+      "url": "http://127.0.0.1:8000",
+      "description": "Local Docker"
+    }
   ],
   "tags": [
-    { "name": "Users" },
-    { "name": "Recipes" },
-    { "name": "Interactions" },
-    { "name": "Pantry" },
-    { "name": "UserDietNotes" },
-    { "name": "AIChat" },
-    { "name": "FlowGuide" }
+    {
+      "name": "Users",
+      "description": "Nhóm API tài khoản người dùng (legacy)."
+    },
+    {
+      "name": "Recipes",
+      "description": "Nhóm API công thức, tìm kiếm, thịnh hành v1/v2."
+    },
+    {
+      "name": "Interactions",
+      "description": "Like, comment, tăng view công thức."
+    },
+    {
+      "name": "Pantry",
+      "description": "Quản lý tủ lạnh theo từng user."
+    },
+    {
+      "name": "UserDietNotes",
+      "description": "Ghi chú ăn uống: dị ứng/hạn chế/sở thích/sức khỏe."
+    },
+    {
+      "name": "AIChat",
+      "description": "Session chat nấu ăn, chọn món, gửi message và history."
+    },
+    {
+      "name": "FlowGuide",
+      "description": "Mô tả flow tích hợp gợi ý cho client."
+    }
   ],
   "paths": {
     "/api/users/all": {
       "get": {
-        "tags": ["Users"],
+        "tags": [
+          "Users"
+        ],
         "summary": "Get all users",
         "responses": {
           "200": {
@@ -32,13 +61,17 @@
     },
     "/api/users/register": {
       "post": {
-        "tags": ["Users"],
+        "tags": [
+          "Users"
+        ],
         "summary": "Register",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/RegisterRequest" },
+              "schema": {
+                "$ref": "#/components/schemas/RegisterRequest"
+              },
               "example": {
                 "fullName": "Nguyen Van A",
                 "phone": "0912345678",
@@ -49,51 +82,84 @@
           }
         },
         "responses": {
-          "201": { "description": "Created" },
-          "400": { "$ref": "#/components/responses/BadRequest" }
+          "201": {
+            "description": "Created"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          }
         }
       }
     },
     "/api/users/login": {
       "post": {
-        "tags": ["Users"],
+        "tags": [
+          "Users"
+        ],
         "summary": "Login by phone/email",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/LoginRequest" },
-              "example": { "identifier": "0912345678", "password": "123456" }
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              },
+              "example": {
+                "identifier": "0912345678",
+                "password": "123456"
+              }
             }
           }
         },
         "responses": {
-          "200": { "description": "OK" },
-          "401": { "$ref": "#/components/responses/Unauthorized" }
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
         }
       }
     },
     "/api/users/forgot-password": {
       "post": {
-        "tags": ["Users"],
+        "tags": [
+          "Users"
+        ],
         "summary": "Forgot password",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
-              "schema": { "type": "object", "required": ["phone"], "properties": { "phone": { "type": "string" } } },
-              "example": { "phone": "0912345678" }
+              "schema": {
+                "type": "object",
+                "required": [
+                  "phone"
+                ],
+                "properties": {
+                  "phone": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "phone": "0912345678"
+              }
             }
           }
         },
         "responses": {
-          "200": { "description": "OK" }
+          "200": {
+            "description": "OK"
+          }
         }
       }
     },
     "/api/users/change-password": {
       "post": {
-        "tags": ["Users"],
+        "tags": [
+          "Users"
+        ],
         "summary": "Change password",
         "requestBody": {
           "required": true,
@@ -101,37 +167,62 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["phone", "currentPassword", "newPassword"],
+                "required": [
+                  "phone",
+                  "currentPassword",
+                  "newPassword"
+                ],
                 "properties": {
-                  "phone": { "type": "string" },
-                  "currentPassword": { "type": "string" },
-                  "newPassword": { "type": "string" }
+                  "phone": {
+                    "type": "string"
+                  },
+                  "currentPassword": {
+                    "type": "string"
+                  },
+                  "newPassword": {
+                    "type": "string"
+                  }
                 }
               }
             }
           }
         },
         "responses": {
-          "200": { "description": "OK" }
+          "200": {
+            "description": "OK"
+          }
         }
       }
     },
     "/api/users/recipes-view-history": {
       "get": {
-        "tags": ["Users"],
+        "tags": [
+          "Users"
+        ],
         "summary": "Get recipe view history (legacy)",
         "description": "Legacy endpoint. Controller đang đọc userId từ body/query.",
         "parameters": [
-          { "name": "userId", "in": "query", "required": true, "schema": { "type": "integer" } }
+          {
+            "name": "userId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
         ],
         "responses": {
-          "200": { "description": "OK" }
+          "200": {
+            "description": "OK"
+          }
         }
       }
     },
     "/api/users/update-user-information": {
       "post": {
-        "tags": ["Users"],
+        "tags": [
+          "Users"
+        ],
         "summary": "Update user information",
         "requestBody": {
           "required": true,
@@ -139,30 +230,52 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["userId"],
+                "required": [
+                  "userId"
+                ],
                 "properties": {
-                  "userId": { "type": "integer" },
-                  "fullName": { "type": "string" },
-                  "phone": { "type": "string" },
-                  "email": { "type": "string" }
+                  "userId": {
+                    "type": "integer"
+                  },
+                  "fullName": {
+                    "type": "string"
+                  },
+                  "phone": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string"
+                  }
                 }
               }
             }
           }
         },
-        "responses": { "200": { "description": "OK" } }
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
       }
     },
     "/api/recipes/all": {
       "get": {
-        "tags": ["Recipes"],
+        "tags": [
+          "Recipes"
+        ],
         "summary": "Get all recipes (full payload)",
-        "responses": { "200": { "description": "OK" } }
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
       }
     },
     "/api/recipes/create": {
       "post": {
-        "tags": ["Recipes"],
+        "tags": [
+          "Recipes"
+        ],
         "summary": "Create recipe (multipart)",
         "requestBody": {
           "required": true,
@@ -170,27 +283,61 @@
             "multipart/form-data": {
               "schema": {
                 "type": "object",
-                "required": ["image", "recipeName", "cookingTime", "ration", "ingredients", "cookingSteps", "userId"],
+                "required": [
+                  "image",
+                  "recipeName",
+                  "cookingTime",
+                  "ration",
+                  "ingredients",
+                  "cookingSteps",
+                  "userId"
+                ],
                 "properties": {
-                  "image": { "type": "string", "format": "binary" },
-                  "recipeName": { "type": "string" },
-                  "cookingTime": { "type": "string" },
-                  "ration": { "type": "integer" },
-                  "ingredients": { "type": "string", "description": "JSON string array" },
-                  "cookingSteps": { "type": "string", "description": "JSON string array" },
-                  "tags": { "type": "string", "description": "JSON string array" },
-                  "userId": { "type": "integer" }
+                  "image": {
+                    "type": "string",
+                    "format": "binary"
+                  },
+                  "recipeName": {
+                    "type": "string"
+                  },
+                  "cookingTime": {
+                    "type": "string"
+                  },
+                  "ration": {
+                    "type": "integer"
+                  },
+                  "ingredients": {
+                    "type": "string",
+                    "description": "JSON string array"
+                  },
+                  "cookingSteps": {
+                    "type": "string",
+                    "description": "JSON string array"
+                  },
+                  "tags": {
+                    "type": "string",
+                    "description": "JSON string array"
+                  },
+                  "userId": {
+                    "type": "integer"
+                  }
                 }
               }
             }
           }
         },
-        "responses": { "201": { "description": "Created" } }
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        }
       }
     },
     "/api/recipes/search": {
       "post": {
-        "tags": ["Recipes"],
+        "tags": [
+          "Recipes"
+        ],
         "summary": "Search recipes by name",
         "requestBody": {
           "required": true,
@@ -198,28 +345,46 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["recipeName"],
+                "required": [
+                  "recipeName"
+                ],
                 "properties": {
-                  "recipeName": { "type": "string" },
-                  "userId": { "type": "integer" }
+                  "recipeName": {
+                    "type": "string"
+                  },
+                  "userId": {
+                    "type": "integer"
+                  }
                 }
               }
             }
           }
         },
-        "responses": { "200": { "description": "OK" } }
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
       }
     },
     "/api/recipes/ingredients": {
       "get": {
-        "tags": ["Recipes"],
+        "tags": [
+          "Recipes"
+        ],
         "summary": "Get all ingredients",
-        "responses": { "200": { "description": "OK" } }
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
       }
     },
     "/api/recipes/top-trending": {
       "post": {
-        "tags": ["Recipes"],
+        "tags": [
+          "Recipes"
+        ],
         "summary": "Top trending (legacy, fixed 30)",
         "description": "Legacy contract. Trả array recipe đầy đủ (full payload).",
         "requestBody": {
@@ -228,47 +393,112 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "properties": { "userId": { "type": "integer" } }
+                "properties": {
+                  "userId": {
+                    "type": "integer"
+                  }
+                }
               }
             }
           }
         },
-        "responses": { "200": { "description": "OK" } }
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
       }
     },
     "/api/recipes/trending-v2": {
       "get": {
-        "tags": ["Recipes"],
+        "tags": [
+          "Recipes"
+        ],
         "summary": "Trending v2 (pagination for infinite scroll)",
-        "description": "Endpoint mới để thay cho top-trending ở client mới. Giữ payload recipe full như v1 nhưng bổ sung pagination.",
+        "description": "Feed thịnh hành có phân trang cho infinite scroll.\nPayload recipe trong `data.items` tương thích v1 (top-trending), chỉ bổ sung `pagination` và `period`.",
         "parameters": [
-          { "name": "userId", "in": "query", "required": false, "schema": { "type": "integer" } },
-          { "name": "page", "in": "query", "required": false, "schema": { "type": "integer", "default": 1 } },
-          { "name": "limit", "in": "query", "required": false, "schema": { "type": "integer", "default": 20, "maximum": 50 } },
-          { "name": "period", "in": "query", "required": false, "schema": { "type": "string", "enum": ["all", "7d", "30d", "90d"], "default": "all" } }
+          {
+            "name": "userId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Optional. Nếu có, trả thêm trạng thái isLiked"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 1,
+              "minimum": 1
+            },
+            "description": "Trang hiện tại"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 20,
+              "minimum": 1,
+              "maximum": 50
+            },
+            "description": "Số item mỗi trang"
+          },
+          {
+            "name": "period",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "all",
+                "7d",
+                "30d",
+                "90d"
+              ],
+              "default": "all"
+            },
+            "description": "Khoảng thời gian tính trend"
+          }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/TrendingV2Response" }
+                "schema": {
+                  "$ref": "#/components/schemas/TrendingV2Response"
+                }
               }
             }
           }
-        }
+        },
+        "operationId": "getTrendingV2"
       }
     },
     "/api/recipes/tags": {
       "get": {
-        "tags": ["Recipes"],
+        "tags": [
+          "Recipes"
+        ],
         "summary": "Get all tags",
-        "responses": { "200": { "description": "OK" } }
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
       }
     },
     "/api/recipes/search-by-tag": {
       "post": {
-        "tags": ["Recipes"],
+        "tags": [
+          "Recipes"
+        ],
         "summary": "Search recipes by tag",
         "requestBody": {
           "required": true,
@@ -276,58 +506,112 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["tagName"],
+                "required": [
+                  "tagName"
+                ],
                 "properties": {
-                  "tagName": { "type": "string" },
-                  "userId": { "type": "integer" }
+                  "tagName": {
+                    "type": "string"
+                  },
+                  "userId": {
+                    "type": "integer"
+                  }
                 }
               }
             }
           }
         },
-        "responses": { "200": { "description": "OK" } }
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
       }
     },
     "/api/recipes/user-recipes": {
       "post": {
-        "tags": ["Recipes"],
+        "tags": [
+          "Recipes"
+        ],
         "summary": "Get recipes by user",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
-              "schema": { "type": "object", "required": ["userId"], "properties": { "userId": { "type": "integer" } } }
+              "schema": {
+                "type": "object",
+                "required": [
+                  "userId"
+                ],
+                "properties": {
+                  "userId": {
+                    "type": "integer"
+                  }
+                }
+              }
             }
           }
         },
-        "responses": { "200": { "description": "OK" } }
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
       }
     },
     "/api/recipes/growth-report": {
       "get": {
-        "tags": ["Recipes"],
+        "tags": [
+          "Recipes"
+        ],
         "summary": "Recipe growth report by month",
-        "responses": { "200": { "description": "OK" } }
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
       }
     },
     "/api/interactions/like": {
       "post": {
-        "tags": ["Interactions"],
+        "tags": [
+          "Interactions"
+        ],
         "summary": "Like/unlike recipe",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
-              "schema": { "type": "object", "required": ["userId", "recipeId"], "properties": { "userId": { "type": "integer" }, "recipeId": { "type": "integer" } } }
+              "schema": {
+                "type": "object",
+                "required": [
+                  "userId",
+                  "recipeId"
+                ],
+                "properties": {
+                  "userId": {
+                    "type": "integer"
+                  },
+                  "recipeId": {
+                    "type": "integer"
+                  }
+                }
+              }
             }
           }
         },
-        "responses": { "200": { "description": "OK" } }
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
       }
     },
     "/api/interactions/comment": {
       "post": {
-        "tags": ["Interactions"],
+        "tags": [
+          "Interactions"
+        ],
         "summary": "Create comment",
         "requestBody": {
           "required": true,
@@ -335,67 +619,135 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["userId", "recipeId", "content"],
+                "required": [
+                  "userId",
+                  "recipeId",
+                  "content"
+                ],
                 "properties": {
-                  "userId": { "type": "integer" },
-                  "recipeId": { "type": "integer" },
-                  "content": { "type": "string" }
+                  "userId": {
+                    "type": "integer"
+                  },
+                  "recipeId": {
+                    "type": "integer"
+                  },
+                  "content": {
+                    "type": "string"
+                  }
                 }
               }
             }
           }
         },
-        "responses": { "200": { "description": "OK" } }
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
       },
       "delete": {
-        "tags": ["Interactions"],
+        "tags": [
+          "Interactions"
+        ],
         "summary": "Delete comment",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
-              "schema": { "type": "object", "required": ["commentId"], "properties": { "commentId": { "type": "integer" } } }
+              "schema": {
+                "type": "object",
+                "required": [
+                  "commentId"
+                ],
+                "properties": {
+                  "commentId": {
+                    "type": "integer"
+                  }
+                }
+              }
             }
           }
         },
-        "responses": { "200": { "description": "OK" } }
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
       }
     },
     "/api/interactions/increase-view-count": {
       "post": {
-        "tags": ["Interactions"],
+        "tags": [
+          "Interactions"
+        ],
         "summary": "Increase view count",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
-              "schema": { "type": "object", "required": ["recipeId"], "properties": { "recipeId": { "type": "integer" } } }
+              "schema": {
+                "type": "object",
+                "required": [
+                  "recipeId"
+                ],
+                "properties": {
+                  "recipeId": {
+                    "type": "integer"
+                  }
+                }
+              }
             }
           }
         },
-        "responses": { "200": { "description": "OK" } }
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
       }
     },
     "/api/interactions/comments": {
       "get": {
-        "tags": ["Interactions"],
+        "tags": [
+          "Interactions"
+        ],
         "summary": "Get all comments",
-        "responses": { "200": { "description": "OK" } }
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
       }
     },
     "/api/pantry": {
       "get": {
-        "tags": ["Pantry"],
+        "tags": [
+          "Pantry"
+        ],
         "summary": "Get pantry by user",
         "parameters": [
-          { "name": "userId", "in": "query", "required": true, "schema": { "type": "integer" } }
+          {
+            "name": "userId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
         ],
-        "responses": { "200": { "description": "OK" } }
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "operationId": "getPantryByUser"
       }
     },
     "/api/pantry/upsert": {
       "post": {
-        "tags": ["Pantry"],
+        "tags": [
+          "Pantry"
+        ],
         "summary": "Upsert pantry item",
         "requestBody": {
           "required": true,
@@ -403,64 +755,130 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["userId", "ingredientName", "quantity", "unit"],
+                "required": [
+                  "userId",
+                  "ingredientName",
+                  "quantity",
+                  "unit"
+                ],
                 "properties": {
-                  "userId": { "type": "integer" },
-                  "ingredientName": { "type": "string" },
-                  "quantity": { "type": "number" },
-                  "unit": { "type": "string" },
-                  "expiresAt": { "type": "string", "nullable": true }
+                  "userId": {
+                    "type": "integer"
+                  },
+                  "ingredientName": {
+                    "type": "string"
+                  },
+                  "quantity": {
+                    "type": "number"
+                  },
+                  "unit": {
+                    "type": "string"
+                  },
+                  "expiresAt": {
+                    "type": "string",
+                    "nullable": true
+                  }
                 }
               }
             }
           }
         },
-        "responses": { "200": { "description": "OK" } }
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "operationId": "upsertPantryItem"
       }
     },
     "/api/pantry/delete": {
       "delete": {
-        "tags": ["Pantry"],
+        "tags": [
+          "Pantry"
+        ],
         "summary": "Delete pantry item",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
-              "schema": { "type": "object", "required": ["userId", "pantryItemId"], "properties": { "userId": { "type": "integer" }, "pantryItemId": { "type": "integer" } } }
+              "schema": {
+                "type": "object",
+                "required": [
+                  "userId",
+                  "pantryItemId"
+                ],
+                "properties": {
+                  "userId": {
+                    "type": "integer"
+                  },
+                  "pantryItemId": {
+                    "type": "integer"
+                  }
+                }
+              }
             }
           }
         },
-        "responses": { "200": { "description": "OK" } }
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
       }
     },
     "/api/user-diet-notes": {
       "get": {
-        "tags": ["UserDietNotes"],
+        "tags": [
+          "UserDietNotes"
+        ],
         "summary": "Get diet notes by user",
         "parameters": [
-          { "name": "userId", "in": "query", "required": true, "schema": { "type": "integer" } }
+          {
+            "name": "userId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
         ],
-        "responses": { "200": { "description": "OK" } }
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "operationId": "getUserDietNotes"
       }
     },
     "/api/user-diet-notes/upsert": {
       "post": {
-        "tags": ["UserDietNotes"],
+        "tags": [
+          "UserDietNotes"
+        ],
         "summary": "Upsert diet note",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/UserDietNoteUpsertRequest" }
+              "schema": {
+                "$ref": "#/components/schemas/UserDietNoteUpsertRequest"
+              }
             }
           }
         },
-        "responses": { "200": { "description": "OK" } }
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "operationId": "upsertUserDietNote"
       }
     },
     "/api/user-diet-notes/delete": {
       "delete": {
-        "tags": ["UserDietNotes"],
+        "tags": [
+          "UserDietNotes"
+        ],
         "summary": "Delete diet note",
         "requestBody": {
           "required": true,
@@ -468,69 +886,208 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["userId", "noteId"],
+                "required": [
+                  "userId",
+                  "noteId"
+                ],
                 "properties": {
-                  "userId": { "type": "integer" },
-                  "noteId": { "type": "integer" }
+                  "userId": {
+                    "type": "integer"
+                  },
+                  "noteId": {
+                    "type": "integer"
+                  }
                 }
               }
             }
           }
         },
-        "responses": { "200": { "description": "OK" } }
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
       }
     },
     "/api/ai-chat/sessions": {
       "post": {
-        "tags": ["AIChat"],
+        "tags": [
+          "AIChat"
+        ],
         "summary": "Create chat session",
-        "description": "Nếu thiếu title, server tự đặt title bằng AI từ firstMessage. Session mới luôn có intro message của Bepes.",
+        "description": "Tạo session chat. Nếu không truyền `title`, server tự đặt tên bằng AI từ `firstMessage`.\nSession mới luôn được chèn message giới thiệu của agent **Bepes** ngay đầu lịch sử.",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/CreateSessionRequest" }
+              "schema": {
+                "$ref": "#/components/schemas/CreateSessionRequest"
+              },
+              "examples": {
+                "AutoTitleByFirstMessage": {
+                  "summary": "Không truyền title, để server đặt tên tự động bằng AI",
+                  "value": {
+                    "userId": 4,
+                    "firstMessage": "Tôi muốn nấu món bò nhanh cho bữa tối",
+                    "model": "gemma3:4b"
+                  }
+                },
+                "CustomTitle": {
+                  "summary": "Truyền title thủ công",
+                  "value": {
+                    "userId": 4,
+                    "title": "Bữa tối healthy",
+                    "activeRecipeId": null
+                  }
+                }
+              }
             }
           }
         },
-        "responses": { "201": { "description": "Created" } }
+        "responses": {
+          "201": {
+            "description": "Created",
+            "links": {
+              "GetCreatedSessionHistory": {
+                "operationId": "getChatSessionHistory",
+                "parameters": {
+                  "sessionId": "$response.body#/data/chatSessionId",
+                  "userId": "$response.body#/data/userId"
+                },
+                "description": "Lấy ngay lịch sử session vừa tạo (sẽ có intro message Bepes)."
+              },
+              "SendFirstMessageToCreatedSession": {
+                "operationId": "sendChatMessage",
+                "requestBody": {
+                  "userId": "$response.body#/data/userId",
+                  "chatSessionId": "$response.body#/data/chatSessionId",
+                  "message": "Xin chào Bepes, bắt đầu nấu món cho tôi nhé",
+                  "stream": false
+                },
+                "description": "Gửi message đầu tiên cho session vừa tạo."
+              }
+            }
+          }
+        },
+        "operationId": "createChatSession"
       },
       "get": {
-        "tags": ["AIChat"],
+        "tags": [
+          "AIChat"
+        ],
         "summary": "List chat sessions by user (pagination)",
         "parameters": [
-          { "name": "userId", "in": "query", "required": true, "schema": { "type": "integer" } },
-          { "name": "page", "in": "query", "required": false, "schema": { "type": "integer", "default": 1 } },
-          { "name": "limit", "in": "query", "required": false, "schema": { "type": "integer", "default": 50, "maximum": 200 } }
+          {
+            "name": "userId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 50,
+              "maximum": 200
+            }
+          }
         ],
-        "responses": { "200": { "description": "OK" } }
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "operationId": "listChatSessions"
       }
     },
     "/api/ai-chat/sessions/{sessionId}": {
       "get": {
-        "tags": ["AIChat"],
+        "tags": [
+          "AIChat"
+        ],
         "summary": "Get session history",
         "parameters": [
-          { "name": "sessionId", "in": "path", "required": true, "schema": { "type": "integer" } },
-          { "name": "userId", "in": "query", "required": true, "schema": { "type": "integer" } }
+          {
+            "name": "sessionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "userId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
         ],
-        "responses": { "200": { "description": "OK" }, "404": { "$ref": "#/components/responses/NotFound" } }
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "operationId": "getChatSessionHistory"
       }
     },
     "/api/ai-chat/sessions/{id}": {
       "delete": {
-        "tags": ["AIChat"],
+        "tags": [
+          "AIChat"
+        ],
         "summary": "Delete session",
         "parameters": [
-          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } },
-          { "name": "userId", "in": "query", "required": true, "schema": { "type": "integer" } }
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "userId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
         ],
-        "responses": { "200": { "description": "OK" }, "404": { "$ref": "#/components/responses/NotFound" } }
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "operationId": "deleteChatSession"
       }
     },
     "/api/ai-chat/sessions/title": {
       "patch": {
-        "tags": ["AIChat"],
+        "tags": [
+          "AIChat"
+        ],
         "summary": "Update session title",
         "requestBody": {
           "required": true,
@@ -538,22 +1095,42 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["userId", "chatSessionId", "title"],
+                "required": [
+                  "userId",
+                  "chatSessionId",
+                  "title"
+                ],
                 "properties": {
-                  "userId": { "type": "integer" },
-                  "chatSessionId": { "type": "integer" },
-                  "title": { "type": "string" }
+                  "userId": {
+                    "type": "integer"
+                  },
+                  "chatSessionId": {
+                    "type": "integer"
+                  },
+                  "title": {
+                    "type": "string"
+                  }
                 }
               }
             }
           }
         },
-        "responses": { "200": { "description": "OK" }, "404": { "$ref": "#/components/responses/NotFound" } }
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "operationId": "updateChatSessionTitle"
       }
     },
     "/api/ai-chat/sessions/active-recipe": {
       "patch": {
-        "tags": ["AIChat"],
+        "tags": [
+          "AIChat"
+        ],
         "summary": "Update active recipe in session",
         "requestBody": {
           "required": true,
@@ -561,22 +1138,42 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["userId", "chatSessionId"],
+                "required": [
+                  "userId",
+                  "chatSessionId"
+                ],
                 "properties": {
-                  "userId": { "type": "integer" },
-                  "chatSessionId": { "type": "integer" },
-                  "recipeId": { "type": "integer", "nullable": true }
+                  "userId": {
+                    "type": "integer"
+                  },
+                  "chatSessionId": {
+                    "type": "integer"
+                  },
+                  "recipeId": {
+                    "type": "integer",
+                    "nullable": true
+                  }
                 }
               }
             }
           }
         },
-        "responses": { "200": { "description": "OK" }, "404": { "$ref": "#/components/responses/NotFound" } }
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "operationId": "updateChatSessionActiveRecipe"
       }
     },
     "/api/ai-chat/recommendations-from-pantry": {
       "post": {
-        "tags": ["AIChat"],
+        "tags": [
+          "AIChat"
+        ],
         "summary": "Recommend recipes from pantry",
         "description": "Ưu tiên ready_to_cook, thiếu slot thì bù almost_ready. Có index tuần tự và lọc theo allergy/restriction active.",
         "requestBody": {
@@ -585,35 +1182,77 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["userId"],
+                "required": [
+                  "userId"
+                ],
                 "properties": {
-                  "userId": { "type": "integer" },
-                  "limit": { "type": "integer", "default": 10 }
+                  "userId": {
+                    "type": "integer"
+                  },
+                  "limit": {
+                    "type": "integer",
+                    "default": 10
+                  }
                 }
               }
             }
           }
         },
-        "responses": { "200": { "description": "OK" } }
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "operationId": "getRecommendationsFromPantry"
       }
     },
     "/api/ai-chat/messages": {
       "post": {
-        "tags": ["AIChat"],
+        "tags": [
+          "AIChat"
+        ],
         "summary": "Chat with AI",
-        "description": "Nếu không truyền chatSessionId, server tự tạo session + auto-title + inject intro message Bepes.",
+        "description": "Gửi message tới AI. Nếu không truyền `chatSessionId`, server tự tạo session + auto-title + intro Bepes rồi mới xử lý message.\nKhi AI upstream bận/lỗi sẽ trả `503` với `code=AI_SERVER_BUSY`.",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/ChatMessageRequest" }
+              "schema": {
+                "$ref": "#/components/schemas/ChatMessageRequest"
+              },
+              "examples": {
+                "WithExistingSession": {
+                  "summary": "Chat trong session đã có",
+                  "value": {
+                    "userId": 4,
+                    "chatSessionId": 26,
+                    "message": "Hướng dẫn bước 1 thật ngắn",
+                    "model": "gemma3:4b",
+                    "stream": true
+                  }
+                },
+                "AutoCreateSession": {
+                  "summary": "Không có chatSessionId => server auto tạo session",
+                  "value": {
+                    "userId": 4,
+                    "message": "Tôi muốn ăn món gà ít dầu mỡ tối nay",
+                    "model": "gemma3:4b",
+                    "stream": false
+                  }
+                }
+              }
             }
           }
         },
         "responses": {
-          "200": { "description": "OK" },
-          "503": { "$ref": "#/components/responses/AIServerBusy" }
-        }
+          "200": {
+            "description": "OK"
+          },
+          "503": {
+            "$ref": "#/components/responses/AIServerBusy"
+          }
+        },
+        "operationId": "sendChatMessage"
       }
     }
   },
@@ -623,7 +1262,9 @@
         "description": "Bad request",
         "content": {
           "application/json": {
-            "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
           }
         }
       },
@@ -631,7 +1272,9 @@
         "description": "Unauthorized",
         "content": {
           "application/json": {
-            "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
           }
         }
       },
@@ -639,7 +1282,9 @@
         "description": "Not found",
         "content": {
           "application/json": {
-            "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
           }
         }
       },
@@ -647,7 +1292,9 @@
         "description": "AI server busy",
         "content": {
           "application/json": {
-            "schema": { "$ref": "#/components/schemas/AIServerBusyResponse" }
+            "schema": {
+              "$ref": "#/components/schemas/AIServerBusyResponse"
+            }
           }
         }
       }
@@ -656,78 +1303,178 @@
       "ErrorResponse": {
         "type": "object",
         "properties": {
-          "success": { "type": "boolean", "example": false },
-          "data": { "nullable": true },
-          "message": { "type": "string" }
+          "success": {
+            "type": "boolean",
+            "example": false
+          },
+          "data": {
+            "nullable": true
+          },
+          "message": {
+            "type": "string"
+          }
         }
       },
       "RegisterRequest": {
         "type": "object",
-        "required": ["fullName", "phone", "password"],
+        "required": [
+          "fullName",
+          "phone",
+          "password"
+        ],
         "properties": {
-          "fullName": { "type": "string" },
-          "phone": { "type": "string" },
-          "email": { "type": "string", "format": "email" },
-          "password": { "type": "string" }
+          "fullName": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "password": {
+            "type": "string"
+          }
         }
       },
       "LoginRequest": {
         "type": "object",
-        "required": ["identifier", "password"],
+        "required": [
+          "identifier",
+          "password"
+        ],
         "properties": {
-          "identifier": { "type": "string" },
-          "password": { "type": "string" }
+          "identifier": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          }
         }
       },
       "UserDietNoteUpsertRequest": {
         "type": "object",
-        "required": ["userId", "noteType", "label"],
+        "required": [
+          "userId",
+          "noteType",
+          "label"
+        ],
         "properties": {
-          "noteId": { "type": "integer", "nullable": true },
-          "userId": { "type": "integer" },
-          "noteType": { "type": "string", "enum": ["allergy", "restriction", "preference", "health_note"] },
-          "label": { "type": "string" },
+          "noteId": {
+            "type": "integer",
+            "nullable": true
+          },
+          "userId": {
+            "type": "integer"
+          },
+          "noteType": {
+            "type": "string",
+            "enum": [
+              "allergy",
+              "restriction",
+              "preference",
+              "health_note"
+            ]
+          },
+          "label": {
+            "type": "string"
+          },
           "keywords": {
             "type": "array",
-            "items": { "type": "string" }
+            "items": {
+              "type": "string"
+            }
           },
-          "instruction": { "type": "string", "nullable": true },
-          "isActive": { "type": "boolean", "default": true },
-          "startAt": { "type": "string", "nullable": true },
-          "endAt": { "type": "string", "nullable": true }
+          "instruction": {
+            "type": "string",
+            "nullable": true
+          },
+          "isActive": {
+            "type": "boolean",
+            "default": true
+          },
+          "startAt": {
+            "type": "string",
+            "nullable": true
+          },
+          "endAt": {
+            "type": "string",
+            "nullable": true
+          }
         }
       },
       "CreateSessionRequest": {
         "type": "object",
-        "required": ["userId"],
+        "required": [
+          "userId"
+        ],
         "properties": {
-          "userId": { "type": "integer" },
-          "title": { "type": "string", "nullable": true },
-          "activeRecipeId": { "type": "integer", "nullable": true },
-          "firstMessage": { "type": "string", "nullable": true },
-          "model": { "type": "string", "nullable": true }
+          "userId": {
+            "type": "integer"
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "activeRecipeId": {
+            "type": "integer",
+            "nullable": true
+          },
+          "firstMessage": {
+            "type": "string",
+            "nullable": true
+          },
+          "model": {
+            "type": "string",
+            "nullable": true
+          }
         }
       },
       "ChatMessageRequest": {
         "type": "object",
-        "required": ["userId", "message"],
+        "required": [
+          "userId",
+          "message"
+        ],
         "properties": {
-          "userId": { "type": "integer" },
-          "chatSessionId": { "type": "integer", "nullable": true },
-          "message": { "type": "string" },
-          "model": { "type": "string", "nullable": true },
-          "stream": { "type": "boolean", "default": false },
-          "activeRecipeId": { "type": "integer", "nullable": true }
+          "userId": {
+            "type": "integer"
+          },
+          "chatSessionId": {
+            "type": "integer",
+            "nullable": true
+          },
+          "message": {
+            "type": "string"
+          },
+          "model": {
+            "type": "string",
+            "nullable": true
+          },
+          "stream": {
+            "type": "boolean",
+            "default": false
+          },
+          "activeRecipeId": {
+            "type": "integer",
+            "nullable": true
+          }
         }
       },
       "TrendingV2Response": {
         "type": "object",
         "properties": {
-          "success": { "type": "boolean" },
+          "success": {
+            "type": "boolean"
+          },
           "data": {
             "type": "object",
             "properties": {
-              "apiVersion": { "type": "string", "example": "v2" },
+              "apiVersion": {
+                "type": "string",
+                "example": "v2"
+              },
               "items": {
                 "type": "array",
                 "items": {
@@ -738,32 +1485,59 @@
               "pagination": {
                 "type": "object",
                 "properties": {
-                  "page": { "type": "integer" },
-                  "limit": { "type": "integer" },
-                  "total": { "type": "integer" },
-                  "totalPages": { "type": "integer" },
-                  "hasMore": { "type": "boolean" }
+                  "page": {
+                    "type": "integer"
+                  },
+                  "limit": {
+                    "type": "integer"
+                  },
+                  "total": {
+                    "type": "integer"
+                  },
+                  "totalPages": {
+                    "type": "integer"
+                  },
+                  "hasMore": {
+                    "type": "boolean"
+                  }
                 }
               },
-              "period": { "type": "string" }
+              "period": {
+                "type": "string"
+              }
             }
           },
-          "message": { "type": "string" }
+          "message": {
+            "type": "string"
+          }
         }
       },
       "AIServerBusyResponse": {
         "type": "object",
         "properties": {
-          "success": { "type": "boolean", "example": false },
-          "code": { "type": "string", "example": "AI_SERVER_BUSY" },
+          "success": {
+            "type": "boolean",
+            "example": false
+          },
+          "code": {
+            "type": "string",
+            "example": "AI_SERVER_BUSY"
+          },
           "data": {
             "type": "object",
             "properties": {
-              "session": { "type": "object" },
-              "assistantMessage": { "type": "string" }
+              "session": {
+                "type": "object"
+              },
+              "assistantMessage": {
+                "type": "string"
+              }
             }
           },
-          "message": { "type": "string", "example": "AI server is busy" }
+          "message": {
+            "type": "string",
+            "example": "AI server is busy"
+          }
         }
       }
     }
@@ -787,6 +1561,45 @@
     "compatibility": {
       "legacyTopTrending": "POST /api/recipes/top-trending giữ nguyên contract cũ",
       "newTrendingV2": "GET /api/recipes/trending-v2 dùng cho infinite scroll"
+    },
+    "flows": {
+      "SessionBasedChat": {
+        "goal": "Chat theo phiên, có khả năng đổi món trong lúc nấu",
+        "steps": [
+          "POST /api/ai-chat/sessions",
+          "PATCH /api/ai-chat/sessions/active-recipe",
+          "POST /api/ai-chat/messages",
+          "GET /api/ai-chat/sessions/{id}?userId=..."
+        ]
+      },
+      "AutoSessionChat": {
+        "goal": "Cho phép gửi message ngay khi chưa có session",
+        "steps": [
+          "POST /api/ai-chat/messages (without chatSessionId)",
+          "Server tự tạo session + auto-title + intro Bepes",
+          "Client đọc sessionId trong response để dùng cho các lượt sau"
+        ]
+      },
+      "TrendingInfiniteScrollV2": {
+        "goal": "Cuộn danh sách thịnh hành không giới hạn",
+        "steps": [
+          "GET /api/recipes/trending-v2?page=1&limit=20",
+          "Append data.items vào list",
+          "Nếu pagination.hasMore=true thì tăng page và gọi tiếp"
+        ]
+      }
+    },
+    "retryPolicy": {
+      "AI_SERVER_BUSY": {
+        "httpStatus": 503,
+        "retryAfterSeconds": "3-5",
+        "maxRetries": 3,
+        "strategy": "exponential backoff nhẹ (3s, 5s, 8s)"
+      }
     }
+  },
+  "externalDocs": {
+    "description": "Swagger UI trực quan",
+    "url": "https://api.example.com/api-docs"
   }
 }
