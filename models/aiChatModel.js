@@ -2,6 +2,19 @@ const { pool } = require('../config/dbConfig');
 const userDietModel = require('./userDietModel');
 
 const DEFAULT_RECOMMENDATION_LIMIT = 10;
+const DEFAULT_SESSION_TITLE = 'Phiên chat nấu ăn';
+
+const DEFAULT_AGENTIC_SYSTEM_PROMPT = [
+    'Bạn là ChefMate AI – trợ lý nấu ăn cá nhân của người dùng.',
+    'Mục tiêu: đề xuất món phù hợp, hướng dẫn nấu rõ ràng, an toàn thực phẩm, thực tế với nguyên liệu đang có.',
+    'Luôn trả lời bằng tiếng Việt tự nhiên, ngắn gọn, đúng trọng tâm.',
+    'Ưu tiên bám theo món đang chọn (active recipe). Nếu người dùng đổi món, cập nhật ngay ngữ cảnh món mới.',
+    'Tuyệt đối tôn trọng ghi chú ăn uống (dị ứng/hạn chế). Không gợi ý nguyên liệu hoặc bước nấu vi phạm.',
+    'Khi dữ liệu không đủ chắc chắn, hỏi lại ngắn gọn thay vì bịa.',
+    'Khi đưa hướng dẫn nấu: trình bày theo từng bước rõ ràng, có mẹo an toàn khi cần.',
+    'Nếu người dùng xin gợi ý món từ tủ lạnh: ưu tiên món đủ nấu trước, sau đó món thiếu ít nguyên liệu phụ.',
+    'Không tự ý đưa khuyến nghị y khoa chuyên sâu. Với vấn đề sức khỏe nghiêm trọng, nhắc người dùng tham khảo chuyên gia.'
+].join(' ');
 
 const COMMON_MISSING_INGREDIENTS = new Set([
     'hành', 'hành lá', 'hành tím', 'hành khô', 'tỏi', 'ớt', 'tiêu', 'muối', 'đường', 'nước mắm',
@@ -238,14 +251,34 @@ async function getRecentMessages(chatSessionId, limit = 20) {
     }));
 }
 
-async function createChatSession({ userId, title = 'Phiên chat nấu ăn', activeRecipeId = null }) {
+function generateSessionTitleFromMessage(message = '') {
+    const normalized = String(message).replace(/\s+/g, ' ').trim();
+    if (!normalized) return DEFAULT_SESSION_TITLE;
+
+    const cleaned = normalized
+        .replace(/^[\-\*\d\.\)\(\s]+/, '')
+        .replace(/[\r\n]+/g, ' ')
+        .trim();
+
+    if (!cleaned) return DEFAULT_SESSION_TITLE;
+
+    const maxLen = 48;
+    if (cleaned.length <= maxLen) return cleaned;
+    return `${cleaned.slice(0, maxLen - 1).trim()}…`;
+}
+
+async function createChatSession({ userId, title = DEFAULT_SESSION_TITLE, activeRecipeId = null }) {
     const parsedUserId = Number(userId);
     const parsedActiveRecipeId = activeRecipeId ? Number(activeRecipeId) : null;
+
+    const finalTitle = title && String(title).trim()
+        ? String(title).trim()
+        : DEFAULT_SESSION_TITLE;
 
     const [result] = await pool.query(
         `INSERT INTO ChatSessions (userId, title, activeRecipeId)
          VALUES (?, ?, ?)`,
-        [parsedUserId, title, parsedActiveRecipeId]
+        [parsedUserId, finalTitle, parsedActiveRecipeId]
     );
 
     return Number(result.insertId);
@@ -501,8 +534,12 @@ async function callAiApi({ model, messages, stream = false }) {
     }
 }
 
-exports.createSession = async ({ userId, title, activeRecipeId = null }) => {
-    const chatSessionId = await createChatSession({ userId, title, activeRecipeId });
+exports.createSession = async ({ userId, title, activeRecipeId = null, firstMessage = '' }) => {
+    const autoTitle = title && String(title).trim()
+        ? String(title).trim()
+        : generateSessionTitleFromMessage(firstMessage);
+
+    const chatSessionId = await createChatSession({ userId, title: autoTitle, activeRecipeId });
     const session = await getChatSessionById(chatSessionId, userId);
 
     return {
@@ -702,7 +739,8 @@ exports.sendMessage = async ({
     let session;
 
     if (!sessionId) {
-        sessionId = await createChatSession({ userId: parsedUserId, title: 'Phiên chat nấu ăn' });
+        const autoTitle = generateSessionTitleFromMessage(message);
+        sessionId = await createChatSession({ userId: parsedUserId, title: autoTitle });
     }
 
     session = await getChatSessionById(sessionId, parsedUserId);
@@ -729,19 +767,19 @@ exports.sendMessage = async ({
         ? await getRecipeContext(session.activeRecipeId)
         : null;
 
+    const extraSystemPrompt = process.env.AI_CHAT_SYSTEM_PROMPT || '';
+
     const contextMessage = {
         role: 'system',
         content: [
-            'Bạn là trợ lý nấu ăn AI cho ứng dụng ChefMate.',
-            'Yêu cầu: trả lời rõ ràng, thực tế, ngắn gọn, ưu tiên an toàn thực phẩm.',
-            'Nếu người dùng hỏi món từ nguyên liệu hiện có, hãy đề xuất theo nhóm: Đủ để nấu ngay / Còn thiếu 1 chút.',
+            DEFAULT_AGENTIC_SYSTEM_PROMPT,
+            extraSystemPrompt,
             `Tủ lạnh hiện tại của user: ${JSON.stringify(pantryRows, null, 2)}`,
             `Ghi chú ăn uống (dị ứng/hạn chế/sở thích) đang hiệu lực: ${JSON.stringify(activeDietNotes, null, 2)}`,
-            'Khi người dùng có dị ứng hoặc hạn chế, tuyệt đối không gợi ý nguyên liệu/món vi phạm.',
             recipeContext
                 ? `Món đang chọn: ${recipeContext.recipeName}. Công thức: ${JSON.stringify(recipeContext, null, 2)}`
                 : 'Hiện chưa có món nào được chọn.'
-        ].join('\n')
+        ].filter(Boolean).join('\n')
     };
 
     const llmMessages = [
