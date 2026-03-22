@@ -4,9 +4,11 @@ const userDietModel = require('./userDietModel');
 const DEFAULT_RECOMMENDATION_LIMIT = 10;
 const DEFAULT_SESSION_TITLE = 'Phiên chat nấu ăn';
 const DEFAULT_AUTO_TITLE_MODEL = process.env.AI_CHAT_TITLE_MODEL || process.env.AI_CHAT_MODEL || 'gemma3:4b';
+const DEFAULT_AGENT_NAME = 'Bepes';
+const DEFAULT_SESSION_INTRO_MESSAGE = `Xin chào anh, em là ${DEFAULT_AGENT_NAME} – trợ lý nấu ăn của ChefMate. Em có thể gợi ý món theo nguyên liệu hiện có, hướng dẫn từng bước nấu và điều chỉnh theo dị ứng/hạn chế ăn uống của anh.`;
 
 const DEFAULT_AGENTIC_SYSTEM_PROMPT = [
-    'Bạn là ChefMate AI – trợ lý nấu ăn cá nhân của người dùng.',
+    `Bạn là ${DEFAULT_AGENT_NAME}, trợ lý nấu ăn cá nhân trong ứng dụng ChefMate.`,
     'Mục tiêu: đề xuất món phù hợp, hướng dẫn nấu rõ ràng, an toàn thực phẩm, thực tế với nguyên liệu đang có.',
     'Luôn trả lời bằng tiếng Việt tự nhiên, ngắn gọn, đúng trọng tâm.',
     'Ưu tiên bám theo món đang chọn (active recipe). Nếu người dùng đổi món, cập nhật ngay ngữ cảnh món mới.',
@@ -586,11 +588,26 @@ exports.createSession = async ({ userId, title, activeRecipeId = null, firstMess
         : await generateSessionTitleByAgentApi({ firstMessage, model });
 
     const chatSessionId = await createChatSession({ userId, title: autoTitle, activeRecipeId });
+
+    await addChatMessage({
+        chatSessionId,
+        role: 'assistant',
+        content: DEFAULT_SESSION_INTRO_MESSAGE,
+        meta: {
+            agentName: DEFAULT_AGENT_NAME,
+            intro: true
+        }
+    });
+
     const session = await getChatSessionById(chatSessionId, userId);
 
     return {
         success: true,
-        data: session,
+        data: {
+            ...session,
+            introMessage: DEFAULT_SESSION_INTRO_MESSAGE,
+            agentName: DEFAULT_AGENT_NAME
+        },
         message: 'Create chat session successfully'
     };
 };
@@ -787,6 +804,16 @@ exports.sendMessage = async ({
     if (!sessionId) {
         const autoTitle = await generateSessionTitleByAgentApi({ firstMessage: message, model });
         sessionId = await createChatSession({ userId: parsedUserId, title: autoTitle });
+
+        await addChatMessage({
+            chatSessionId: sessionId,
+            role: 'assistant',
+            content: DEFAULT_SESSION_INTRO_MESSAGE,
+            meta: {
+                agentName: DEFAULT_AGENT_NAME,
+                intro: true
+            }
+        });
     }
 
     session = await getChatSessionById(sessionId, parsedUserId);
