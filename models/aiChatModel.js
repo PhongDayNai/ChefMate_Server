@@ -31,6 +31,45 @@ function normalizeIngredientName(name = '') {
         .replace(/\s+/g, ' ');
 }
 
+function stripVietnameseDiacritics(text = '') {
+    return String(text)
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/đ/g, 'd')
+        .replace(/Đ/g, 'D');
+}
+
+function canonicalizeIngredientName(name = '') {
+    const base = stripVietnameseDiacritics(normalizeIngredientName(name))
+        .replace(/[^a-z0-9\s]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+
+    if (!base) return '';
+
+    let tokens = base.split(' ').filter(Boolean);
+
+    tokens = tokens.map(token => {
+        if (token === 'lon' || token === 'heo') return 'heo';
+        return token;
+    });
+
+    const hasChan = tokens.includes('chan');
+    const hasMong = tokens.includes('mong');
+    const hasGio = tokens.includes('gio');
+    const hasHeo = tokens.includes('heo');
+
+    if (hasGio && (hasChan || hasMong || hasHeo)) {
+        return 'chan gio heo';
+    }
+
+    if (tokens[0] === 'thit' && tokens[1] === 'heo') {
+        return 'thit heo';
+    }
+
+    return tokens.join(' ');
+}
+
 function shouldBlockRecipeByDiet(ingredients = [], activeDietNotes = []) {
     if (!Array.isArray(activeDietNotes) || activeDietNotes.length === 0) {
         return { blocked: false, matchedNotes: [] };
@@ -214,12 +253,23 @@ async function getPantryMapByUser(userId) {
 
     for (const row of rows) {
         const normalizedName = normalizeIngredientName(row.ingredientName);
+        const canonicalName = canonicalizeIngredientName(row.ingredientName);
         const normalizedUnit = String(row.unit || '').trim().toLowerCase();
-        const key = `${normalizedName}|${normalizedUnit}`;
         const qty = Number(row.quantity || 0);
 
-        exactMap.set(key, (exactMap.get(key) || 0) + qty);
+        const keys = new Set([
+            `${normalizedName}|${normalizedUnit}`,
+            canonicalName ? `${canonicalName}|${normalizedUnit}` : null
+        ].filter(Boolean));
+
+        for (const key of keys) {
+            exactMap.set(key, (exactMap.get(key) || 0) + qty);
+        }
+
         nameMap.set(normalizedName, (nameMap.get(normalizedName) || 0) + qty);
+        if (canonicalName) {
+            nameMap.set(canonicalName, (nameMap.get(canonicalName) || 0) + qty);
+        }
     }
 
     return {
@@ -439,9 +489,23 @@ async function getRecipeRecommendationsFromPantry({ userId, limit, activeDietNot
         for (const ing of ingredients) {
             const unit = String(ing.unit || '').trim().toLowerCase();
             const normalizedName = normalizeIngredientName(ing.ingredientName);
-            const key = `${normalizedName}|${unit}`;
-            const currentExact = pantryExactMap.get(key) || 0;
-            const currentByName = pantryNameMap.get(normalizedName) || 0;
+            const canonicalName = canonicalizeIngredientName(ing.ingredientName);
+
+            const candidateKeys = [
+                `${normalizedName}|${unit}`,
+                canonicalName ? `${canonicalName}|${unit}` : null
+            ].filter(Boolean);
+
+            const candidateNames = [normalizedName, canonicalName].filter(Boolean);
+
+            const currentExact = candidateKeys.reduce((max, key) => {
+                return Math.max(max, pantryExactMap.get(key) || 0);
+            }, 0);
+
+            const currentByName = candidateNames.reduce((max, name) => {
+                return Math.max(max, pantryNameMap.get(name) || 0);
+            }, 0);
+
             const current = Math.max(currentExact, currentByName);
             const required = Number(ing.weight || 0);
             const tolerance = required * 0.1;
