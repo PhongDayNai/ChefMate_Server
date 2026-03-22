@@ -1,4 +1,5 @@
 const { pool } = require('../config/dbConfig');
+const userDietModel = require('./userDietModel');
 
 const DEFAULT_RECOMMENDATION_LIMIT = 10;
 
@@ -12,6 +13,52 @@ function normalizeIngredientName(name = '') {
         .trim()
         .toLowerCase()
         .replace(/\s+/g, ' ');
+}
+
+function shouldBlockRecipeByDiet(ingredients = [], activeDietNotes = []) {
+    if (!Array.isArray(activeDietNotes) || activeDietNotes.length === 0) {
+        return { blocked: false, matchedNotes: [] };
+    }
+
+    const ingredientNames = ingredients.map(ing => normalizeIngredientName(ing.ingredientName));
+    const matchedNotes = [];
+
+    for (const note of activeDietNotes) {
+        const noteType = String(note.noteType || '').toLowerCase();
+        if (noteType !== 'allergy' && noteType !== 'restriction') {
+            continue;
+        }
+
+        const label = normalizeIngredientName(note.label || '');
+        const keywords = Array.isArray(note.keywords)
+            ? note.keywords.map(k => normalizeIngredientName(k))
+            : [];
+
+        const terms = new Set([label, ...keywords].filter(Boolean));
+        if (terms.size === 0) continue;
+
+        const hit = ingredientNames.some(name => {
+            for (const term of terms) {
+                if (name.includes(term) || term.includes(name)) {
+                    return true;
+                }
+            }
+            return false;
+        });
+
+        if (hit) {
+            matchedNotes.push({
+                noteType,
+                label: note.label,
+                terms: Array.from(terms)
+            });
+        }
+    }
+
+    return {
+        blocked: matchedNotes.length > 0,
+        matchedNotes
+    };
 }
 
 function safeParseJson(value) {
@@ -258,7 +305,7 @@ function resolveRecommendationLimit(limit) {
     return Math.min(Math.floor(parsed), 50);
 }
 
-async function getRecipeRecommendationsFromPantry({ userId, limit }) {
+async function getRecipeRecommendationsFromPantry({ userId, limit, activeDietNotes = [] }) {
     const parsedUserId = Number(userId);
     if (!parsedUserId || parsedUserId <= 0) {
         throw new Error('userId must be a positive number');
@@ -333,6 +380,11 @@ async function getRecipeRecommendationsFromPantry({ userId, limit }) {
         }
 
         const completionRate = Math.round((matchedCount / ingredients.length) * 100);
+
+        const dietCheck = shouldBlockRecipeByDiet(ingredients, activeDietNotes);
+        if (dietCheck.blocked) {
+            continue;
+        }
 
         const basePayload = {
             recipeId,
@@ -504,7 +556,8 @@ exports.updateActiveRecipe = async ({ userId, chatSessionId, recipeId }) => {
 };
 
 exports.getRecommendationsFromPantry = async ({ userId, limit = 10 }) => {
-    return getRecipeRecommendationsFromPantry({ userId, limit });
+    const activeDietNotes = await userDietModel.getActiveDietNotes(userId);
+    return getRecipeRecommendationsFromPantry({ userId, limit, activeDietNotes });
 };
 
 exports.sendMessage = async ({
@@ -549,6 +602,7 @@ exports.sendMessage = async ({
 
     const recentMessages = await getRecentMessages(sessionId, 30);
     const { rows: pantryRows } = await getPantryMapByUser(parsedUserId);
+    const activeDietNotes = await userDietModel.getActiveDietNotes(parsedUserId);
 
     const recipeContext = session.activeRecipeId
         ? await getRecipeContext(session.activeRecipeId)
@@ -561,6 +615,8 @@ exports.sendMessage = async ({
             'Yêu cầu: trả lời rõ ràng, thực tế, ngắn gọn, ưu tiên an toàn thực phẩm.',
             'Nếu người dùng hỏi món từ nguyên liệu hiện có, hãy đề xuất theo nhóm: Đủ để nấu ngay / Còn thiếu 1 chút.',
             `Tủ lạnh hiện tại của user: ${JSON.stringify(pantryRows, null, 2)}`,
+            `Ghi chú ăn uống (dị ứng/hạn chế/sở thích) đang hiệu lực: ${JSON.stringify(activeDietNotes, null, 2)}`,
+            'Khi người dùng có dị ứng hoặc hạn chế, tuyệt đối không gợi ý nguyên liệu/món vi phạm.',
             recipeContext
                 ? `Món đang chọn: ${recipeContext.recipeName}. Công thức: ${JSON.stringify(recipeContext, null, 2)}`
                 : 'Hiện chưa có món nào được chọn.'
