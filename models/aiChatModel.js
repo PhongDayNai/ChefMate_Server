@@ -35,6 +35,10 @@ function extractAssistantMessage(apiData) {
     if (typeof apiData.response === 'string') return apiData.response;
     if (typeof apiData.content === 'string') return apiData.content;
 
+    if (typeof apiData.message === 'object' && typeof apiData.message?.content === 'string') {
+        return apiData.message.content;
+    }
+
     if (Array.isArray(apiData.choices) && apiData.choices.length > 0) {
         const choice = apiData.choices[0];
         if (choice?.message?.content) {
@@ -50,6 +54,34 @@ function extractAssistantMessage(apiData) {
     }
 
     return null;
+}
+
+function parseStreamNdjsonToMessage(rawText = '') {
+    const lines = String(rawText)
+        .split('\n')
+        .map(line => line.trim())
+        .filter(Boolean);
+
+    let combined = '';
+    const chunks = [];
+
+    for (const line of lines) {
+        try {
+            const payload = JSON.parse(line);
+            const token = payload?.message?.content || payload?.response || payload?.content || '';
+            if (token) {
+                combined += token;
+            }
+            chunks.push(payload);
+        } catch (_) {
+            // ignore non-json lines
+        }
+    }
+
+    return {
+        assistantMessage: combined || null,
+        chunks
+    };
 }
 
 async function getRecipeContext(recipeId) {
@@ -375,18 +407,37 @@ async function callAiApi({ model, messages, stream = false }) {
         });
 
         const text = await response.text();
+
+        if (!response.ok) {
+            let errorPayload;
+            try {
+                errorPayload = JSON.parse(text);
+            } catch (_) {
+                errorPayload = { raw: text };
+            }
+
+            const err = new Error(`AI API failed with status ${response.status}`);
+            err.status = response.status;
+            err.payload = errorPayload;
+            throw err;
+        }
+
+        if (stream) {
+            const streamResult = parseStreamNdjsonToMessage(text);
+            return {
+                raw: {
+                    mode: 'stream',
+                    chunks: streamResult.chunks
+                },
+                assistantMessage: streamResult.assistantMessage
+            };
+        }
+
         let data;
         try {
             data = JSON.parse(text);
         } catch (_) {
             data = { raw: text };
-        }
-
-        if (!response.ok) {
-            const err = new Error(`AI API failed with status ${response.status}`);
-            err.status = response.status;
-            err.payload = data;
-            throw err;
         }
 
         return {
