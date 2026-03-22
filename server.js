@@ -26,6 +26,14 @@ app.use('/api/pantry', pantryRoutes);
 app.use('/api/ai-chat', aiChatRoutes);
 app.use('/api/user-diet-notes', userDietRoutes);
 
+app.get('/api-docs', (req, res) => {
+    res.sendFile(path.join(__dirname, 'docs', 'swagger-ui.html'));
+});
+
+app.get('/api-docs/openapi.json', (req, res) => {
+    res.sendFile(path.join(__dirname, 'docs', 'openapi.json'));
+});
+
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
     console.log(`Server đang chạy tại http://localhost:${PORT}`);
