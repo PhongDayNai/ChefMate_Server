@@ -1,0 +1,552 @@
+const { pool } = require('../config/dbConfig');
+
+const COMMON_MISSING_INGREDIENTS = new Set([
+    'hành', 'hành lá', 'hành tím', 'hành khô', 'tỏi', 'ớt', 'tiêu', 'muối', 'đường', 'nước mắm',
+    'hạt nêm', 'dầu ăn', 'dầu oliu', 'bột ngọt', 'bột canh', 'rau mùi', 'ngò rí', 'gừng', 'chanh'
+]);
+
+function normalizeIngredientName(name = '') {
+    return String(name)
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g, ' ');
+}
+
+function safeParseJson(value) {
+    if (!value) return null;
+
+    if (typeof value === 'object') {
+        return value;
+    }
+
+    try {
+        return JSON.parse(value);
+    } catch (_) {
+        return null;
+    }
+}
+
+function extractAssistantMessage(apiData) {
+    if (!apiData) return null;
+
+    if (typeof apiData.message === 'string') return apiData.message;
+    if (typeof apiData.response === 'string') return apiData.response;
+    if (typeof apiData.content === 'string') return apiData.content;
+
+    if (Array.isArray(apiData.choices) && apiData.choices.length > 0) {
+        const choice = apiData.choices[0];
+        if (choice?.message?.content) {
+            return choice.message.content;
+        }
+        if (typeof choice?.text === 'string') {
+            return choice.text;
+        }
+    }
+
+    if (apiData.data && typeof apiData.data.message === 'string') {
+        return apiData.data.message;
+    }
+
+    return null;
+}
+
+async function getRecipeContext(recipeId) {
+    const parsedRecipeId = Number(recipeId);
+    if (!parsedRecipeId || parsedRecipeId <= 0) return null;
+
+    const [recipeRows] = await pool.query(
+        `SELECT r.recipeId, r.recipeName, r.cookingTime, r.ration, r.userId, u.fullName AS authorName
+         FROM Recipes r
+         JOIN Users u ON r.userId = u.userId
+         WHERE r.recipeId = ?
+         LIMIT 1`,
+        [parsedRecipeId]
+    );
+
+    if (recipeRows.length === 0) {
+        return null;
+    }
+
+    const [ingredientRows] = await pool.query(
+        `SELECT i.ingredientName, ri.weight, ri.unit
+         FROM RecipesIngredients ri
+         JOIN Ingredients i ON i.ingredientId = ri.ingredientId
+         WHERE ri.recipeId = ?
+         ORDER BY ri.weight DESC`,
+        [parsedRecipeId]
+    );
+
+    const [stepRows] = await pool.query(
+        `SELECT indexStep, content
+         FROM CookingSteps
+         WHERE recipeId = ?
+         ORDER BY indexStep ASC`,
+        [parsedRecipeId]
+    );
+
+    return {
+        recipeId: Number(recipeRows[0].recipeId),
+        recipeName: recipeRows[0].recipeName,
+        cookingTime: recipeRows[0].cookingTime,
+        ration: Number(recipeRows[0].ration),
+        authorName: recipeRows[0].authorName,
+        ingredients: ingredientRows.map(row => ({
+            ingredientName: row.ingredientName,
+            weight: Number(row.weight),
+            unit: row.unit
+        })),
+        steps: stepRows.map(row => ({
+            indexStep: Number(row.indexStep),
+            content: row.content
+        }))
+    };
+}
+
+async function getPantryMapByUser(userId) {
+    const parsedUserId = Number(userId);
+    const [rows] = await pool.query(
+        `SELECT i.ingredientName, p.quantity, p.unit
+         FROM PantryItems p
+         JOIN Ingredients i ON i.ingredientId = p.ingredientId
+         WHERE p.userId = ?`,
+        [parsedUserId]
+    );
+
+    const map = new Map();
+
+    for (const row of rows) {
+        const key = `${normalizeIngredientName(row.ingredientName)}|${String(row.unit || '').trim().toLowerCase()}`;
+        const oldVal = map.get(key) || 0;
+        map.set(key, oldVal + Number(row.quantity || 0));
+    }
+
+    return {
+        rows: rows.map(r => ({
+            ingredientName: r.ingredientName,
+            quantity: Number(r.quantity),
+            unit: r.unit
+        })),
+        map
+    };
+}
+
+async function getRecentMessages(chatSessionId, limit = 20) {
+    const parsedLimit = Number(limit) > 0 ? Number(limit) : 20;
+
+    const [rows] = await pool.query(
+        `SELECT chatMessageId, role, content, metaJson, createdAt
+         FROM ChatMessages
+         WHERE chatSessionId = ?
+         ORDER BY chatMessageId DESC
+         LIMIT ?`,
+        [chatSessionId, parsedLimit]
+    );
+
+    return rows.reverse().map(row => ({
+        chatMessageId: Number(row.chatMessageId),
+        role: row.role,
+        content: row.content,
+        meta: safeParseJson(row.metaJson),
+        createdAt: row.createdAt
+    }));
+}
+
+async function createChatSession({ userId, title = 'Phiên chat nấu ăn', activeRecipeId = null }) {
+    const parsedUserId = Number(userId);
+    const parsedActiveRecipeId = activeRecipeId ? Number(activeRecipeId) : null;
+
+    const [result] = await pool.query(
+        `INSERT INTO ChatSessions (userId, title, activeRecipeId)
+         VALUES (?, ?, ?)`,
+        [parsedUserId, title, parsedActiveRecipeId]
+    );
+
+    return Number(result.insertId);
+}
+
+async function getChatSessionById(chatSessionId, userId) {
+    const [rows] = await pool.query(
+        `SELECT chatSessionId, userId, title, activeRecipeId, createdAt, updatedAt
+         FROM ChatSessions
+         WHERE chatSessionId = ? AND userId = ?
+         LIMIT 1`,
+        [chatSessionId, userId]
+    );
+
+    if (rows.length === 0) return null;
+
+    return {
+        chatSessionId: Number(rows[0].chatSessionId),
+        userId: Number(rows[0].userId),
+        title: rows[0].title,
+        activeRecipeId: rows[0].activeRecipeId ? Number(rows[0].activeRecipeId) : null,
+        createdAt: rows[0].createdAt,
+        updatedAt: rows[0].updatedAt
+    };
+}
+
+async function addChatMessage({ chatSessionId, role, content, meta = null }) {
+    await pool.query(
+        `INSERT INTO ChatMessages (chatSessionId, role, content, metaJson)
+         VALUES (?, ?, ?, ?)`,
+        [chatSessionId, role, content, meta ? JSON.stringify(meta) : null]
+    );
+
+    await pool.query(
+        'UPDATE ChatSessions SET updatedAt = CURRENT_TIMESTAMP WHERE chatSessionId = ?',
+        [chatSessionId]
+    );
+}
+
+async function setActiveRecipe({ chatSessionId, userId, recipeId = null }) {
+    const parsedRecipeId = recipeId ? Number(recipeId) : null;
+
+    await pool.query(
+        `UPDATE ChatSessions
+         SET activeRecipeId = ?, updatedAt = CURRENT_TIMESTAMP
+         WHERE chatSessionId = ? AND userId = ?`,
+        [parsedRecipeId, chatSessionId, userId]
+    );
+}
+
+async function getRecipeRecommendationsFromPantry({ userId, limit = 10 }) {
+    const parsedUserId = Number(userId);
+    if (!parsedUserId || parsedUserId <= 0) {
+        throw new Error('userId must be a positive number');
+    }
+
+    const { map: pantryMap } = await getPantryMapByUser(parsedUserId);
+
+    const [recipeRows] = await pool.query(
+        `SELECT recipeId, recipeName, image, cookingTime, ration, likeQuantity, viewCount
+         FROM Recipes
+         ORDER BY viewCount DESC, likeQuantity DESC, createdAt DESC
+         LIMIT 300`
+    );
+
+    const [ingredientRows] = await pool.query(
+        `SELECT ri.recipeId, i.ingredientName, ri.weight, ri.unit, ri.isMain, ri.isCommon
+         FROM RecipesIngredients ri
+         JOIN Ingredients i ON i.ingredientId = ri.ingredientId`
+    );
+
+    const recipeIngredientMap = new Map();
+    for (const row of ingredientRows) {
+        const recipeId = Number(row.recipeId);
+        if (!recipeIngredientMap.has(recipeId)) {
+            recipeIngredientMap.set(recipeId, []);
+        }
+
+        recipeIngredientMap.get(recipeId).push({
+            ingredientName: row.ingredientName,
+            weight: Number(row.weight || 0),
+            unit: row.unit,
+            isMain: Number(row.isMain || 0) === 1,
+            isCommon: Number(row.isCommon || 0) === 1
+        });
+    }
+
+    const readyToCook = [];
+    const almostReady = [];
+
+    for (const recipe of recipeRows) {
+        const recipeId = Number(recipe.recipeId);
+        const ingredients = recipeIngredientMap.get(recipeId) || [];
+        if (ingredients.length === 0) continue;
+
+        const missing = [];
+        let matchedCount = 0;
+
+        for (const ing of ingredients) {
+            const unit = String(ing.unit || '').trim().toLowerCase();
+            const key = `${normalizeIngredientName(ing.ingredientName)}|${unit}`;
+            const current = pantryMap.get(key) || 0;
+            const required = Number(ing.weight || 0);
+            const tolerance = required * 0.1;
+
+            if (current + tolerance >= required) {
+                matchedCount += 1;
+            } else {
+                missing.push({
+                    ingredientName: ing.ingredientName,
+                    need: required,
+                    have: current,
+                    unit: ing.unit,
+                    isMain: Boolean(ing.isMain),
+                    isCommon: Boolean(ing.isCommon)
+                });
+            }
+        }
+
+        const completionRate = Math.round((matchedCount / ingredients.length) * 100);
+
+        const basePayload = {
+            recipeId,
+            recipeName: recipe.recipeName,
+            image: recipe.image,
+            cookingTime: recipe.cookingTime,
+            ration: Number(recipe.ration),
+            completionRate,
+            missing
+        };
+
+        if (missing.length === 0) {
+            readyToCook.push(basePayload);
+            continue;
+        }
+
+        const missingMainCount = missing.filter(item => item.isMain).length;
+
+        const isAlmostReady =
+            missingMainCount === 0 &&
+            missing.length <= 2 &&
+            missing.every(item => item.isCommon || COMMON_MISSING_INGREDIENTS.has(normalizeIngredientName(item.ingredientName)));
+
+        if (isAlmostReady) {
+            almostReady.push(basePayload);
+        }
+    }
+
+    const sortedReady = readyToCook
+        .sort((a, b) => b.completionRate - a.completionRate)
+        .slice(0, limit);
+
+    const remainLimit = Math.max(limit - sortedReady.length, 0);
+
+    const sortedAlmost = almostReady
+        .sort((a, b) => b.completionRate - a.completionRate)
+        .slice(0, remainLimit);
+
+    return {
+        success: true,
+        data: {
+            readyToCook: sortedReady,
+            almostReady: sortedAlmost
+        },
+        message: 'Get recommendations from pantry successfully'
+    };
+}
+
+async function callAiApi({ model, messages, stream = false }) {
+    const apiUrl = process.env.AI_CHAT_API_URL || 'https://your-ai-api-url.com';
+    const timeoutMs = Number(process.env.AI_CHAT_TIMEOUT_MS || 20000);
+
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+
+    try {
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ model, messages, stream }),
+            signal: controller.signal
+        });
+
+        const text = await response.text();
+        let data;
+        try {
+            data = JSON.parse(text);
+        } catch (_) {
+            data = { raw: text };
+        }
+
+        if (!response.ok) {
+            const err = new Error(`AI API failed with status ${response.status}`);
+            err.status = response.status;
+            err.payload = data;
+            throw err;
+        }
+
+        return {
+            raw: data,
+            assistantMessage: extractAssistantMessage(data)
+        };
+    } finally {
+        clearTimeout(timer);
+    }
+}
+
+exports.createSession = async ({ userId, title, activeRecipeId = null }) => {
+    const chatSessionId = await createChatSession({ userId, title, activeRecipeId });
+    const session = await getChatSessionById(chatSessionId, userId);
+
+    return {
+        success: true,
+        data: session,
+        message: 'Create chat session successfully'
+    };
+};
+
+exports.getSessionHistory = async ({ userId, chatSessionId }) => {
+    const session = await getChatSessionById(chatSessionId, userId);
+    if (!session) {
+        return {
+            success: false,
+            data: null,
+            message: 'Chat session not found'
+        };
+    }
+
+    const messages = await getRecentMessages(chatSessionId, 200);
+
+    return {
+        success: true,
+        data: {
+            session,
+            messages
+        },
+        message: 'Get chat history successfully'
+    };
+};
+
+exports.updateActiveRecipe = async ({ userId, chatSessionId, recipeId }) => {
+    const session = await getChatSessionById(chatSessionId, userId);
+    if (!session) {
+        return {
+            success: false,
+            data: null,
+            message: 'Chat session not found'
+        };
+    }
+
+    await setActiveRecipe({ chatSessionId, userId, recipeId });
+
+    const updatedSession = await getChatSessionById(chatSessionId, userId);
+
+    return {
+        success: true,
+        data: updatedSession,
+        message: 'Update active recipe successfully'
+    };
+};
+
+exports.getRecommendationsFromPantry = async ({ userId, limit = 10 }) => {
+    return getRecipeRecommendationsFromPantry({ userId, limit });
+};
+
+exports.sendMessage = async ({
+    userId,
+    chatSessionId = null,
+    message,
+    model = process.env.AI_CHAT_MODEL || 'gemma3:4b',
+    stream = false,
+    activeRecipeId = null
+}) => {
+    const parsedUserId = Number(userId);
+    if (!parsedUserId || parsedUserId <= 0) {
+        throw new Error('userId must be a positive number');
+    }
+
+    if (!message || typeof message !== 'string' || !message.trim()) {
+        throw new Error('message is required');
+    }
+
+    let sessionId = chatSessionId ? Number(chatSessionId) : null;
+    let session;
+
+    if (!sessionId) {
+        sessionId = await createChatSession({ userId: parsedUserId, title: 'Phiên chat nấu ăn' });
+    }
+
+    session = await getChatSessionById(sessionId, parsedUserId);
+    if (!session) {
+        throw new Error('Chat session not found');
+    }
+
+    if (activeRecipeId !== null && activeRecipeId !== undefined) {
+        await setActiveRecipe({ chatSessionId: sessionId, userId: parsedUserId, recipeId: activeRecipeId });
+        session = await getChatSessionById(sessionId, parsedUserId);
+    }
+
+    await addChatMessage({
+        chatSessionId: sessionId,
+        role: 'user',
+        content: message.trim()
+    });
+
+    const recentMessages = await getRecentMessages(sessionId, 30);
+    const { rows: pantryRows } = await getPantryMapByUser(parsedUserId);
+
+    const recipeContext = session.activeRecipeId
+        ? await getRecipeContext(session.activeRecipeId)
+        : null;
+
+    const contextMessage = {
+        role: 'system',
+        content: [
+            'Bạn là trợ lý nấu ăn AI cho ứng dụng ChefMate.',
+            'Yêu cầu: trả lời rõ ràng, thực tế, ngắn gọn, ưu tiên an toàn thực phẩm.',
+            'Nếu người dùng hỏi món từ nguyên liệu hiện có, hãy đề xuất theo nhóm: Đủ để nấu ngay / Còn thiếu 1 chút.',
+            `Tủ lạnh hiện tại của user: ${JSON.stringify(pantryRows, null, 2)}`,
+            recipeContext
+                ? `Món đang chọn: ${recipeContext.recipeName}. Công thức: ${JSON.stringify(recipeContext, null, 2)}`
+                : 'Hiện chưa có món nào được chọn.'
+        ].join('\n')
+    };
+
+    const llmMessages = [
+        contextMessage,
+        ...recentMessages
+            .filter(msg => msg.role === 'user' || msg.role === 'assistant')
+            .map(msg => ({ role: msg.role, content: msg.content }))
+    ];
+
+    const fallbackAssistantMessage = 'Máy chủ AI đang bận hoặc tạm thời không khả dụng, anh vui lòng thử lại sau ít phút.';
+
+    try {
+        const aiResult = await callAiApi({
+            model,
+            messages: llmMessages,
+            stream
+        });
+
+        const assistantMessage = aiResult.assistantMessage || 'Em chưa nhận được phản hồi hợp lệ từ AI, anh thử lại giúp em nhé.';
+
+        await addChatMessage({
+            chatSessionId: sessionId,
+            role: 'assistant',
+            content: assistantMessage,
+            meta: {
+                model,
+                raw: aiResult.raw
+            }
+        });
+
+        const updatedSession = await getChatSessionById(sessionId, parsedUserId);
+
+        return {
+            success: true,
+            data: {
+                session: updatedSession,
+                assistantMessage
+            },
+            message: 'Chat with AI successfully'
+        };
+    } catch (error) {
+        await addChatMessage({
+            chatSessionId: sessionId,
+            role: 'assistant',
+            content: fallbackAssistantMessage,
+            meta: {
+                model,
+                error: error.message,
+                status: error.status || null,
+                payload: error.payload || null
+            }
+        });
+
+        const updatedSession = await getChatSessionById(sessionId, parsedUserId);
+
+        return {
+            success: false,
+            code: 'AI_SERVER_BUSY',
+            data: {
+                session: updatedSession,
+                assistantMessage: fallbackAssistantMessage
+            },
+            message: 'AI server is busy'
+        };
+    }
+};

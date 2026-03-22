@@ -62,6 +62,45 @@
 - [x]  Lấy tất cả bình luận
 - [x]  Xóa bình luận
 
+### d. Pantry + AI Chat (New)
+
+- [x] Tủ lạnh theo từng user (`PantryItems`)
+- [x] Gợi ý món theo tủ lạnh: `Đủ để nấu ngay` + `Còn thiếu 1 chút`
+- [x] AI Chat theo phiên, lưu lịch sử riêng cho từng user (`ChatSessions`, `ChatMessages`)
+- [x] Cho phép gắn món đang nấu (`activeRecipeId`) để AI giữ ngữ cảnh
+- [x] Khi AI API lỗi: trả về fallback `AI_SERVER_BUSY` + message server bận
+
+#### API mới
+
+- `GET /api/pantry?userId={id}`
+- `POST /api/pantry/upsert`
+  - body: `{ userId, ingredientName, quantity, unit, expiresAt? }`
+- `DELETE /api/pantry/delete`
+  - body: `{ userId, pantryItemId }`
+- `POST /api/ai-chat/sessions`
+  - body: `{ userId, title?, activeRecipeId? }`
+- `GET /api/ai-chat/sessions/:sessionId?userId={id}`
+- `PATCH /api/ai-chat/sessions/active-recipe`
+  - body: `{ userId, chatSessionId, recipeId|null }`
+- `POST /api/ai-chat/recommendations-from-pantry`
+  - body: `{ userId, limit? }`
+- `POST /api/ai-chat/messages`
+  - body: `{ userId, chatSessionId?, message, model?, stream?, activeRecipeId? }`
+
+#### Biến môi trường AI
+
+- `AI_CHAT_API_URL=https://your-ai-api-url.com`
+- `AI_CHAT_MODEL=gemma3:4b`
+- `AI_CHAT_TIMEOUT_MS=20000`
+
+#### Migration DB (cho hệ thống đã chạy)
+
+Chạy thêm script:
+
+```bash
+mysql -h <host> -u <user> -p <database> < scripts/migrate_ai_chat.sql
+```
+
 ## 4. Cơ sở dữ liệu
 
 <img width="852" height="540" alt="image" src="https://github.com/user-attachments/assets/3172ba07-46dc-4192-afa2-fb8d799a8ce2" />

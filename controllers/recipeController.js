@@ -35,7 +35,9 @@ exports.createRecipe = async (req, res) => {
         const parsedIngredients = parsedIngredientsRaw.map(ing => ({
             ...ing,
             ingredientName: normalizeText(ing.ingredientName),
-            unit: normalizeText(ing.unit)
+            unit: normalizeText(ing.unit),
+            isMain: Boolean(ing.isMain),
+            isCommon: Boolean(ing.isCommon)
         }));
 
         const normalizedTags = parsedTags.map(tag => ({
