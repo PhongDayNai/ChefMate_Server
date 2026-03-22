@@ -113,7 +113,7 @@ exports.updateActiveRecipe = async (req, res) => {
 
 exports.getRecommendationsFromPantry = async (req, res) => {
     const userId = Number(req.body?.userId || req.query.userId);
-    const limit = Number(req.body?.limit || req.query.limit || 10);
+    const limit = req.body?.limit ?? req.query.limit;
 
     if (!userId || userId <= 0) {
         return res.status(400).json({
