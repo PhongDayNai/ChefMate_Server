@@ -3,6 +3,7 @@ const userDietModel = require('./userDietModel');
 
 const DEFAULT_RECOMMENDATION_LIMIT = 10;
 const DEFAULT_SESSION_TITLE = 'Phiên chat nấu ăn';
+const DEFAULT_AUTO_TITLE_MODEL = process.env.AI_CHAT_TITLE_MODEL || process.env.AI_CHAT_MODEL || 'gemma3:4b';
 
 const DEFAULT_AGENTIC_SYSTEM_PROMPT = [
     'Bạn là ChefMate AI – trợ lý nấu ăn cá nhân của người dùng.',
@@ -265,6 +266,51 @@ function generateSessionTitleFromMessage(message = '') {
     const maxLen = 48;
     if (cleaned.length <= maxLen) return cleaned;
     return `${cleaned.slice(0, maxLen - 1).trim()}…`;
+}
+
+async function generateSessionTitleByAgentApi({
+    firstMessage = '',
+    model = DEFAULT_AUTO_TITLE_MODEL
+}) {
+    const normalized = String(firstMessage).replace(/\s+/g, ' ').trim();
+    if (!normalized) return DEFAULT_SESSION_TITLE;
+
+    const prompt = [
+        'Bạn là bộ tạo tiêu đề ngắn cho phiên chat nấu ăn.',
+        'Nhiệm vụ: tạo 1 tiêu đề tiếng Việt ngắn (tối đa 8 từ), dễ hiểu, không dấu ngoặc, không emoji.',
+        'Chỉ trả về đúng tiêu đề, không giải thích thêm.',
+        `Tin nhắn đầu tiên của người dùng: "${normalized}"`
+    ].join('\n');
+
+    try {
+        const result = await callAiApi({
+            model,
+            messages: [
+                { role: 'system', content: 'Bạn chỉ được trả về đúng một tiêu đề ngắn.' },
+                { role: 'user', content: prompt }
+            ],
+            stream: false
+        });
+
+        const rawTitle = String(result.assistantMessage || '').replace(/\s+/g, ' ').trim();
+        if (!rawTitle) {
+            return generateSessionTitleFromMessage(firstMessage);
+        }
+
+        const cleaned = rawTitle
+            .replace(/^['"“”`]+|['"“”`]+$/g, '')
+            .replace(/[\r\n]+/g, ' ')
+            .trim();
+
+        if (!cleaned) {
+            return generateSessionTitleFromMessage(firstMessage);
+        }
+
+        const words = cleaned.split(' ').slice(0, 8).join(' ');
+        return words || generateSessionTitleFromMessage(firstMessage);
+    } catch (_) {
+        return generateSessionTitleFromMessage(firstMessage);
+    }
 }
 
 async function createChatSession({ userId, title = DEFAULT_SESSION_TITLE, activeRecipeId = null }) {
@@ -534,10 +580,10 @@ async function callAiApi({ model, messages, stream = false }) {
     }
 }
 
-exports.createSession = async ({ userId, title, activeRecipeId = null, firstMessage = '' }) => {
+exports.createSession = async ({ userId, title, activeRecipeId = null, firstMessage = '', model }) => {
     const autoTitle = title && String(title).trim()
         ? String(title).trim()
-        : generateSessionTitleFromMessage(firstMessage);
+        : await generateSessionTitleByAgentApi({ firstMessage, model });
 
     const chatSessionId = await createChatSession({ userId, title: autoTitle, activeRecipeId });
     const session = await getChatSessionById(chatSessionId, userId);
@@ -739,7 +785,7 @@ exports.sendMessage = async ({
     let session;
 
     if (!sessionId) {
-        const autoTitle = generateSessionTitleFromMessage(message);
+        const autoTitle = await generateSessionTitleByAgentApi({ firstMessage: message, model });
         sessionId = await createChatSession({ userId: parsedUserId, title: autoTitle });
     }
 
