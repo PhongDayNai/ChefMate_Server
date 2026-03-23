@@ -9,6 +9,7 @@ router.delete('/sessions/:id', aiChatController.deleteSession);
 router.patch('/sessions/title', aiChatController.updateSessionTitle);
 router.patch('/sessions/active-recipe', aiChatController.updateActiveRecipe);
 router.post('/recommendations-from-pantry', aiChatController.getRecommendationsFromPantry);
+router.post('/sessions/resolve-previous', aiChatController.resolvePreviousSession);
 router.post('/messages', aiChatController.sendMessage);
 router.get('/messages', aiChatController.getUnifiedTimeline);
 
