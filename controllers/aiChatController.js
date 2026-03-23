@@ -249,6 +249,47 @@ exports.getRecommendationsFromPantry = async (req, res) => {
     }
 };
 
+exports.resolvePreviousSession = async (req, res) => {
+    const { userId, previousSessionId, action } = req.body || {};
+
+    if (!userId || Number(userId) <= 0) {
+        return res.status(400).json({
+            success: false,
+            data: null,
+            message: 'userId is required and must be a positive number'
+        });
+    }
+
+    if (!previousSessionId || Number(previousSessionId) <= 0) {
+        return res.status(400).json({
+            success: false,
+            data: null,
+            message: 'previousSessionId is required and must be a positive number'
+        });
+    }
+
+    try {
+        const result = await aiChatModel.resolvePreviousSession({
+            userId: Number(userId),
+            previousSessionId: Number(previousSessionId),
+            action: String(action || '')
+        });
+
+        if (!result.success) {
+            return res.status(404).json(result);
+        }
+
+        return res.status(200).json(result);
+    } catch (error) {
+        console.error('Error in resolvePreviousSession:', error);
+        return res.status(500).json({
+            success: false,
+            data: null,
+            message: `Failed to resolve previous session: ${error.message}`
+        });
+    }
+};
+
 exports.sendMessage = async (req, res) => {
     const { userId, chatSessionId, message, model, stream, activeRecipeId, useUnifiedSession } = req.body || {};
 

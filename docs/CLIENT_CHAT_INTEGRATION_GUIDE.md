@@ -15,6 +15,7 @@ Client cần triển khai đủ các nhóm flow sau:
 4. Đổi món đang nấu
 5. Gợi ý món theo pantry
 6. Cập nhật pantry thủ công sau khi nấu (vì chưa có auto-deduct chính thức)
+7. Xử lý nhắc mạnh khi session cũ có món chưa chốt (30 phút - 3 tiếng+)
 
 ### 1.2 Nguyên tắc
 - **Không tách session trên UI chat chính**.
@@ -109,7 +110,43 @@ Client cần triển khai đủ các nhóm flow sau:
 }
 ```
 
-## 2.5 Pantry thủ công (dùng tạm sau khi nấu)
+## 2.5 Resolve session cũ khi món trước chưa chốt (API mới)
+`POST /api/ai-chat/sessions/resolve-previous`
+
+```json
+{
+  "userId": 1,
+  "previousSessionId": 41,
+  "action": "complete_and_deduct"
+}
+```
+
+hoặc
+
+```json
+{
+  "userId": 1,
+  "previousSessionId": 41,
+  "action": "skip_deduction"
+}
+```
+
+### Response mẫu
+```json
+{
+  "success": true,
+  "data": {
+    "resolvedSessionId": 41,
+    "resolution": "skip_deduction",
+    "newSession": {
+      "chatSessionId": 42,
+      "title": "Trò chuyện mới"
+    }
+  }
+}
+```
+
+## 2.6 Pantry thủ công (dùng tạm sau khi nấu)
 ### Upsert item
 `POST /api/pantry/upsert`
 
@@ -151,7 +188,16 @@ Client cần triển khai đủ các nhóm flow sau:
 ## 3.2 Flow gửi tin nhắn (khuyến nghị chuẩn để tránh lệch)
 1. User bấm gửi.
 2. Gọi `POST /api/ai-chat/messages`.
-3. Sau khi thành công, **gọi lại** `GET /api/ai-chat/messages?userId={id}&limit=30` để đồng bộ timeline.
+3. Nếu response bình thường (`Chat with AI successfully`) → reload trang đầu timeline.
+4. Nếu response code nghiệp vụ là `PENDING_PREVIOUS_RECIPE_COMPLETION`:
+   - mở modal bắt buộc với 2 nút:
+     - `Hoàn thành & trừ nguyên liệu`
+     - `Bỏ qua (không trừ)`
+   - hiển thị `data.reminderMessage`
+   - gọi `POST /api/ai-chat/sessions/resolve-previous` theo lựa chọn
+   - sau khi resolve thành công:
+     - chuyển `sessionId` local = `data.newSession.chatSessionId`
+     - gọi lại `GET /api/ai-chat/messages?userId={id}&limit=30` để render session mới.
 
 > Có thể làm optimistic UI, nhưng vẫn nên reload trang đầu sau send để tránh lệch khi backend thêm meta/tool reply.
 
@@ -185,6 +231,17 @@ Vì vậy client tạm làm:
 2. Mở UI pantry editor.
 3. Dùng `upsert/delete` để user xác nhận chỉnh tay.
 
+## 3.7 Flow nhắc mạnh theo thời gian (món trước chưa chốt)
+Backend hiện áp rule:
+- từ **30 phút trở lên** kể từ tin nhắn cuối của session cũ, nếu còn `activeRecipeId` thì chặn chat tiếp và trả `PENDING_PREVIOUS_RECIPE_COMPLETION`.
+- từ **3 tiếng trở lên** thì `reminderMessage` sẽ là bản nhắc mạnh hơn (`isStrongReminder = true`).
+
+Client cần:
+1. Nhận code `PENDING_PREVIOUS_RECIPE_COMPLETION`.
+2. Hiển thị bắt buộc modal xác nhận với đúng 2 nút hành động.
+3. Gọi `POST /api/ai-chat/sessions/resolve-previous`.
+4. Đổi context UI sang `newSession` backend trả về.
+
 ---
 
 ## 4) Rule UI/UX bắt buộc để tránh loạn
@@ -207,6 +264,7 @@ Vì vậy client tạm làm:
 
 ## 5.2 `POST /api/ai-chat/messages`
 - `400`: message rỗng/sai input → báo nhập lại
+- `code=PENDING_PREVIOUS_RECIPE_COMPLETION` (HTTP 200): mở modal xử lý session cũ trước khi chat tiếp
 - `503`: AI bận → “AI đang bận, thử lại sau ít phút”
 - `500`: lỗi nội bộ → retry
 
@@ -215,7 +273,12 @@ Vì vậy client tạm làm:
 - `404`: session không tồn tại → reload timeline để lấy session mới
 - `500`: retry
 
-## 5.4 Pantry API
+## 5.4 `POST /api/ai-chat/sessions/resolve-previous`
+- `400`: thiếu userId/previousSessionId/action sai
+- `404`: session cũ không tồn tại
+- `500`: retry
+
+## 5.5 Pantry API
 - `400`: input sai (quantity/unit/ingredientName)
 - `404`: item không tồn tại (delete)
 - `500`: retry
@@ -262,7 +325,22 @@ async function loadOlder(userId: number) {
 }
 
 async function sendMessage(userId: number, message: string) {
-  await api.post('/api/ai-chat/messages', { userId, message, stream: false });
+  const res = await api.post('/api/ai-chat/messages', { userId, message, stream: false });
+
+  if (res.data?.code === 'PENDING_PREVIOUS_RECIPE_COMPLETION') {
+    const payload = res.data.data;
+    const action = await openPendingRecipeModalAndWaitAction(payload);
+
+    await api.post('/api/ai-chat/sessions/resolve-previous', {
+      userId,
+      previousSessionId: payload.previousSessionId,
+      action
+    });
+
+    await loadInitial(userId);
+    return;
+  }
+
   await loadInitial(userId); // sync an toàn
 }
 
@@ -308,6 +386,13 @@ curl -sS -X POST "https://api.example.com/api/ai-chat/recommendations-from-pantr
   -d '{"userId":1,"limit":10}'
 ```
 
+### 7.6 Resolve session cũ khi bị nhắc hoàn thành món trước
+```bash
+curl -sS -X POST "https://api.example.com/api/ai-chat/sessions/resolve-previous" \
+  -H "Content-Type: application/json" \
+  -d '{"userId":1,"previousSessionId":41,"action":"skip_deduction"}'
+```
+
 ---
 
 ## 8) Checklist nghiệm thu cuối
@@ -319,6 +404,7 @@ curl -sS -X POST "https://api.example.com/api/ai-chat/recommendations-from-pantr
 - [ ] Đổi món hoạt động qua `PATCH active-recipe`.
 - [ ] Gợi ý món từ pantry hiển thị đúng.
 - [ ] Trường hợp "nấu xong" có flow cập nhật pantry thủ công rõ ràng.
+- [ ] Khi nhận `PENDING_PREVIOUS_RECIPE_COMPLETION`, client hiển thị modal + resolve đúng.
 - [ ] Xử lý đủ lỗi 400/404/500/503, không crash UI.
 
 ---
