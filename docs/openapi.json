@@ -1212,7 +1212,7 @@
           "AIChat"
         ],
         "summary": "Chat with AI",
-        "description": "Gửi message tới AI. Nếu không truyền `chatSessionId`, server tự tạo session + auto-title + intro Bepes rồi mới xử lý message.\nKhi AI upstream bận/lỗi sẽ trả `503` với `code=AI_SERVER_BUSY`.",
+        "description": "Gửi message tới AI. Luồng unified mặc định sẽ dùng session gần nhất của user. Nếu session trước còn activeRecipeId và đã trôi qua >=30 phút, API có thể trả code `PENDING_PREVIOUS_RECIPE_COMPLETION` để client yêu cầu user xác nhận xử lý session cũ trước khi tiếp tục.",
         "requestBody": {
           "required": true,
           "content": {
@@ -1246,13 +1246,114 @@
         },
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK (chat bình thường hoặc response nghiệp vụ PENDING_PREVIOUS_RECIPE_COMPLETION)"
           },
           "503": {
             "$ref": "#/components/responses/AIServerBusy"
           }
         },
         "operationId": "sendChatMessage"
+      },
+      "get": {
+        "tags": [
+          "AIChat"
+        ],
+        "summary": "Get unified chat timeline (lazy-load)",
+        "description": "Lấy timeline chat hợp nhất theo user. Hỗ trợ beforeMessageId để lazy-load tin cũ khi cuộn lên.",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 30,
+              "minimum": 1,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "beforeMessageId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "nullable": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          }
+        },
+        "operationId": "getUnifiedChatTimeline"
+      }
+    },
+    "/api/ai-chat/sessions/resolve-previous": {
+      "post": {
+        "tags": [
+          "AIChat"
+        ],
+        "summary": "Resolve previous session and create new session",
+        "description": "Xử lý session cũ khi còn món chưa chốt (complete_and_deduct hoặc skip_deduction), sau đó tạo session mới. Có thể truyền pendingUserMessage để giữ lại tin nhắn user vừa gửi sang session mới.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "userId",
+                  "previousSessionId",
+                  "action"
+                ],
+                "properties": {
+                  "userId": {
+                    "type": "integer"
+                  },
+                  "previousSessionId": {
+                    "type": "integer"
+                  },
+                  "action": {
+                    "type": "string",
+                    "enum": [
+                      "complete_and_deduct",
+                      "skip_deduction"
+                    ]
+                  },
+                  "pendingUserMessage": {
+                    "type": "string",
+                    "nullable": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "operationId": "resolvePreviousChatSession"
       }
     }
   },
@@ -1459,6 +1560,11 @@
           "activeRecipeId": {
             "type": "integer",
             "nullable": true
+          },
+          "useUnifiedSession": {
+            "type": "boolean",
+            "default": true,
+            "description": "Mặc định true. Nếu false và không có chatSessionId thì server sẽ tạo session mới theo nhánh cũ."
           }
         }
       },
@@ -1537,6 +1643,65 @@
           "message": {
             "type": "string",
             "example": "AI server is busy"
+          }
+        }
+      },
+      "PendingPreviousRecipeResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "code": {
+            "type": "string",
+            "example": "PENDING_PREVIOUS_RECIPE_COMPLETION"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "previousSessionId": {
+                "type": "integer"
+              },
+              "recipeId": {
+                "type": "integer",
+                "nullable": true
+              },
+              "recipeName": {
+                "type": "string",
+                "nullable": true
+              },
+              "minutesSinceLastMessage": {
+                "type": "integer"
+              },
+              "isStrongReminder": {
+                "type": "boolean"
+              },
+              "reminderMessage": {
+                "type": "string"
+              },
+              "pendingUserMessage": {
+                "type": "string",
+                "nullable": true
+              },
+              "actions": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "label": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "message": {
+            "type": "string"
           }
         }
       }
