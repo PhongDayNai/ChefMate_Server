@@ -10,5 +10,6 @@ router.patch('/sessions/title', aiChatController.updateSessionTitle);
 router.patch('/sessions/active-recipe', aiChatController.updateActiveRecipe);
 router.post('/recommendations-from-pantry', aiChatController.getRecommendationsFromPantry);
 router.post('/messages', aiChatController.sendMessage);
+router.get('/messages', aiChatController.getUnifiedTimeline);
 
 module.exports = router;

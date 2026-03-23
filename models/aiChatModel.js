@@ -533,6 +533,51 @@ async function getRecentMessages(chatSessionId, limit = 20) {
     }));
 }
 
+async function getSessionMessagesPaginated({ chatSessionId, beforeMessageId = null, limit = 30 }) {
+    const parsedLimit = Math.min(Math.max(Number(limit) || 30, 1), 100);
+    const parsedBeforeId = beforeMessageId ? Number(beforeMessageId) : null;
+
+    let query = `SELECT chatMessageId, role, content, metaJson, createdAt
+                 FROM ChatMessages
+                 WHERE chatSessionId = ?`;
+    const params = [chatSessionId];
+
+    if (parsedBeforeId && parsedBeforeId > 0) {
+        query += ' AND chatMessageId < ?';
+        params.push(parsedBeforeId);
+    }
+
+    query += ' ORDER BY chatMessageId DESC LIMIT ?';
+    params.push(parsedLimit + 1);
+
+    const [rows] = await pool.query(query, params);
+
+    const hasMore = rows.length > parsedLimit;
+    const trimmed = hasMore ? rows.slice(0, parsedLimit) : rows;
+    const ascending = trimmed.slice().reverse();
+
+    const items = ascending.map(row => ({
+        chatMessageId: Number(row.chatMessageId),
+        role: row.role,
+        content: row.content,
+        meta: safeParseJson(row.metaJson),
+        createdAt: row.createdAt
+    }));
+
+    const nextBeforeMessageId = hasMore && trimmed.length > 0
+        ? Number(trimmed[trimmed.length - 1].chatMessageId)
+        : null;
+
+    return {
+        items,
+        paging: {
+            limit: parsedLimit,
+            hasMore,
+            nextBeforeMessageId
+        }
+    };
+}
+
 function generateSessionTitleFromMessage(message = '') {
     const normalized = String(message).replace(/\s+/g, ' ').trim();
     if (!normalized) return DEFAULT_SESSION_TITLE;
@@ -630,6 +675,52 @@ async function getChatSessionById(chatSessionId, userId) {
         createdAt: rows[0].createdAt,
         updatedAt: rows[0].updatedAt
     };
+}
+
+async function getLatestChatSessionByUser(userId) {
+    const [rows] = await pool.query(
+        `SELECT chatSessionId, userId, title, activeRecipeId, createdAt, updatedAt
+         FROM ChatSessions
+         WHERE userId = ?
+         ORDER BY updatedAt DESC, chatSessionId DESC
+         LIMIT 1`,
+        [userId]
+    );
+
+    if (rows.length === 0) return null;
+
+    return {
+        chatSessionId: Number(rows[0].chatSessionId),
+        userId: Number(rows[0].userId),
+        title: rows[0].title,
+        activeRecipeId: rows[0].activeRecipeId ? Number(rows[0].activeRecipeId) : null,
+        createdAt: rows[0].createdAt,
+        updatedAt: rows[0].updatedAt
+    };
+}
+
+async function getOrCreateDefaultChatSession(userId, { createIfMissing = true } = {}) {
+    const latestSession = await getLatestChatSessionByUser(userId);
+    if (latestSession) return latestSession;
+
+    if (!createIfMissing) return null;
+
+    const chatSessionId = await createChatSession({
+        userId,
+        title: 'Trò chuyện với Bepes'
+    });
+
+    await addChatMessage({
+        chatSessionId,
+        role: 'assistant',
+        content: DEFAULT_SESSION_INTRO_MESSAGE,
+        meta: {
+            agentName: DEFAULT_AGENT_NAME,
+            intro: true
+        }
+    });
+
+    return getChatSessionById(chatSessionId, userId);
 }
 
 async function addChatMessage({ chatSessionId, role, content, meta = null }) {
@@ -1048,6 +1139,47 @@ exports.getSessionHistory = async ({ userId, chatSessionId }) => {
     };
 };
 
+exports.getUnifiedTimeline = async ({ userId, beforeMessageId = null, limit = 30, createIfMissing = true }) => {
+    const parsedUserId = Number(userId);
+    if (!parsedUserId || parsedUserId <= 0) {
+        throw new Error('userId must be a positive number');
+    }
+
+    const session = await getOrCreateDefaultChatSession(parsedUserId, { createIfMissing });
+
+    if (!session) {
+        return {
+            success: true,
+            data: {
+                session: null,
+                items: [],
+                paging: {
+                    limit: Math.min(Math.max(Number(limit) || 30, 1), 100),
+                    hasMore: false,
+                    nextBeforeMessageId: null
+                }
+            },
+            message: 'Get unified chat timeline successfully'
+        };
+    }
+
+    const paginated = await getSessionMessagesPaginated({
+        chatSessionId: session.chatSessionId,
+        beforeMessageId,
+        limit
+    });
+
+    return {
+        success: true,
+        data: {
+            session,
+            items: paginated.items,
+            paging: paginated.paging
+        },
+        message: 'Get unified chat timeline successfully'
+    };
+};
+
 exports.updateActiveRecipe = async ({ userId, chatSessionId, recipeId }) => {
     const session = await getChatSessionById(chatSessionId, userId);
     if (!session) {
@@ -1080,7 +1212,8 @@ exports.sendMessage = async ({
     message,
     model = process.env.AI_CHAT_MODEL || 'gemma3:4b',
     stream = false,
-    activeRecipeId = null
+    activeRecipeId = null,
+    useUnifiedSession = false
 }) => {
     const parsedUserId = Number(userId);
     if (!parsedUserId || parsedUserId <= 0) {
@@ -1093,6 +1226,11 @@ exports.sendMessage = async ({
 
     let sessionId = chatSessionId ? Number(chatSessionId) : null;
     let session;
+
+    if (!sessionId && useUnifiedSession) {
+        session = await getOrCreateDefaultChatSession(parsedUserId);
+        sessionId = session?.chatSessionId || null;
+    }
 
     if (!sessionId) {
         const autoTitle = await generateSessionTitleByAgentApi({ firstMessage: message, model });
@@ -1109,7 +1247,7 @@ exports.sendMessage = async ({
         });
     }
 
-    session = await getChatSessionById(sessionId, parsedUserId);
+    session = session || await getChatSessionById(sessionId, parsedUserId);
     if (!session) {
         throw new Error('Chat session not found');
     }
