@@ -250,7 +250,7 @@ exports.getRecommendationsFromPantry = async (req, res) => {
 };
 
 exports.resolvePreviousSession = async (req, res) => {
-    const { userId, previousSessionId, action } = req.body || {};
+    const { userId, previousSessionId, action, pendingUserMessage } = req.body || {};
 
     if (!userId || Number(userId) <= 0) {
         return res.status(400).json({
@@ -272,7 +272,10 @@ exports.resolvePreviousSession = async (req, res) => {
         const result = await aiChatModel.resolvePreviousSession({
             userId: Number(userId),
             previousSessionId: Number(previousSessionId),
-            action: String(action || '')
+            action: String(action || ''),
+            pendingUserMessage: pendingUserMessage === undefined || pendingUserMessage === null
+                ? ''
+                : String(pendingUserMessage)
         });
 
         if (!result.success) {
