@@ -499,7 +499,7 @@ function getMinutesSince(dateInput) {
     return Math.floor(diffMs / (1000 * 60));
 }
 
-function getCompletionReminderPayload({ session, recipeContext, minutesSinceLastMessage }) {
+function getCompletionReminderPayload({ session, recipeContext, minutesSinceLastMessage, pendingUserMessage = '' }) {
     const minMinutes = PREVIOUS_RECIPE_REMINDER_MINUTES;
     if (!Number.isFinite(minMinutes) || minutesSinceLastMessage === null || minutesSinceLastMessage < minMinutes) {
         return null;
@@ -525,6 +525,7 @@ function getCompletionReminderPayload({ session, recipeContext, minutesSinceLast
             minutesSinceLastMessage,
             isStrongReminder,
             reminderMessage,
+            pendingUserMessage: String(pendingUserMessage || ''),
             actions: [
                 { id: 'complete_and_deduct', label: 'Hoàn thành & trừ nguyên liệu' },
                 { id: 'skip_deduction', label: 'Bỏ qua (không trừ)' }
@@ -1275,7 +1276,7 @@ exports.getRecommendationsFromPantry = async ({ userId, limit = 10 }) => {
     return getRecipeRecommendationsFromPantry({ userId, limit, activeDietNotes });
 };
 
-exports.resolvePreviousSession = async ({ userId, previousSessionId, action }) => {
+exports.resolvePreviousSession = async ({ userId, previousSessionId, action, pendingUserMessage = '' }) => {
     const parsedUserId = Number(userId);
     const parsedSessionId = Number(previousSessionId);
 
@@ -1303,6 +1304,8 @@ exports.resolvePreviousSession = async ({ userId, previousSessionId, action }) =
 
     const recipeContext = session.activeRecipeId ? await getRecipeContext(session.activeRecipeId) : null;
 
+    const finalPendingUserMessage = String(pendingUserMessage || '').trim();
+
     await setActiveRecipe({ chatSessionId: parsedSessionId, userId: parsedUserId, recipeId: null });
 
     await addChatMessage({
@@ -1321,7 +1324,8 @@ exports.resolvePreviousSession = async ({ userId, previousSessionId, action }) =
 
     const newSessionId = await createChatSession({
         userId: parsedUserId,
-        title: 'Trò chuyện mới'
+        title: 'Trò chuyện mới',
+        activeRecipeId: session.activeRecipeId
     });
 
     await addChatMessage({
@@ -1332,9 +1336,23 @@ exports.resolvePreviousSession = async ({ userId, previousSessionId, action }) =
             agentName: DEFAULT_AGENT_NAME,
             intro: true,
             createdAfterResolution: true,
-            resolvedPreviousSessionId: parsedSessionId
+            resolvedPreviousSessionId: parsedSessionId,
+            carriedActiveRecipeId: session.activeRecipeId,
+            carriedActiveRecipeName: recipeContext?.recipeName || null
         }
     });
+
+    if (finalPendingUserMessage) {
+        await addChatMessage({
+            chatSessionId: newSessionId,
+            role: 'user',
+            content: finalPendingUserMessage,
+            meta: {
+                migratedFromPreviousSession: parsedSessionId,
+                migratedByResolveFlow: true
+            }
+        });
+    }
 
     const newSession = await getChatSessionById(newSessionId, parsedUserId);
 
@@ -1343,6 +1361,11 @@ exports.resolvePreviousSession = async ({ userId, previousSessionId, action }) =
         data: {
             resolvedSessionId: parsedSessionId,
             resolution: action,
+            carriedRecipe: {
+                recipeId: session.activeRecipeId,
+                recipeName: recipeContext?.recipeName || null
+            },
+            carriedPendingUserMessage: finalPendingUserMessage || null,
             newSession
         },
         message: 'Resolve previous session successfully'
@@ -1407,7 +1430,8 @@ exports.sendMessage = async ({
         const reminderPayload = getCompletionReminderPayload({
             session,
             recipeContext: recipeContextBeforeContinue,
-            minutesSinceLastMessage
+            minutesSinceLastMessage,
+            pendingUserMessage: message.trim()
         });
 
         if (reminderPayload) {

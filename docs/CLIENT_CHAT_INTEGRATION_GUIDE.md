@@ -117,7 +117,8 @@ Client cần triển khai đủ các nhóm flow sau:
 {
   "userId": 1,
   "previousSessionId": 41,
-  "action": "complete_and_deduct"
+  "action": "complete_and_deduct",
+  "pendingUserMessage": "ok vậy món mới là gà áp chảo"
 }
 ```
 
@@ -138,9 +139,15 @@ hoặc
   "data": {
     "resolvedSessionId": 41,
     "resolution": "skip_deduction",
+    "carriedRecipe": {
+      "recipeId": 3,
+      "recipeName": "Bang bang prawn salad"
+    },
+    "carriedPendingUserMessage": "ok vậy món mới là gà áp chảo",
     "newSession": {
       "chatSessionId": 42,
-      "title": "Trò chuyện mới"
+      "title": "Trò chuyện mới",
+      "activeRecipeId": 3
     }
   }
 }
@@ -194,10 +201,13 @@ hoặc
      - `Hoàn thành & trừ nguyên liệu`
      - `Bỏ qua (không trừ)`
    - hiển thị `data.reminderMessage`
-   - gọi `POST /api/ai-chat/sessions/resolve-previous` theo lựa chọn
+   - gọi `POST /api/ai-chat/sessions/resolve-previous` theo lựa chọn,
+     trong body nhớ gửi thêm `pendingUserMessage = data.pendingUserMessage`
    - sau khi resolve thành công:
      - chuyển `sessionId` local = `data.newSession.chatSessionId`
      - gọi lại `GET /api/ai-chat/messages?userId={id}&limit=30` để render session mới.
+
+> Lưu ý: backend sẽ tự mang `pendingUserMessage` sang session mới để không mất câu user vừa gửi.
 
 > Có thể làm optimistic UI, nhưng vẫn nên reload trang đầu sau send để tránh lệch khi backend thêm meta/tool reply.
 
@@ -334,7 +344,8 @@ async function sendMessage(userId: number, message: string) {
     await api.post('/api/ai-chat/sessions/resolve-previous', {
       userId,
       previousSessionId: payload.previousSessionId,
-      action
+      action,
+      pendingUserMessage: payload.pendingUserMessage || ''
     });
 
     await loadInitial(userId);
