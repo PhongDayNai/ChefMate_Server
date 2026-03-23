@@ -173,7 +173,97 @@ curl -sS -X POST "https://api.example.com/api/ai-chat/messages" \
 
 ---
 
-## 7) Checklist nghiệm thu cho client
+## 7) Luồng nghiệp vụ món ăn: đổi món / gợi ý / trừ nguyên liệu
+
+## 7.1 Đổi món đang nấu (đã có API)
+
+### API
+`PATCH /api/ai-chat/sessions/active-recipe`
+
+### Request
+```json
+{
+  "userId": 1,
+  "chatSessionId": 41,
+  "recipeId": 123
+}
+```
+
+### Cách lấy `chatSessionId` trong luồng unified
+- Gọi `GET /api/ai-chat/messages?userId=...`
+- Lấy từ `data.session.chatSessionId`
+
+### Rule UI
+- Khi user chọn món khác trong màn chat, gọi API này ngay.
+- Khi user bỏ món đang nấu, gửi `recipeId: null`.
+
+---
+
+## 7.2 Gợi ý món theo tủ lạnh (đã có API)
+
+### API
+`POST /api/ai-chat/recommendations-from-pantry`
+
+### Request
+```json
+{
+  "userId": 1,
+  "limit": 10
+}
+```
+
+### Response chính
+- `readyToCook`: đủ nguyên liệu để nấu ngay
+- `almostReady`: thiếu rất ít nguyên liệu phụ
+
+### Rule UI
+- Có thể gọi API này khi user bấm “Gợi ý món”
+- Hoặc gọi ngầm trước rồi hiển thị khi user hỏi trong chat
+
+---
+
+## 7.3 Trừ nguyên liệu sau khi nấu (trạng thái hiện tại)
+
+### Hiện trạng backend
+- **Chưa có API chính thức** cho luồng `draft -> confirm -> apply` trừ nguyên liệu.
+- Vì vậy client **không nên tự trừ kho tự động** theo text chat ở thời điểm hiện tại.
+
+### Khuyến nghị tạm thời
+- Nếu cần cập nhật kho thủ công, dùng API pantry hiện có (upsert/delete) theo thao tác người dùng.
+- Chưa bật auto-deduct cho production đến khi backend có transaction + idempotency.
+
+### API pantry thủ công (đang dùng được)
+
+#### 1) Thêm/cập nhật nguyên liệu trong tủ lạnh
+`POST /api/pantry/upsert`
+
+```json
+{
+  "userId": 1,
+  "ingredientName": "trứng gà",
+  "quantity": 6,
+  "unit": "quả"
+}
+```
+
+#### 2) Xóa một item khỏi tủ lạnh
+`DELETE /api/pantry/delete`
+
+```json
+{
+  "userId": 1,
+  "pantryItemId": 12
+}
+```
+
+### Luồng mục tiêu (phase tiếp theo)
+1. AI đề xuất draft trừ kho.
+2. User xác nhận nhẹ (text/nút).
+3. Backend apply 1 lần duy nhất (idempotent), có lịch sử transaction.
+
+---
+
+## 8) Checklist nghiệm thu cho client
 
 - [ ] Không còn màn chọn session trong flow chat chính.
 - [ ] Mở chat load được 20–30 tin mới nhất.
@@ -184,7 +274,7 @@ curl -sS -X POST "https://api.example.com/api/ai-chat/messages" \
 
 ---
 
-## 8) Kết luận
+## 9) Kết luận
 
 Với luồng mới, team client chỉ cần 2 API chính:
 - `GET /api/ai-chat/messages` (kèm lazy-load cursor)
