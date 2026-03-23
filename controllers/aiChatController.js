@@ -250,7 +250,7 @@ exports.getRecommendationsFromPantry = async (req, res) => {
 };
 
 exports.sendMessage = async (req, res) => {
-    const { userId, chatSessionId, message, model, stream, activeRecipeId } = req.body || {};
+    const { userId, chatSessionId, message, model, stream, activeRecipeId, useUnifiedSession } = req.body || {};
 
     if (!userId || Number(userId) <= 0) {
         return res.status(400).json({
@@ -275,7 +275,8 @@ exports.sendMessage = async (req, res) => {
             message,
             model,
             stream: Boolean(stream),
-            activeRecipeId: activeRecipeId === null || activeRecipeId === undefined ? null : Number(activeRecipeId)
+            activeRecipeId: activeRecipeId === null || activeRecipeId === undefined ? null : Number(activeRecipeId),
+            useUnifiedSession: useUnifiedSession === undefined ? true : Boolean(useUnifiedSession)
         });
 
         if (!result.success && result.code === 'AI_SERVER_BUSY') {
@@ -289,6 +290,38 @@ exports.sendMessage = async (req, res) => {
             success: false,
             data: null,
             message: `Failed to send message: ${error.message}`
+        });
+    }
+};
+
+exports.getUnifiedTimeline = async (req, res) => {
+    const userId = Number(req.query.userId || req.body?.userId);
+    const beforeMessageId = req.query.beforeMessageId || req.body?.beforeMessageId || null;
+    const limit = req.query.limit || req.body?.limit || 30;
+
+    if (!userId || userId <= 0) {
+        return res.status(400).json({
+            success: false,
+            data: null,
+            message: 'userId is required and must be a positive number'
+        });
+    }
+
+    try {
+        const result = await aiChatModel.getUnifiedTimeline({
+            userId,
+            beforeMessageId,
+            limit,
+            createIfMissing: true
+        });
+
+        return res.status(200).json(result);
+    } catch (error) {
+        console.error('Error in getUnifiedTimeline:', error);
+        return res.status(500).json({
+            success: false,
+            data: null,
+            message: `Failed to get unified chat timeline: ${error.message}`
         });
     }
 };
