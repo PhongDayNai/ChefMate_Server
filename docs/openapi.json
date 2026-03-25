@@ -199,8 +199,8 @@
         "tags": [
           "Users"
         ],
-        "summary": "Get recipe view history (legacy)",
-        "description": "Legacy endpoint. Controller đang đọc userId từ body/query.",
+        "summary": "Get recipe view history by user",
+        "description": "Lấy danh sách recipe của user, sắp xếp theo lượt xem. Nên truyền userId qua query.",
         "parameters": [
           {
             "name": "userId",
@@ -214,6 +214,9 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "400": {
+            "description": "userId không hợp lệ"
           }
         }
       }
@@ -577,7 +580,8 @@
         "tags": [
           "Interactions"
         ],
-        "summary": "Like/unlike recipe",
+        "summary": "Toggle like/unlike recipe",
+        "description": "Nếu user chưa like thì sẽ like, nếu đã like thì sẽ unlike.",
         "requestBody": {
           "required": true,
           "content": {
@@ -602,7 +606,13 @@
         },
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "Toggle thành công"
+          },
+          "400": {
+            "description": "userId/recipeId không hợp lệ"
+          },
+          "404": {
+            "description": "Recipe không tồn tại"
           }
         }
       }
@@ -821,7 +831,13 @@
         },
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "Delete thành công"
+          },
+          "400": {
+            "description": "Dữ liệu đầu vào không hợp lệ"
+          },
+          "404": {
+            "description": "Pantry item không tồn tại"
           }
         }
       }
@@ -856,6 +872,7 @@
           "UserDietNotes"
         ],
         "summary": "Upsert diet note",
+        "description": "Create mới khi không có noteId; update khi có noteId. Nếu noteId không tồn tại sẽ trả 404.",
         "requestBody": {
           "required": true,
           "content": {
@@ -868,7 +885,13 @@
         },
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "Create/update thành công"
+          },
+          "400": {
+            "description": "Dữ liệu đầu vào không hợp lệ"
+          },
+          "404": {
+            "description": "Diet note không tồn tại (khi update)"
           }
         },
         "operationId": "upsertUserDietNote"
@@ -904,7 +927,13 @@
         },
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "Delete thành công"
+          },
+          "400": {
+            "description": "Dữ liệu đầu vào không hợp lệ"
+          },
+          "404": {
+            "description": "Diet note không tồn tại"
           }
         }
       }
