@@ -56,6 +56,14 @@ exports.upsertDietNote = async (req, res) => {
             });
         }
 
+        if (error.message && error.message.includes('not found')) {
+            return res.status(404).json({
+                success: false,
+                data: null,
+                message: error.message
+            });
+        }
+
         return res.status(500).json({
             success: false,
             data: null,
@@ -82,6 +90,14 @@ exports.deleteDietNote = async (req, res) => {
             error.message.includes('noteId')
         )) {
             return res.status(400).json({
+                success: false,
+                data: null,
+                message: error.message
+            });
+        }
+
+        if (error.message && error.message.includes('not found')) {
+            return res.status(404).json({
                 success: false,
                 data: null,
                 message: error.message

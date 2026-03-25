@@ -6,27 +6,49 @@ exports.likeRecipe = async (userId, recipeId) => {
     try {
         await conn.beginTransaction();
 
+        const [recipeRows] = await conn.query(
+            'SELECT likeQuantity FROM Recipes WHERE recipeId = ? LIMIT 1',
+            [recipeId]
+        );
+
+        if (recipeRows.length === 0) {
+            await conn.rollback();
+            return {
+                success: false,
+                data: null,
+                message: 'Recipe not found'
+            };
+        }
+
         const [checkRows] = await conn.query(
             'SELECT COUNT(*) AS likeCount FROM UsersLike WHERE userId = ? AND recipeId = ?',
             [userId, recipeId]
         );
 
         const likeCount = Number(checkRows[0]?.likeCount || 0);
+        let liked = false;
 
         if (likeCount > 0) {
-            await conn.rollback();
-            return { success: false, message: 'User has already liked this recipe' };
+            await conn.query(
+                'DELETE FROM UsersLike WHERE userId = ? AND recipeId = ?',
+                [userId, recipeId]
+            );
+            await conn.query(
+                'UPDATE Recipes SET likeQuantity = GREATEST(likeQuantity - 1, 0) WHERE recipeId = ?',
+                [recipeId]
+            );
+            liked = false;
+        } else {
+            await conn.query(
+                'INSERT INTO UsersLike (userId, recipeId) VALUES (?, ?)',
+                [userId, recipeId]
+            );
+            await conn.query(
+                'UPDATE Recipes SET likeQuantity = likeQuantity + 1 WHERE recipeId = ?',
+                [recipeId]
+            );
+            liked = true;
         }
-
-        await conn.query(
-            'INSERT INTO UsersLike (userId, recipeId) VALUES (?, ?)',
-            [userId, recipeId]
-        );
-
-        await conn.query(
-            'UPDATE Recipes SET likeQuantity = likeQuantity + 1 WHERE recipeId = ?',
-            [recipeId]
-        );
 
         const [countRows] = await conn.query(
             'SELECT likeQuantity FROM Recipes WHERE recipeId = ? LIMIT 1',
@@ -38,13 +60,16 @@ exports.likeRecipe = async (userId, recipeId) => {
         await conn.commit();
         return {
             success: true,
-            data: { count: newLikeQuantity },
-            message: 'Recipe liked successfully'
+            data: {
+                count: newLikeQuantity,
+                liked
+            },
+            message: liked ? 'Recipe liked successfully' : 'Recipe unliked successfully'
         };
     } catch (error) {
         await conn.rollback();
         console.error('Error in likeRecipe:', error);
-        throw new Error('Failed to like recipe');
+        throw new Error('Failed to toggle like recipe');
     } finally {
         conn.release();
     }

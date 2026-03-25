@@ -143,10 +143,14 @@ exports.deletePantryItem = async ({ userId, pantryItemId }) => {
         throw new Error('pantryItemId must be a positive number');
     }
 
-    await pool.query(
+    const [deleteResult] = await pool.query(
         'DELETE FROM PantryItems WHERE pantryItemId = ? AND userId = ?',
         [parsedPantryItemId, parsedUserId]
     );
+
+    if (Number(deleteResult.affectedRows || 0) === 0) {
+        throw new Error('pantry item not found');
+    }
 
     return module.exports.listPantryByUser(parsedUserId);
 };

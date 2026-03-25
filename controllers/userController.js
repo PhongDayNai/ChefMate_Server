@@ -173,7 +173,15 @@ exports.updateUserInformation = async (req, res) => {
 };
 
 exports.getRecipesViewHistory = async (req, res) => {
-    const { userId } = req.body;
+    const userId = Number(req.query.userId || req.body?.userId);
+
+    if (!userId || userId <= 0) {
+        return res.status(400).json({
+            success: false,
+            data: null,
+            message: 'userId is required and must be a positive number'
+        });
+    }
 
     try {
         const recipesViewHistory = await userModel.getRecipesViewHistory(userId);

@@ -2,18 +2,33 @@ const express = require('express');
 const interactionModel = require('../models/interactionModel');
 
 exports.likeRecipe = async (req, res) => {
-    const { userId, recipeId } = req.body;
+    const { userId, recipeId } = req.body || {};
+    const parsedUserId = Number(userId);
+    const parsedRecipeId = Number(recipeId);
 
-    if (!userId || !recipeId) {
-        return res.status(400).json({ error: 'Missing required fields' });
+    if (!parsedUserId || parsedUserId <= 0 || !parsedRecipeId || parsedRecipeId <= 0) {
+        return res.status(400).json({
+            success: false,
+            data: null,
+            message: 'userId and recipeId are required and must be positive numbers'
+        });
     }
 
     try {
-        const result = await interactionModel.likeRecipe(userId, recipeId);
-        res.json(result);
+        const result = await interactionModel.likeRecipe(parsedUserId, parsedRecipeId);
+
+        if (!result.success && result.message === 'Recipe not found') {
+            return res.status(404).json(result);
+        }
+
+        return res.status(200).json(result);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: 'Internal Server Error' });
+        return res.status(500).json({
+            success: false,
+            data: null,
+            message: 'Internal Server Error'
+        });
     }
 };
 
