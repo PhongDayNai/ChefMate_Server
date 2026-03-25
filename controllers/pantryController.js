@@ -82,6 +82,14 @@ exports.deletePantryItem = async (req, res) => {
             });
         }
 
+        if (error.message && error.message.includes('not found')) {
+            return res.status(404).json({
+                success: false,
+                data: null,
+                message: error.message
+            });
+        }
+
         return res.status(500).json({
             success: false,
             data: null,

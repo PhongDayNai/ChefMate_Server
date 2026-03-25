@@ -75,7 +75,7 @@ exports.upsertDietNote = async ({
     const normalizedKeywords = parseJsonArray(keywords);
 
     if (parsedNoteId) {
-        await pool.query(
+        const [updateResult] = await pool.query(
             `UPDATE UserDietNotes
              SET noteType = ?, label = ?, keywordsJson = ?, instruction = ?, isActive = ?, startAt = ?, endAt = ?, updatedAt = CURRENT_TIMESTAMP
              WHERE noteId = ? AND userId = ?`,
@@ -91,6 +91,10 @@ exports.upsertDietNote = async ({
                 parsedUserId
             ]
         );
+
+        if (Number(updateResult.affectedRows || 0) === 0) {
+            throw new Error('diet note not found');
+        }
     } else {
         await pool.query(
             `INSERT INTO UserDietNotes (userId, noteType, label, keywordsJson, instruction, isActive, startAt, endAt)
@@ -123,7 +127,11 @@ exports.deleteDietNote = async ({ userId, noteId }) => {
         throw new Error('noteId must be a positive number');
     }
 
-    await pool.query('DELETE FROM UserDietNotes WHERE noteId = ? AND userId = ?', [parsedNoteId, parsedUserId]);
+    const [deleteResult] = await pool.query('DELETE FROM UserDietNotes WHERE noteId = ? AND userId = ?', [parsedNoteId, parsedUserId]);
+
+    if (Number(deleteResult.affectedRows || 0) === 0) {
+        throw new Error('diet note not found');
+    }
 
     return this.getDietNotesByUser(parsedUserId);
 };
