@@ -491,6 +491,17 @@ async function getLatestMessageBySession(chatSessionId) {
     };
 }
 
+async function getUserMessageCountBySession(chatSessionId) {
+    const [rows] = await pool.query(
+        `SELECT COUNT(*) AS total
+         FROM ChatMessages
+         WHERE chatSessionId = ? AND role = 'user'`,
+        [chatSessionId]
+    );
+
+    return Number(rows?.[0]?.total || 0);
+}
+
 function getMinutesSince(dateInput) {
     if (!dateInput) return null;
     const ts = new Date(dateInput).getTime();
@@ -528,7 +539,8 @@ function getCompletionReminderPayload({ session, recipeContext, minutesSinceLast
             pendingUserMessage: String(pendingUserMessage || ''),
             actions: [
                 { id: 'complete_and_deduct', label: 'Hoàn thành & trừ nguyên liệu' },
-                { id: 'skip_deduction', label: 'Bỏ qua (không trừ)' }
+                { id: 'skip_deduction', label: 'Bỏ qua (không trừ)' },
+                { id: 'continue_current_session', label: 'Chưa kết thúc phiên, tiếp tục chat' }
             ]
         },
         message: isStrongReminder
@@ -1338,7 +1350,7 @@ exports.getRecommendationsFromPantry = async ({ userId, limit = 10 }) => {
     return getRecipeRecommendationsFromPantry({ userId, limit, activeDietNotes });
 };
 
-exports.resolvePreviousSession = async ({ userId, previousSessionId, action, pendingUserMessage = '' }) => {
+exports.resolvePreviousSession = async ({ userId, previousSessionId, action, pendingUserMessage = '', model = process.env.AI_CHAT_MODEL || 'gemma3:4b' }) => {
     const parsedUserId = Number(userId);
     const parsedSessionId = Number(previousSessionId);
 
@@ -1350,9 +1362,9 @@ exports.resolvePreviousSession = async ({ userId, previousSessionId, action, pen
         throw new Error('previousSessionId must be a positive number');
     }
 
-    const validActions = new Set(['complete_and_deduct', 'skip_deduction']);
+    const validActions = new Set(['complete_and_deduct', 'skip_deduction', 'continue_current_session']);
     if (!validActions.has(action)) {
-        throw new Error('action must be one of: complete_and_deduct, skip_deduction');
+        throw new Error('action must be one of: complete_and_deduct, skip_deduction, continue_current_session');
     }
 
     const session = await getChatSessionById(parsedSessionId, parsedUserId);
@@ -1367,6 +1379,50 @@ exports.resolvePreviousSession = async ({ userId, previousSessionId, action, pen
     const recipeContext = session.activeRecipeId ? await getRecipeContext(session.activeRecipeId) : null;
 
     const finalPendingUserMessage = String(pendingUserMessage || '').trim();
+
+    if (action === 'continue_current_session') {
+        await addChatMessage({
+            chatSessionId: parsedSessionId,
+            role: 'assistant',
+            content: 'Đã giữ nguyên phiên hiện tại theo lựa chọn của anh. Mình tiếp tục hội thoại trên phiên này nhé.',
+            meta: {
+                sessionResolution: true,
+                resolutionAction: action,
+                previousRecipeId: session.activeRecipeId,
+                previousRecipeName: recipeContext?.recipeName || null
+            }
+        });
+
+        let continuation = null;
+
+        if (finalPendingUserMessage) {
+            continuation = await exports.sendMessage({
+                userId: parsedUserId,
+                chatSessionId: parsedSessionId,
+                message: finalPendingUserMessage,
+                model,
+                useUnifiedSession: false
+            });
+        }
+
+        const currentSession = await getChatSessionById(parsedSessionId, parsedUserId);
+
+        return {
+            success: true,
+            data: {
+                resolvedSessionId: parsedSessionId,
+                resolution: action,
+                carriedRecipe: {
+                    recipeId: session.activeRecipeId,
+                    recipeName: recipeContext?.recipeName || null
+                },
+                carriedPendingUserMessage: finalPendingUserMessage || null,
+                continuedSession: currentSession,
+                continuation
+            },
+            message: 'Continue current session successfully'
+        };
+    }
 
     await setActiveRecipe({ chatSessionId: parsedSessionId, userId: parsedUserId, recipeId: null });
 
@@ -1486,18 +1542,24 @@ exports.sendMessage = async ({
     }
 
     if (!chatSessionId && useUnifiedSession && session.activeRecipeId) {
-        const latestMessage = await getLatestMessageBySession(session.chatSessionId);
-        const minutesSinceLastMessage = getMinutesSince(latestMessage?.createdAt);
-        const recipeContextBeforeContinue = await getRecipeContext(session.activeRecipeId);
-        const reminderPayload = getCompletionReminderPayload({
-            session,
-            recipeContext: recipeContextBeforeContinue,
-            minutesSinceLastMessage,
-            pendingUserMessage: message.trim()
-        });
+        const userMessageCount = await getUserMessageCountBySession(session.chatSessionId);
 
-        if (reminderPayload) {
-            return reminderPayload;
+        // Nếu phiên mới chỉ có greeting hoặc chưa có user message thì bỏ qua nhắc nhở,
+        // cho phép user dùng lại phiên hiện tại bình thường.
+        if (userMessageCount > 0) {
+            const latestMessage = await getLatestMessageBySession(session.chatSessionId);
+            const minutesSinceLastMessage = getMinutesSince(latestMessage?.createdAt);
+            const recipeContextBeforeContinue = await getRecipeContext(session.activeRecipeId);
+            const reminderPayload = getCompletionReminderPayload({
+                session,
+                recipeContext: recipeContextBeforeContinue,
+                minutesSinceLastMessage,
+                pendingUserMessage: message.trim()
+            });
+
+            if (reminderPayload) {
+                return reminderPayload;
+            }
         }
     }
 

@@ -250,7 +250,7 @@ exports.getRecommendationsFromPantry = async (req, res) => {
 };
 
 exports.resolvePreviousSession = async (req, res) => {
-    const { userId, previousSessionId, action, pendingUserMessage } = req.body || {};
+    const { userId, previousSessionId, action, pendingUserMessage, model } = req.body || {};
 
     if (!userId || Number(userId) <= 0) {
         return res.status(400).json({
@@ -275,7 +275,8 @@ exports.resolvePreviousSession = async (req, res) => {
             action: String(action || ''),
             pendingUserMessage: pendingUserMessage === undefined || pendingUserMessage === null
                 ? ''
-                : String(pendingUserMessage)
+                : String(pendingUserMessage),
+            model
         });
 
         if (!result.success) {
