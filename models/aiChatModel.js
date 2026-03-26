@@ -648,6 +648,65 @@ async function getSessionMessagesPaginated({ chatSessionId, beforeMessageId = nu
     };
 }
 
+async function getUserMessagesPaginated({ userId, beforeMessageId = null, limit = 30 }) {
+    const parsedUserId = Number(userId);
+    const parsedLimit = Math.min(Math.max(Number(limit) || 30, 1), 100);
+    const parsedBeforeId = beforeMessageId ? Number(beforeMessageId) : null;
+
+    let query = `SELECT m.chatMessageId, m.chatSessionId, m.role, m.content, m.metaJson, m.createdAt,
+                        s.title AS sessionTitle, s.activeRecipeId, s.createdAt AS sessionCreatedAt, s.updatedAt AS sessionUpdatedAt
+                 FROM ChatMessages m
+                 JOIN ChatSessions s ON s.chatSessionId = m.chatSessionId
+                 WHERE s.userId = ?`;
+    const params = [parsedUserId];
+
+    if (parsedBeforeId && parsedBeforeId > 0) {
+        query += ' AND m.chatMessageId < ?';
+        params.push(parsedBeforeId);
+    }
+
+    query += ' ORDER BY m.chatMessageId DESC LIMIT ?';
+    params.push(parsedLimit + 1);
+
+    const [rows] = await pool.query(query, params);
+
+    const hasMore = rows.length > parsedLimit;
+    const trimmed = hasMore ? rows.slice(0, parsedLimit) : rows;
+    const ascending = trimmed.slice().reverse();
+
+    const items = ascending.map((row, index, arr) => {
+        const currentSessionId = Number(row.chatSessionId);
+        const prevSessionId = index > 0 ? Number(arr[index - 1].chatSessionId) : null;
+
+        return {
+            chatMessageId: Number(row.chatMessageId),
+            chatSessionId: currentSessionId,
+            sessionTitle: row.sessionTitle,
+            activeRecipeId: row.activeRecipeId ? Number(row.activeRecipeId) : null,
+            sessionCreatedAt: row.sessionCreatedAt,
+            sessionUpdatedAt: row.sessionUpdatedAt,
+            isSessionStart: index === 0 ? true : currentSessionId !== prevSessionId,
+            role: row.role,
+            content: row.content,
+            meta: safeParseJson(row.metaJson),
+            createdAt: row.createdAt
+        };
+    });
+
+    const nextBeforeMessageId = hasMore && trimmed.length > 0
+        ? Number(trimmed[trimmed.length - 1].chatMessageId)
+        : null;
+
+    return {
+        items,
+        paging: {
+            limit: parsedLimit,
+            hasMore,
+            nextBeforeMessageId
+        }
+    };
+}
+
 function generateSessionTitleFromMessage(message = '') {
     const normalized = String(message).replace(/\s+/g, ' ').trim();
     if (!normalized) return DEFAULT_SESSION_TITLE;
@@ -1215,13 +1274,14 @@ exports.getUnifiedTimeline = async ({ userId, beforeMessageId = null, limit = 30
         throw new Error('userId must be a positive number');
     }
 
-    const session = await getOrCreateDefaultChatSession(parsedUserId, { createIfMissing });
+    const latestSession = await getOrCreateDefaultChatSession(parsedUserId, { createIfMissing });
 
-    if (!session) {
+    if (!latestSession) {
         return {
             success: true,
             data: {
                 session: null,
+                latestSession: null,
                 items: [],
                 paging: {
                     limit: Math.min(Math.max(Number(limit) || 30, 1), 100),
@@ -1233,8 +1293,8 @@ exports.getUnifiedTimeline = async ({ userId, beforeMessageId = null, limit = 30
         };
     }
 
-    const paginated = await getSessionMessagesPaginated({
-        chatSessionId: session.chatSessionId,
+    const paginated = await getUserMessagesPaginated({
+        userId: parsedUserId,
         beforeMessageId,
         limit
     });
@@ -1242,7 +1302,9 @@ exports.getUnifiedTimeline = async ({ userId, beforeMessageId = null, limit = 30
     return {
         success: true,
         data: {
-            session,
+            // giữ field `session` để tương thích client cũ
+            session: latestSession,
+            latestSession,
             items: paginated.items,
             paging: paginated.paging
         },
