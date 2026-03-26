@@ -411,6 +411,143 @@ Dùng cho UI chat cuộn ngược.
 
 ---
 
+## 7.10 Cơ chế tạo session mới, kết thúc session cũ, và tin nhắn đầu tiên (QUAN TRỌNG)
+
+Phần này mô tả đúng hành vi backend hiện tại để client xử lý chính xác vòng đời chat.
+
+### A. Khi nào session mới được tạo?
+
+Session mới được tạo trong 3 tình huống chính:
+
+1. **Client gọi tạo session tường minh**
+   - API: `POST /api/ai-chat/sessions`
+   - Dùng khi user bấm “Tạo cuộc trò chuyện mới”, hoặc vào màn chat mới từ Home.
+
+2. **Client gửi message nhưng không có `chatSessionId` và không đi nhánh dùng session cũ**
+   - API: `POST /api/ai-chat/messages`
+   - Backend có thể auto tạo session mới (đặt title tự động từ message đầu nếu không có title).
+
+3. **Client resolve session cũ còn dang dở món nấu**
+   - API: `POST /api/ai-chat/sessions/resolve-previous`
+   - Sau khi xử lý session cũ theo action, backend tạo session mới.
+
+---
+
+### B. “Kết thúc session cũ” trong ChefMate được hiểu như thế nào?
+
+Hiện tại backend **không có trạng thái `closed` riêng** cho `ChatSessions`.  
+Thay vào đó, “kết thúc session cũ” trong flow nấu ăn được thực hiện bằng nghiệp vụ:
+
+1. Clear món đang nấu của session cũ (`activeRecipeId -> null`)
+2. Ghi một assistant message vào session cũ để log quyết định:
+   - `complete_and_deduct`: ghi nhận hoàn thành (hiện chưa tự trừ kho, user cập nhật kho thủ công)
+   - `skip_deduction`: ghi nhận bỏ qua trừ kho
+3. Tạo session mới để tiếp tục chat
+
+=> Nghĩa là session cũ vẫn tồn tại trong lịch sử, nhưng **đã được chốt nghiệp vụ** và không còn active recipe.
+
+---
+
+### C. Tin nhắn đầu tiên khi tạo session mới là gì?
+
+Backend luôn chèn intro message của agent **Bepes** vào đầu session mới:
+
+```text
+Xin chào anh, em là Bepes – trợ lý nấu ăn của ChefMate. Em có thể gợi ý món theo nguyên liệu hiện có, hướng dẫn từng bước nấu và điều chỉnh theo dị ứng/hạn chế ăn uống của anh.
+```
+
+Intro này xuất hiện trong các nhánh:
+- `POST /api/ai-chat/sessions`
+- Auto-create session từ `POST /api/ai-chat/messages` (khi chưa có session)
+- `POST /api/ai-chat/sessions/resolve-previous` (session mới tạo sau khi chốt session cũ)
+- Lần đầu mở unified timeline nếu chưa có session (server tạo default session)
+
+---
+
+### D. Flow chuẩn “session cũ -> session mới” (có pending recipe)
+
+#### Bước 1: User gửi message mới
+`POST /api/ai-chat/messages`
+
+Nếu session gần nhất còn `activeRecipeId` và đủ điều kiện nhắc, API có thể trả:
+
+```json
+{
+  "success": true,
+  "code": "PENDING_PREVIOUS_RECIPE_COMPLETION",
+  "data": {
+    "previousSessionId": 26,
+    "recipeId": 101,
+    "recipeName": "Ức gà áp chảo",
+    "minutesSinceLastMessage": 42,
+    "isStrongReminder": false,
+    "reminderMessage": "...",
+    "pendingUserMessage": "Cho tôi món mới",
+    "actions": [
+      { "id": "complete_and_deduct", "label": "Hoàn thành & trừ nguyên liệu" },
+      { "id": "skip_deduction", "label": "Bỏ qua (không trừ)" }
+    ]
+  }
+}
+```
+
+#### Bước 2: Client buộc user chọn hành động
+- Nút 1: `complete_and_deduct`
+- Nút 2: `skip_deduction`
+
+#### Bước 3: Gọi resolve
+`POST /api/ai-chat/sessions/resolve-previous`
+
+```json
+{
+  "userId": 4,
+  "previousSessionId": 26,
+  "action": "complete_and_deduct",
+  "pendingUserMessage": "Cho tôi món mới"
+}
+```
+
+#### Bước 4: Backend thực thi
+- Clear `activeRecipeId` của session 26
+- Ghi assistant log message vào session 26
+- Tạo session mới
+- Chèn intro Bepes vào session mới
+- Nếu có `pendingUserMessage`, migrate message này sang session mới dưới role `user`
+
+#### Bước 5: Client cập nhật state
+- Set `currentSessionId = data.newSession.chatSessionId`
+- Reload timeline session mới
+- Đóng modal pending
+
+---
+
+### E. Flow “tạo session mới chủ động”
+
+Khi user bấm nút “Cuộc trò chuyện mới”:
+
+1. Gọi `POST /api/ai-chat/sessions`
+2. Lấy `chatSessionId` mới từ response
+3. Mở màn chat với session mới
+4. Render ngay intro message đã có sẵn trong history
+
+Khuyến nghị UX:
+- Nếu user đang có session với `activeRecipeId`, hỏi xác nhận trước khi tạo session mới.
+- Cho phép 2 lựa chọn giống resolve flow để tránh lệch logic kho/ngữ cảnh.
+
+---
+
+### F. Quy tắc client bắt buộc để không lỗi logic
+
+1. Không coi “session mới” = “xóa session cũ”.
+2. Luôn xử lý `PENDING_PREVIOUS_RECIPE_COMPLETION` trước khi gửi tiếp message mới.
+3. Khi nhận `newSession` từ resolve flow, luôn đồng bộ:
+   - `currentSessionId`
+   - `currentSession`
+   - timeline theo session mới
+4. Luôn hiển thị intro message đầu phiên (nếu API đã trả trong history).
+
+---
+
 ## 8) App Flow theo từng màn hình (đề xuất triển khai)
 
 ## 8.1 Onboarding / Login
