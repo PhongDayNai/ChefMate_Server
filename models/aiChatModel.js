@@ -1047,10 +1047,7 @@ async function getRecipeRecommendationsFromPantry({ userId, limit, activeDietNot
     };
 }
 
-async function callAiApi({ model, messages, stream = false }) {
-    const apiUrl = process.env.AI_CHAT_API_URL || 'https://your-ai-api-url.com';
-    const timeoutMs = Number(process.env.AI_CHAT_TIMEOUT_MS || 20000);
-
+async function callAiPrimary({ apiUrl, model, messages, stream, timeoutMs }) {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), timeoutMs);
 
@@ -1074,7 +1071,7 @@ async function callAiApi({ model, messages, stream = false }) {
                 errorPayload = { raw: text };
             }
 
-            const err = new Error(`AI API failed with status ${response.status}`);
+            const err = new Error(`Primary AI API failed with status ${response.status}`);
             err.status = response.status;
             err.payload = errorPayload;
             throw err;
@@ -1084,6 +1081,7 @@ async function callAiApi({ model, messages, stream = false }) {
             const streamResult = parseStreamNdjsonToMessage(text);
             return {
                 raw: {
+                    provider: 'primary',
                     mode: 'stream',
                     chunks: streamResult.chunks
                 },
@@ -1099,11 +1097,118 @@ async function callAiApi({ model, messages, stream = false }) {
         }
 
         return {
-            raw: data,
+            raw: {
+                provider: 'primary',
+                payload: data
+            },
             assistantMessage: extractAssistantMessage(data)
         };
     } finally {
         clearTimeout(timer);
+    }
+}
+
+async function callAiFallbackOpenAI({ apiUrl, apiKey, model, messages, stream, timeoutMs }) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+
+    try {
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${apiKey}`
+            },
+            body: JSON.stringify({
+                model,
+                messages,
+                stream,
+                temperature: 0.7
+            }),
+            signal: controller.signal
+        });
+
+        const text = await response.text();
+
+        if (!response.ok) {
+            let errorPayload;
+            try {
+                errorPayload = JSON.parse(text);
+            } catch (_) {
+                errorPayload = { raw: text };
+            }
+
+            const err = new Error(`Fallback AI API failed with status ${response.status}`);
+            err.status = response.status;
+            err.payload = errorPayload;
+            throw err;
+        }
+
+        let data;
+        try {
+            data = JSON.parse(text);
+        } catch (_) {
+            data = { raw: text };
+        }
+
+        const assistantMessage =
+            data?.choices?.[0]?.message?.content ||
+            data?.choices?.[0]?.delta?.content ||
+            extractAssistantMessage(data) ||
+            '';
+
+        return {
+            raw: {
+                provider: 'fallback',
+                payload: data
+            },
+            assistantMessage: String(assistantMessage || '').trim()
+        };
+    } finally {
+        clearTimeout(timer);
+    }
+}
+
+async function callAiApi({ model, messages, stream = false }) {
+    const primaryApiUrl = process.env.AI_CHAT_API_URL || 'https://your-ai-api-url.com';
+    const timeoutMs = Number(process.env.AI_CHAT_TIMEOUT_MS || 20000);
+
+    const fallbackApiUrl = process.env.AI_CHAT_FALLBACK_API_URL || 'https://your-ai-fallback-api-url.com';
+    const fallbackApiKey = process.env.AI_CHAT_FALLBACK_API_KEY || process.env.OPENAI_API_KEY || '';
+    const fallbackModel = process.env.AI_CHAT_FALLBACK_MODEL || 'gpt-4.1-mini';
+
+    try {
+        return await callAiPrimary({
+            apiUrl: primaryApiUrl,
+            model,
+            messages,
+            stream,
+            timeoutMs
+        });
+    } catch (primaryError) {
+        if (!fallbackApiUrl || !fallbackApiKey) {
+            throw primaryError;
+        }
+
+        try {
+            const fallbackResult = await callAiFallbackOpenAI({
+                apiUrl: fallbackApiUrl,
+                apiKey: fallbackApiKey,
+                model: fallbackModel,
+                messages,
+                stream: false,
+                timeoutMs
+            });
+
+            return fallbackResult;
+        } catch (fallbackError) {
+            fallbackError.primary = {
+                message: primaryError.message,
+                status: primaryError.status || null,
+                payload: primaryError.payload || null
+            };
+            throw fallbackError;
+        }
     }
 }
 
