@@ -1,0 +1,23 @@
+{
+  "totalRecipes": 1000,
+  "measurementRecoveredChanges": 245,
+  "ingredientNameLeadingQtyCleaned": 534,
+  "unitNormalizedChanges": 0,
+  "cookingStepTranslatedFixes": 0,
+  "recipeNameCapitalizedFixes": 0,
+  "tagNormalizedRecipes": 0,
+  "qa": {
+    "leftoverEnglishInSteps": 0,
+    "leftoverEnglishInIngredientNames": 0,
+    "badUnitCount": 0,
+    "suspiciousQtyStillMissingCount": 0
+  },
+  "exampleRecipe1Ingredient1": {
+    "ingredientName": "súp lơ",
+    "weight": 1.5,
+    "unit": "kg",
+    "isMain": true,
+    "isCommon": false
+  },
+  "postFix_brandTextCleanupChanged": 1
+}
