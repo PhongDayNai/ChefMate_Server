@@ -1,0 +1,561 @@
+{
+  "batch": "701-800",
+  "sourceFile": "/home/dhpho/workspace/projects/chefmate-server/data/recipe-crawl-2026-03-vi/recipes.vi.json",
+  "note": "Final QA cực kỹ EN↔VI: chỉ tạo patch đề xuất; KHÔNG sửa trực tiếp dataset chính.",
+  "patches": [
+    {
+      "index": 703,
+      "changes": {
+        "recipeName": "Gratin đậu gà và rau bina với salsa verde",
+        "importPayloadTemplate.recipeName": "Gratin đậu gà và rau bina với salsa verde",
+        "ingredients[2].ingredientName": "đậu gà đóng lọ, để ráo và rửa sạch",
+        "importPayloadTemplate.ingredients[2].ingredientName": "đậu gà đóng lọ, để ráo và rửa sạch"
+      },
+      "reason": "Chickpea là đậu gà; bản cũ dịch thành đậu xanh gây sai nguyên liệu chính. Final QA EN↔VI: sửa ingredient dịch sai nghĩa/literal theo EN (đặc biệt clove/can/chickpea/drizzle/sticks/wraps)."
+    },
+    {
+      "index": 704,
+      "changes": {
+        "recipeName": "Thịt viên thịt heo và harissa",
+        "importPayloadTemplate.recipeName": "Thịt viên thịt heo và harissa",
+        "ingredients[8].ingredientName": "dầu ô liu, thêm một ít để rưới",
+        "importPayloadTemplate.ingredients[8].ingredientName": "dầu ô liu, thêm một ít để rưới",
+        "ingredients[11].ingredientName": "tỏi đập dập",
+        "importPayloadTemplate.ingredients[11].ingredientName": "tỏi đập dập",
+        "ingredients[11].unit": "tép",
+        "importPayloadTemplate.ingredients[11].unit": "tép"
+      },
+      "reason": "Chuẩn hóa cấu trúc tên món; bản cũ đảo từ gây gượng và khó hiểu. Final QA EN↔VI: sửa ingredient dịch sai nghĩa/literal theo EN (đặc biệt clove/can/chickpea/drizzle/sticks/wraps)."
+    },
+    {
+      "index": 708,
+      "changes": {
+        "ingredients[3].ingredientName": "tỏi đập dập hoặc bào nhuyễn",
+        "importPayloadTemplate.ingredients[3].ingredientName": "tỏi đập dập hoặc bào nhuyễn",
+        "ingredients[3].unit": "tép",
+        "importPayloadTemplate.ingredients[3].unit": "tép"
+      },
+      "reason": "Final QA EN↔VI: sửa ingredient dịch sai nghĩa/literal theo EN (đặc biệt clove/can/chickpea/drizzle/sticks/wraps)."
+    },
+    {
+      "index": 711,
+      "changes": {
+        "recipeName": "Terrine cá hồi hun khói ướp si-rô phong với dưa chuột ngâm gin",
+        "importPayloadTemplate.recipeName": "Terrine cá hồi hun khói ướp si-rô phong với dưa chuột ngâm gin",
+        "ingredients[5].ingredientName": "thì là băm thô",
+        "importPayloadTemplate.ingredients[5].ingredientName": "thì là băm thô"
+      },
+      "reason": "Bản cũ lặp từ ‘hun khói’ và làm rơi cụm ‘terrine’ + ‘maple-cured’. Final QA EN↔VI: sửa ingredient dịch sai nghĩa/literal theo EN (đặc biệt clove/can/chickpea/drizzle/sticks/wraps)."
+    },
+    {
+      "index": 712,
+      "changes": {
+        "recipeName": "Bánh tart mince pie hình sao",
+        "importPayloadTemplate.recipeName": "Bánh tart mince pie hình sao"
+      },
+      "reason": "Mince pie là dòng bánh ngọt, không phải ‘thịt bằm’; sửa để tránh sai nghĩa literal."
+    },
+    {
+      "index": 713,
+      "changes": {
+        "recipeName": "Cải Brussels với quýt clementine và hạt phỉ",
+        "importPayloadTemplate.recipeName": "Cải Brussels với quýt clementine và hạt phỉ"
+      },
+      "reason": "‘Sprouts’ trong ngữ cảnh này là cải Brussels; bản cũ dịch thành ‘mầm’ gây sai nghĩa món."
+    },
+    {
+      "index": 714,
+      "changes": {
+        "recipeName": "Bowl gà xé harissa",
+        "importPayloadTemplate.recipeName": "Bowl gà xé harissa",
+        "ingredients[3].ingredientName": "tỏi thái lát mỏng",
+        "importPayloadTemplate.ingredients[3].ingredientName": "tỏi thái lát mỏng",
+        "ingredients[3].unit": "tép",
+        "importPayloadTemplate.ingredients[3].unit": "tép",
+        "ingredients[6].ingredientName": "đậu lăng xanh đóng hộp ngâm nước",
+        "importPayloadTemplate.ingredients[6].ingredientName": "đậu lăng xanh đóng hộp ngâm nước"
+      },
+      "reason": "‘Pulled chicken’ là gà xé; bản cũ ‘gà kéo’ là dịch máy literal. Final QA EN↔VI: sửa ingredient dịch sai nghĩa/literal theo EN (đặc biệt clove/can/chickpea/drizzle/sticks/wraps)."
+    },
+    {
+      "index": 717,
+      "changes": {
+        "ingredients[6].ingredientName": "cà chua băm đóng hộp",
+        "importPayloadTemplate.ingredients[6].ingredientName": "cà chua băm đóng hộp"
+      },
+      "reason": "Final QA EN↔VI: sửa ingredient dịch sai nghĩa/literal theo EN (đặc biệt clove/can/chickpea/drizzle/sticks/wraps)."
+    },
+    {
+      "index": 719,
+      "changes": {
+        "ingredients[3].ingredientName": "dầu ô liu nguyên chất, thêm một ít để rưới",
+        "importPayloadTemplate.ingredients[3].ingredientName": "dầu ô liu nguyên chất, thêm một ít để rưới",
+        "ingredients[5].ingredientName": "đậu gà đóng lọ",
+        "importPayloadTemplate.ingredients[5].ingredientName": "đậu gà đóng lọ",
+        "ingredients[7].ingredientName": "nước cốt dừa đóng hộp",
+        "importPayloadTemplate.ingredients[7].ingredientName": "nước cốt dừa đóng hộp"
+      },
+      "reason": "Final QA EN↔VI: sửa ingredient dịch sai nghĩa/literal theo EN (đặc biệt clove/can/chickpea/drizzle/sticks/wraps)."
+    },
+    {
+      "index": 720,
+      "changes": {
+        "recipeName": "Bí đỏ Hasselback vị si-rô phong và thì là Ai Cập với đậu gà & ớt ngâm",
+        "importPayloadTemplate.recipeName": "Bí đỏ Hasselback vị si-rô phong và thì là Ai Cập với đậu gà & ớt ngâm",
+        "ingredients[4].ingredientName": "đậu gà đóng hộp, để ráo nước",
+        "importPayloadTemplate.ingredients[4].ingredientName": "đậu gà đóng hộp, để ráo nước",
+        "ingredients[7].ingredientName": "bánh wrap",
+        "importPayloadTemplate.ingredients[7].ingredientName": "bánh wrap"
+      },
+      "reason": "Bản cũ dịch sai ‘maple’, ‘chickpeas’ và cấu trúc tên món. Final QA EN↔VI: sửa ingredient dịch sai nghĩa/literal theo EN (đặc biệt clove/can/chickpea/drizzle/sticks/wraps)."
+    },
+    {
+      "index": 721,
+      "changes": {
+        "recipeName": "Wrap coronation xoài và đậu gà với chutney hạt điều rau mùi",
+        "importPayloadTemplate.recipeName": "Wrap coronation xoài và đậu gà với chutney hạt điều rau mùi"
+      },
+      "reason": "Sửa ‘chickpea’ (đậu gà) và giữ ‘coronation wraps’ đúng ngữ cảnh món."
+    },
+    {
+      "index": 722,
+      "changes": {
+        "recipeName": "Cottage pie",
+        "importPayloadTemplate.recipeName": "Cottage pie",
+        "ingredients[4].ingredientName": "cần tây cắt khúc",
+        "importPayloadTemplate.ingredients[4].ingredientName": "cần tây cắt khúc",
+        "ingredients[5].ingredientName": "tỏi băm nhuyễn",
+        "importPayloadTemplate.ingredients[5].ingredientName": "tỏi băm nhuyễn",
+        "ingredients[5].unit": "tép",
+        "importPayloadTemplate.ingredients[5].unit": "tép"
+      },
+      "reason": "Bản cũ ‘Bánh tiểu’ sai nghĩa hoàn toàn; giữ tên món chuẩn để tránh hiểu nhầm. Final QA EN↔VI: sửa ingredient dịch sai nghĩa/literal theo EN (đặc biệt clove/can/chickpea/drizzle/sticks/wraps)."
+    },
+    {
+      "index": 723,
+      "changes": {
+        "recipeName": "Chicken parmigiana nồi chiên không dầu",
+        "importPayloadTemplate.recipeName": "Chicken parmigiana nồi chiên không dầu"
+      },
+      "reason": "Chuẩn hóa cụm ‘air fryer’ theo tiếng Việt tự nhiên."
+    },
+    {
+      "index": 724,
+      "changes": {
+        "ingredients[4].ingredientName": "tỏi băm thô",
+        "importPayloadTemplate.ingredients[4].ingredientName": "tỏi băm thô",
+        "ingredients[4].unit": "tép",
+        "importPayloadTemplate.ingredients[4].unit": "tép"
+      },
+      "reason": "Final QA EN↔VI: sửa ingredient dịch sai nghĩa/literal theo EN (đặc biệt clove/can/chickpea/drizzle/sticks/wraps)."
+    },
+    {
+      "index": 729,
+      "changes": {
+        "recipeName": "Bánh mì nướng bắp ngọt cháy cạnh và cua vị devilled",
+        "importPayloadTemplate.recipeName": "Bánh mì nướng bắp ngọt cháy cạnh và cua vị devilled",
+        "ingredients[4].ingredientName": "tỏi đập dập",
+        "importPayloadTemplate.ingredients[4].ingredientName": "tỏi đập dập",
+        "ingredients[4].unit": "tép",
+        "importPayloadTemplate.ingredients[4].unit": "tép"
+      },
+      "reason": "Bản cũ làm rơi thành phần ‘devilled charred sweetcorn’. Final QA EN↔VI: sửa ingredient dịch sai nghĩa/literal theo EN (đặc biệt clove/can/chickpea/drizzle/sticks/wraps)."
+    },
+    {
+      "index": 730,
+      "changes": {
+        "ingredients[1].ingredientName": "thanh quế",
+        "importPayloadTemplate.ingredients[1].ingredientName": "thanh quế",
+        "ingredients[1].unit": "thanh",
+        "importPayloadTemplate.ingredients[1].unit": "thanh",
+        "ingredients[8].ingredientName": "cà chua băm đóng hộp",
+        "importPayloadTemplate.ingredients[8].ingredientName": "cà chua băm đóng hộp"
+      },
+      "reason": "Final QA EN↔VI: sửa ingredient dịch sai nghĩa/literal theo EN (đặc biệt clove/can/chickpea/drizzle/sticks/wraps)."
+    },
+    {
+      "index": 732,
+      "changes": {
+        "ingredients[2].ingredientName": "tỏi đập dập",
+        "importPayloadTemplate.ingredients[2].ingredientName": "tỏi đập dập",
+        "ingredients[2].unit": "tép",
+        "importPayloadTemplate.ingredients[2].unit": "tép"
+      },
+      "reason": "Final QA EN↔VI: sửa ingredient dịch sai nghĩa/literal theo EN (đặc biệt clove/can/chickpea/drizzle/sticks/wraps)."
+    },
+    {
+      "index": 734,
+      "changes": {
+        "ingredients[5].ingredientName": "tỏi băm nhuyễn",
+        "importPayloadTemplate.ingredients[5].ingredientName": "tỏi băm nhuyễn",
+        "ingredients[5].unit": "tép",
+        "importPayloadTemplate.ingredients[5].unit": "tép"
+      },
+      "reason": "Final QA EN↔VI: sửa ingredient dịch sai nghĩa/literal theo EN (đặc biệt clove/can/chickpea/drizzle/sticks/wraps)."
+    },
+    {
+      "index": 735,
+      "changes": {
+        "recipeName": "Bánh loaf chanh và hạt anh túc",
+        "importPayloadTemplate.recipeName": "Bánh loaf chanh và hạt anh túc"
+      },
+      "reason": "‘Loaf cake’ là bánh ngọt khuôn loaf, không phải ‘bánh mì’."
+    },
+    {
+      "index": 736,
+      "changes": {
+        "recipeName": "Babka mince pie",
+        "importPayloadTemplate.recipeName": "Babka mince pie"
+      },
+      "reason": "Bản cũ dịch literal thành ‘thịt bằm’; chỉnh lại đúng dòng bánh mince pie."
+    },
+    {
+      "index": 739,
+      "changes": {
+        "recipeName": "Cupcake ông già Noel tách miếng",
+        "importPayloadTemplate.recipeName": "Cupcake ông già Noel tách miếng"
+      },
+      "reason": "‘Pull-apart’ nên dịch theo nghĩa tách miếng dùng chung, không phải ‘tháo rời’."
+    },
+    {
+      "index": 742,
+      "changes": {
+        "recipeName": "Brunch Boxing Day với bubble & squeak",
+        "importPayloadTemplate.recipeName": "Brunch Boxing Day với bubble & squeak"
+      },
+      "reason": "Bản cũ literal ‘bong bóng và tiếng rít’ sai ngữ dụng; giữ tên món truyền thống."
+    },
+    {
+      "index": 743,
+      "changes": {
+        "ingredients[3].ingredientName": "tỏi bào nhuyễn",
+        "importPayloadTemplate.ingredients[3].ingredientName": "tỏi bào nhuyễn",
+        "ingredients[3].unit": "tép",
+        "importPayloadTemplate.ingredients[3].unit": "tép"
+      },
+      "reason": "Final QA EN↔VI: sửa ingredient dịch sai nghĩa/literal theo EN (đặc biệt clove/can/chickpea/drizzle/sticks/wraps)."
+    },
+    {
+      "index": 745,
+      "changes": {
+        "ingredients[2].ingredientName": "tỏi băm nhuyễn",
+        "importPayloadTemplate.ingredients[2].ingredientName": "tỏi băm nhuyễn",
+        "ingredients[2].unit": "tép",
+        "importPayloadTemplate.ingredients[2].unit": "tép"
+      },
+      "reason": "Final QA EN↔VI: sửa ingredient dịch sai nghĩa/literal theo EN (đặc biệt clove/can/chickpea/drizzle/sticks/wraps)."
+    },
+    {
+      "index": 746,
+      "changes": {
+        "recipeName": "Công thức apple crumble dễ làm",
+        "importPayloadTemplate.recipeName": "Công thức apple crumble dễ làm"
+      },
+      "reason": "Chuẩn hóa tự nhiên hơn so với cụm ‘vụn táo’."
+    },
+    {
+      "index": 747,
+      "changes": {
+        "recipeName": "Latkes tưng bừng!",
+        "importPayloadTemplate.recipeName": "Latkes tưng bừng!"
+      },
+      "reason": "Bản cũ dịch word-by-word gây gượng; giữ sắc thái tiêu đề tự nhiên hơn."
+    },
+    {
+      "index": 749,
+      "changes": {
+        "recipeName": "Scotch eggs nhân cua",
+        "importPayloadTemplate.recipeName": "Scotch eggs nhân cua"
+      },
+      "reason": "Bản cũ rút còn ‘Trứng cua’, làm mất loại món ‘scotch eggs’."
+    },
+    {
+      "index": 753,
+      "changes": {
+        "recipeName": "Profiteroles phiên bản nâng cấp",
+        "importPayloadTemplate.recipeName": "Profiteroles phiên bản nâng cấp"
+      },
+      "reason": "‘Profiteroles’ bị dịch sai thành ‘trục lợi’ do đồng âm từ ‘profit’."
+    },
+    {
+      "index": 755,
+      "changes": {
+        "ingredients[5].ingredientName": "cần tây thái nhỏ",
+        "importPayloadTemplate.ingredients[5].ingredientName": "cần tây thái nhỏ",
+        "ingredients[7].ingredientName": "tỏi bào nhuyễn",
+        "importPayloadTemplate.ingredients[7].ingredientName": "tỏi bào nhuyễn",
+        "ingredients[7].unit": "tép",
+        "importPayloadTemplate.ingredients[7].unit": "tép"
+      },
+      "reason": "Final QA EN↔VI: sửa ingredient dịch sai nghĩa/literal theo EN (đặc biệt clove/can/chickpea/drizzle/sticks/wraps)."
+    },
+    {
+      "index": 758,
+      "changes": {
+        "recipeName": "Shepherd’s pie đậu lăng & nấm với củ cải vàng nghiền",
+        "importPayloadTemplate.recipeName": "Shepherd’s pie đậu lăng & nấm với củ cải vàng nghiền",
+        "ingredients[7].ingredientName": "cà chua băm đóng hộp",
+        "importPayloadTemplate.ingredients[7].ingredientName": "cà chua băm đóng hộp"
+      },
+      "reason": "‘Parsnip’ là củ cải vàng; bản cũ dịch thành rau mùi tây. Final QA EN↔VI: sửa ingredient dịch sai nghĩa/literal theo EN (đặc biệt clove/can/chickpea/drizzle/sticks/wraps)."
+    },
+    {
+      "index": 759,
+      "changes": {
+        "recipeName": "Pasties củ cải vàng, tỏi tây, xô thơm và phô mai xanh",
+        "importPayloadTemplate.recipeName": "Pasties củ cải vàng, tỏi tây, xô thơm và phô mai xanh"
+      },
+      "reason": "Bản cũ chỉ liệt kê nguyên liệu, làm mất loại món ‘pasties’."
+    },
+    {
+      "index": 761,
+      "changes": {
+        "recipeName": "Brownies mince pie",
+        "importPayloadTemplate.recipeName": "Brownies mince pie"
+      },
+      "reason": "Sửa lỗi literal ‘mince pie’ -> ‘thịt băm’."
+    },
+    {
+      "index": 762,
+      "changes": {
+        "ingredients[7].ingredientName": "tỏi bào nhuyễn",
+        "importPayloadTemplate.ingredients[7].ingredientName": "tỏi bào nhuyễn",
+        "ingredients[7].unit": "tép",
+        "importPayloadTemplate.ingredients[7].unit": "tép"
+      },
+      "reason": "Final QA EN↔VI: sửa ingredient dịch sai nghĩa/literal theo EN (đặc biệt clove/can/chickpea/drizzle/sticks/wraps)."
+    },
+    {
+      "index": 763,
+      "changes": {
+        "recipeName": "Linguine đĩa lớn để chia sẻ với tôm pil pil, cà chua bi nổ và chanh cháy",
+        "importPayloadTemplate.recipeName": "Linguine đĩa lớn để chia sẻ với tôm pil pil, cà chua bi nổ và chanh cháy"
+      },
+      "reason": "Bản cũ làm rơi ‘sharing platter’ và dịch sai ‘pil pil’."
+    },
+    {
+      "index": 764,
+      "changes": {
+        "ingredients[3].ingredientName": "cà chua băm đóng hộp",
+        "importPayloadTemplate.ingredients[3].ingredientName": "cà chua băm đóng hộp"
+      },
+      "reason": "Final QA EN↔VI: sửa ingredient dịch sai nghĩa/literal theo EN (đặc biệt clove/can/chickpea/drizzle/sticks/wraps)."
+    },
+    {
+      "index": 765,
+      "changes": {
+        "ingredients[6].ingredientName": "đậu cannellini đóng hộp, để ráo nước",
+        "importPayloadTemplate.ingredients[6].ingredientName": "đậu cannellini đóng hộp, để ráo nước"
+      },
+      "reason": "Final QA EN↔VI: sửa ingredient dịch sai nghĩa/literal theo EN (đặc biệt clove/can/chickpea/drizzle/sticks/wraps)."
+    },
+    {
+      "index": 767,
+      "changes": {
+        "recipeName": "Ba chỉ heo ngũ vị kiểu sticky với gừng và mận",
+        "importPayloadTemplate.recipeName": "Ba chỉ heo ngũ vị kiểu sticky với gừng và mận",
+        "ingredients[2].ingredientName": "tỏi bào nhuyễn hoặc đập dập",
+        "importPayloadTemplate.ingredients[2].ingredientName": "tỏi bào nhuyễn hoặc đập dập",
+        "ingredients[2].unit": "tép",
+        "importPayloadTemplate.ingredients[2].unit": "tép"
+      },
+      "reason": "‘Sticky’ bị dịch sai thành ‘xôi’; chỉnh lại nghĩa món. Final QA EN↔VI: sửa ingredient dịch sai nghĩa/literal theo EN (đặc biệt clove/can/chickpea/drizzle/sticks/wraps)."
+    },
+    {
+      "index": 768,
+      "changes": {
+        "ingredients[9].ingredientName": "tỏi",
+        "importPayloadTemplate.ingredients[9].ingredientName": "tỏi",
+        "ingredients[9].unit": "tép",
+        "importPayloadTemplate.ingredients[9].unit": "tép"
+      },
+      "reason": "Final QA EN↔VI: sửa ingredient dịch sai nghĩa/literal theo EN (đặc biệt clove/can/chickpea/drizzle/sticks/wraps)."
+    },
+    {
+      "index": 769,
+      "changes": {
+        "ingredients[6].ingredientName": "thanh quế bẻ đôi",
+        "importPayloadTemplate.ingredients[6].ingredientName": "thanh quế bẻ đôi",
+        "ingredients[6].unit": "thanh",
+        "importPayloadTemplate.ingredients[6].unit": "thanh"
+      },
+      "reason": "Final QA EN↔VI: sửa ingredient dịch sai nghĩa/literal theo EN (đặc biệt clove/can/chickpea/drizzle/sticks/wraps)."
+    },
+    {
+      "index": 771,
+      "changes": {
+        "ingredients[5].ingredientName": "cần tây thái lát mỏng",
+        "importPayloadTemplate.ingredients[5].ingredientName": "cần tây thái lát mỏng",
+        "ingredients[6].ingredientName": "tỏi băm nhuyễn",
+        "importPayloadTemplate.ingredients[6].ingredientName": "tỏi băm nhuyễn",
+        "ingredients[6].unit": "tép",
+        "importPayloadTemplate.ingredients[6].unit": "tép"
+      },
+      "reason": "Final QA EN↔VI: sửa ingredient dịch sai nghĩa/literal theo EN (đặc biệt clove/can/chickpea/drizzle/sticks/wraps)."
+    },
+    {
+      "index": 774,
+      "changes": {
+        "ingredients[6].ingredientName": "tỏi đập dập hoặc bào nhuyễn",
+        "importPayloadTemplate.ingredients[6].ingredientName": "tỏi đập dập hoặc bào nhuyễn",
+        "ingredients[6].unit": "tép",
+        "importPayloadTemplate.ingredients[6].unit": "tép"
+      },
+      "reason": "Final QA EN↔VI: sửa ingredient dịch sai nghĩa/literal theo EN (đặc biệt clove/can/chickpea/drizzle/sticks/wraps)."
+    },
+    {
+      "index": 777,
+      "changes": {
+        "recipeName": "Pasta đậu tằm với thịt xông khói, kem và bạc hà",
+        "importPayloadTemplate.recipeName": "Pasta đậu tằm với thịt xông khói, kem và bạc hà"
+      },
+      "reason": "‘Broad bean’ phù hợp hơn với ‘đậu tằm’; bản cũ quá chung chung."
+    },
+    {
+      "index": 778,
+      "changes": {
+        "recipeName": "Baked Alaska hạt dẻ cười và anh đào chua",
+        "importPayloadTemplate.recipeName": "Baked Alaska hạt dẻ cười và anh đào chua"
+      },
+      "reason": "Giữ đúng tên món ‘Baked Alaska’; bản cũ đảo cấu trúc gây khó hiểu."
+    },
+    {
+      "index": 779,
+      "changes": {
+        "recipeName": "Tôm sốt dẻo với chanh caramel hóa và ớt trên nền sữa chua tahini",
+        "importPayloadTemplate.recipeName": "Tôm sốt dẻo với chanh caramel hóa và ớt trên nền sữa chua tahini",
+        "ingredients[3].ingredientName": "tỏi băm nhuyễn",
+        "importPayloadTemplate.ingredients[3].ingredientName": "tỏi băm nhuyễn",
+        "ingredients[3].unit": "tép",
+        "importPayloadTemplate.ingredients[3].unit": "tép"
+      },
+      "reason": "‘Sticky’ bị dịch sai thành ‘nếp’; khôi phục ngữ nghĩa món. Final QA EN↔VI: sửa ingredient dịch sai nghĩa/literal theo EN (đặc biệt clove/can/chickpea/drizzle/sticks/wraps)."
+    },
+    {
+      "index": 780,
+      "changes": {
+        "recipeName": "Gà ancho hun khói với hành dẻo, tahini đánh bông và lựu",
+        "importPayloadTemplate.recipeName": "Gà ancho hun khói với hành dẻo, tahini đánh bông và lựu",
+        "ingredients[6].ingredientName": "tỏi để nguyên vỏ",
+        "importPayloadTemplate.ingredients[6].ingredientName": "tỏi để nguyên vỏ",
+        "ingredients[6].unit": "tép",
+        "importPayloadTemplate.ingredients[6].unit": "tép"
+      },
+      "reason": "Bản cũ dịch ‘sticky onions’ thành ‘hành nếp’. Final QA EN↔VI: sửa ingredient dịch sai nghĩa/literal theo EN (đặc biệt clove/can/chickpea/drizzle/sticks/wraps)."
+    },
+    {
+      "index": 782,
+      "changes": {
+        "recipeName": "Khoai tây áo cà ri đậu gà thuần chay",
+        "importPayloadTemplate.recipeName": "Khoai tây áo cà ri đậu gà thuần chay",
+        "ingredients[4].ingredientName": "tỏi đập dập",
+        "importPayloadTemplate.ingredients[4].ingredientName": "tỏi đập dập",
+        "ingredients[4].unit": "tép",
+        "importPayloadTemplate.ingredients[4].unit": "tép",
+        "ingredients[12].ingredientName": "đậu gà đóng hộp, để ráo nước",
+        "importPayloadTemplate.ingredients[12].ingredientName": "đậu gà đóng hộp, để ráo nước"
+      },
+      "reason": "‘Chickpea’ là đậu gà; bản cũ dịch thành đậu xanh. Final QA EN↔VI: sửa ingredient dịch sai nghĩa/literal theo EN (đặc biệt clove/can/chickpea/drizzle/sticks/wraps)."
+    },
+    {
+      "index": 783,
+      "changes": {
+        "ingredients[0].ingredientName": "nước cốt dừa đóng hộp",
+        "importPayloadTemplate.ingredients[0].ingredientName": "nước cốt dừa đóng hộp",
+        "ingredients[6].ingredientName": "tỏi băm nhuyễn",
+        "importPayloadTemplate.ingredients[6].ingredientName": "tỏi băm nhuyễn",
+        "ingredients[6].unit": "tép",
+        "importPayloadTemplate.ingredients[6].unit": "tép"
+      },
+      "reason": "Final QA EN↔VI: sửa ingredient dịch sai nghĩa/literal theo EN (đặc biệt clove/can/chickpea/drizzle/sticks/wraps)."
+    },
+    {
+      "index": 784,
+      "changes": {
+        "recipeName": "Bánh heavenly slice của Angela Hartnett",
+        "importPayloadTemplate.recipeName": "Bánh heavenly slice của Angela Hartnett"
+      },
+      "reason": "‘Slice’ là loại bánh cắt miếng; bản cũ ‘mảnh ghép’ sai ngữ nghĩa."
+    },
+    {
+      "index": 785,
+      "changes": {
+        "recipeName": "Mole bơ đậu phộng hun khói với đậu đen",
+        "importPayloadTemplate.recipeName": "Mole bơ đậu phộng hun khói với đậu đen",
+        "ingredients[7].ingredientName": "tỏi đập dập",
+        "importPayloadTemplate.ingredients[7].ingredientName": "tỏi đập dập",
+        "ingredients[7].unit": "tép",
+        "importPayloadTemplate.ingredients[7].unit": "tép"
+      },
+      "reason": "Tên sốt ‘mole’ bị dịch sai thành ‘nốt’. Final QA EN↔VI: sửa ingredient dịch sai nghĩa/literal theo EN (đặc biệt clove/can/chickpea/drizzle/sticks/wraps)."
+    },
+    {
+      "index": 786,
+      "changes": {
+        "recipeName": "Đậu gà nồi chiên không dầu",
+        "importPayloadTemplate.recipeName": "Đậu gà nồi chiên không dầu",
+        "ingredients[0].ingredientName": "đậu gà đóng hộp, để ráo nước",
+        "importPayloadTemplate.ingredients[0].ingredientName": "đậu gà đóng hộp, để ráo nước"
+      },
+      "reason": "Sửa sai nguyên liệu chính: chickpeas ≠ đậu xanh. Final QA EN↔VI: sửa ingredient dịch sai nghĩa/literal theo EN (đặc biệt clove/can/chickpea/drizzle/sticks/wraps)."
+    },
+    {
+      "index": 788,
+      "changes": {
+        "ingredients[6].ingredientName": "tỏi",
+        "importPayloadTemplate.ingredients[6].ingredientName": "tỏi",
+        "ingredients[6].unit": "tép",
+        "importPayloadTemplate.ingredients[6].unit": "tép"
+      },
+      "reason": "Final QA EN↔VI: sửa ingredient dịch sai nghĩa/literal theo EN (đặc biệt clove/can/chickpea/drizzle/sticks/wraps)."
+    },
+    {
+      "index": 790,
+      "changes": {
+        "ingredients[2].ingredientName": "tỏi đập dập",
+        "importPayloadTemplate.ingredients[2].ingredientName": "tỏi đập dập",
+        "ingredients[2].unit": "tép",
+        "importPayloadTemplate.ingredients[2].unit": "tép"
+      },
+      "reason": "Final QA EN↔VI: sửa ingredient dịch sai nghĩa/literal theo EN (đặc biệt clove/can/chickpea/drizzle/sticks/wraps)."
+    },
+    {
+      "index": 791,
+      "changes": {
+        "ingredients[1].ingredientName": "tỏi bóc vỏ",
+        "importPayloadTemplate.ingredients[1].ingredientName": "tỏi bóc vỏ",
+        "ingredients[1].unit": "tép",
+        "importPayloadTemplate.ingredients[1].unit": "tép",
+        "ingredients[4].ingredientName": "đậu trắng đóng hộp, để ráo và rửa sạch",
+        "importPayloadTemplate.ingredients[4].ingredientName": "đậu trắng đóng hộp, để ráo và rửa sạch"
+      },
+      "reason": "Final QA EN↔VI: sửa ingredient dịch sai nghĩa/literal theo EN (đặc biệt clove/can/chickpea/drizzle/sticks/wraps)."
+    },
+    {
+      "index": 793,
+      "changes": {
+        "ingredients[2].ingredientName": "tỏi bóc vỏ, thái lát",
+        "importPayloadTemplate.ingredients[2].ingredientName": "tỏi bóc vỏ, thái lát",
+        "ingredients[2].unit": "tép",
+        "importPayloadTemplate.ingredients[2].unit": "tép"
+      },
+      "reason": "Final QA EN↔VI: sửa ingredient dịch sai nghĩa/literal theo EN (đặc biệt clove/can/chickpea/drizzle/sticks/wraps)."
+    },
+    {
+      "index": 796,
+      "changes": {
+        "recipeName": "Bánh Cherry Bakewell",
+        "importPayloadTemplate.recipeName": "Bánh Cherry Bakewell"
+      },
+      "reason": "Giữ đúng tên dòng bánh Bakewell; bản cũ quá chung và mất ngữ nghĩa."
+    },
+    {
+      "index": 798,
+      "changes": {
+        "recipeName": "Salad dưa chuột, thì là, cá hồi suối hun khói và mè",
+        "importPayloadTemplate.recipeName": "Salad dưa chuột, thì là, cá hồi suối hun khói và mè"
+      },
+      "reason": "‘Trout’ là cá hồi suối/cá trout, không phải cá hồi (salmon)."
+    }
+  ]
+}

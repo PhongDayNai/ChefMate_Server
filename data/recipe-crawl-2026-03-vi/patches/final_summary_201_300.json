@@ -1,0 +1,27 @@
+{
+  "batch": "201-300",
+  "range": {
+    "start": 201,
+    "end": 300
+  },
+  "recipesScanned": 100,
+  "recipesFlagged": 30,
+  "totalFieldChanges": 69,
+  "categoryCounts": {
+    "loanword_or_term_fix": 21,
+    "phrase_fluency_fix": 25,
+    "recipe_name_fix": 18,
+    "fraction_fix": 2,
+    "spelling_fix": 2,
+    "brand_or_term_fix": 1
+  },
+  "notes": [
+    "Final QA tập trung lỗi dịch sai nghĩa nghiêm trọng EN→VI: thuật ngữ món, tên nguyên liệu và cụm từ máy dịch literal.",
+    "Không chỉnh sửa trực tiếp recipes.vi.json; chỉ xuất final patch + summary.",
+    "Ưu tiên giữ tên món quốc tế khi cần để tránh dịch sai nghĩa (wrap, brownie, corndog, White Russian, Scotch eggs, trout, rocket)."
+  ],
+  "outputFiles": {
+    "patch": "/home/dhpho/workspace/projects/chefmate-server/data/recipe-crawl-2026-03-vi/patches/final_patch_201_300.json",
+    "summary": "/home/dhpho/workspace/projects/chefmate-server/data/recipe-crawl-2026-03-vi/patches/final_summary_201_300.json"
+  }
+}

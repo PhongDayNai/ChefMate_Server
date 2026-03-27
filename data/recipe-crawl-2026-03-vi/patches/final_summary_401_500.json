@@ -1,0 +1,306 @@
+{
+  "range": {
+    "from": 401,
+    "to": 500
+  },
+  "totalPatches": 136,
+  "recipesAffected": 71,
+  "patchesPerRecipe": [
+    {
+      "recipeIndex": 401,
+      "count": 4
+    },
+    {
+      "recipeIndex": 402,
+      "count": 3
+    },
+    {
+      "recipeIndex": 405,
+      "count": 3
+    },
+    {
+      "recipeIndex": 406,
+      "count": 2
+    },
+    {
+      "recipeIndex": 409,
+      "count": 1
+    },
+    {
+      "recipeIndex": 410,
+      "count": 1
+    },
+    {
+      "recipeIndex": 411,
+      "count": 1
+    },
+    {
+      "recipeIndex": 412,
+      "count": 2
+    },
+    {
+      "recipeIndex": 413,
+      "count": 3
+    },
+    {
+      "recipeIndex": 415,
+      "count": 1
+    },
+    {
+      "recipeIndex": 418,
+      "count": 1
+    },
+    {
+      "recipeIndex": 419,
+      "count": 3
+    },
+    {
+      "recipeIndex": 420,
+      "count": 1
+    },
+    {
+      "recipeIndex": 422,
+      "count": 3
+    },
+    {
+      "recipeIndex": 424,
+      "count": 1
+    },
+    {
+      "recipeIndex": 425,
+      "count": 1
+    },
+    {
+      "recipeIndex": 426,
+      "count": 3
+    },
+    {
+      "recipeIndex": 427,
+      "count": 1
+    },
+    {
+      "recipeIndex": 428,
+      "count": 1
+    },
+    {
+      "recipeIndex": 429,
+      "count": 2
+    },
+    {
+      "recipeIndex": 430,
+      "count": 1
+    },
+    {
+      "recipeIndex": 432,
+      "count": 1
+    },
+    {
+      "recipeIndex": 433,
+      "count": 1
+    },
+    {
+      "recipeIndex": 434,
+      "count": 4
+    },
+    {
+      "recipeIndex": 436,
+      "count": 1
+    },
+    {
+      "recipeIndex": 437,
+      "count": 3
+    },
+    {
+      "recipeIndex": 438,
+      "count": 1
+    },
+    {
+      "recipeIndex": 439,
+      "count": 5
+    },
+    {
+      "recipeIndex": 440,
+      "count": 3
+    },
+    {
+      "recipeIndex": 441,
+      "count": 3
+    },
+    {
+      "recipeIndex": 442,
+      "count": 4
+    },
+    {
+      "recipeIndex": 444,
+      "count": 2
+    },
+    {
+      "recipeIndex": 445,
+      "count": 2
+    },
+    {
+      "recipeIndex": 446,
+      "count": 1
+    },
+    {
+      "recipeIndex": 447,
+      "count": 3
+    },
+    {
+      "recipeIndex": 450,
+      "count": 3
+    },
+    {
+      "recipeIndex": 451,
+      "count": 3
+    },
+    {
+      "recipeIndex": 452,
+      "count": 2
+    },
+    {
+      "recipeIndex": 453,
+      "count": 3
+    },
+    {
+      "recipeIndex": 454,
+      "count": 1
+    },
+    {
+      "recipeIndex": 457,
+      "count": 1
+    },
+    {
+      "recipeIndex": 458,
+      "count": 3
+    },
+    {
+      "recipeIndex": 459,
+      "count": 1
+    },
+    {
+      "recipeIndex": 461,
+      "count": 1
+    },
+    {
+      "recipeIndex": 462,
+      "count": 2
+    },
+    {
+      "recipeIndex": 463,
+      "count": 2
+    },
+    {
+      "recipeIndex": 465,
+      "count": 1
+    },
+    {
+      "recipeIndex": 466,
+      "count": 2
+    },
+    {
+      "recipeIndex": 467,
+      "count": 1
+    },
+    {
+      "recipeIndex": 468,
+      "count": 2
+    },
+    {
+      "recipeIndex": 469,
+      "count": 1
+    },
+    {
+      "recipeIndex": 470,
+      "count": 1
+    },
+    {
+      "recipeIndex": 473,
+      "count": 1
+    },
+    {
+      "recipeIndex": 474,
+      "count": 2
+    },
+    {
+      "recipeIndex": 475,
+      "count": 2
+    },
+    {
+      "recipeIndex": 476,
+      "count": 3
+    },
+    {
+      "recipeIndex": 479,
+      "count": 3
+    },
+    {
+      "recipeIndex": 480,
+      "count": 2
+    },
+    {
+      "recipeIndex": 483,
+      "count": 2
+    },
+    {
+      "recipeIndex": 484,
+      "count": 1
+    },
+    {
+      "recipeIndex": 485,
+      "count": 3
+    },
+    {
+      "recipeIndex": 486,
+      "count": 1
+    },
+    {
+      "recipeIndex": 487,
+      "count": 3
+    },
+    {
+      "recipeIndex": 490,
+      "count": 1
+    },
+    {
+      "recipeIndex": 494,
+      "count": 1
+    },
+    {
+      "recipeIndex": 495,
+      "count": 2
+    },
+    {
+      "recipeIndex": 496,
+      "count": 1
+    },
+    {
+      "recipeIndex": 497,
+      "count": 1
+    },
+    {
+      "recipeIndex": 498,
+      "count": 1
+    },
+    {
+      "recipeIndex": 499,
+      "count": 1
+    },
+    {
+      "recipeIndex": 500,
+      "count": 2
+    }
+  ],
+  "reasonStats": {
+    "Final QA EN↔VI: sửa ingredientName dịch sai/literal theo EN": 48,
+    "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)": 133,
+    "Final QA EN↔VI: tinh chỉnh nghĩa theo ngữ cảnh EN gốc": 14
+  },
+  "files": {
+    "en": "/home/dhpho/workspace/projects/chefmate-server/data/recipe-crawl-2026-03/recipes.json",
+    "vi": "/home/dhpho/workspace/projects/chefmate-server/data/recipe-crawl-2026-03-vi/recipes.vi.json",
+    "basePatch": "/home/dhpho/workspace/projects/chefmate-server/data/recipe-crawl-2026-03-vi/patches/patch_401_500.json",
+    "finalPatch": "/home/dhpho/workspace/projects/chefmate-server/data/recipe-crawl-2026-03-vi/patches/final_patch_401_500.json"
+  },
+  "notes": "Final QA cực kỹ EN↔VI cho batch 401-500; không sửa dataset chính, chỉ xuất patch cuối."
+}
