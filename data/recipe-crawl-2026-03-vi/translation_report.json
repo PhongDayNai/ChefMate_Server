@@ -1,9 +1,17 @@
 {
   "totalRecipes": 1000,
   "totalSteps": 3893,
-  "suspiciousEnglishSteps": 3462,
-  "stepVietnameseCoveragePercent": 11.07,
-  "totalIngredients": 11232,
-  "suspiciousEnglishIngredients": 149,
-  "ingredientVietnameseCoveragePercent": 98.67
+  "suspiciousEnglishSteps": 9,
+  "stepVietnameseCoveragePercent": 99.77,
+  "sampleBadSteps": [
+    "Heat the olive oil in a frying pan over a medium heat. Cho hành tây với một chút muối vào xào trong 8 phút cho đến khi mềm. Mix in the garlic and chilli and cook for 2 mins until fragrant. Đổ cà chua vào và rửa sạch lon bằng một chút nước, thêm cà chua vào, sau đó là đường và rau bina. Bring to a simmer and cook for 10-15 mins until thickened slightly and the spinach has loosened. Mùa.",
+    "Đun nóng sữa trong chảo nhỏ trên lửa nhỏ cho đến khi bốc hơi - không đun sôi. Tắt bếp và cho bơ, vani, vụn bánh mì, vỏ chanh và 40g đường vào khuấy đều. Leave to soak for 30 mins until the breadcrumbs have absorbed the liquid and the mixture has cooled. Để nguội cho lòng đỏ trứng vào khuấy đều.",
+    "Chia phần bánh ngọt còn lại thành các phần tư. Cán từng phần thành một hình tròn đủ lớn để che phần trên của bánh nướng. Đặt các nắp bánh ngọt lên trên phần nhân. Cắt bỏ những phần bánh thừa, sau đó dùng ngón tay kẹp lại với nhau. Brush the pastry lids with a little beaten egg and cut a couple of air holes in the top of each one using a sharp knife.",
+    "Đun nóng ghee hoặc bơ trong chảo rán trên lửa vừa cao. Cho hành tây và hạt mù tạt vào xào trong 5 phút cho đến khi vàng quanh các cạnh và hạt mù tạt nổ tung. Mix in the ginger, garlic, green chilli and tomato purée. Nấu trong 4-5 phút cho đến khi có mùi thơm và caramen.",
+    "Sprinkle each salmon fillet with ½ tsp salt and set aside for 20 mins (this helps draw out excess water and firm up the fillets). Rửa sạch bằng nước lạnh và lau khô bằng giấy ăn.",
+    "Pour in 400ml of water and slowly simmer for around 10 mins, until it's reached your preferred texture. Bạn nấu càng lâu thì đậu sẽ càng mềm và bắt đầu tan vào nước sốt.",
+    "Place in the air fryer and cook for 12 mins at 150C. Pull out the drawer and sprinkle the top with the grated cheddar, making sure it is evenly covered. Return to the air fryer for 6-8 mins until the frittata is cooked through. The middle of the frittata should feel springy when prodded. Bạn có thể kiểm tra xem trứng đã chín chưa bằng cách thọc mũi dao vào phần trên của frittata ở giữa hộp thiếc – khi ấn nhẹ sẽ không có trứng lỏng.",
+    "Toss the onions in a bowl with the salt and leave for 5 mins. Trong khi đó, trộn bột mì, bột nở và gia vị vào một tô khác. Thêm 100ml nước để tạo thành hỗn hợp sệt. Trộn hành, ớt và rau mùi.",
+    "Khi đã sẵn sàng nấu, làm nóng vỉ nướng ở mức cao hoặc cho vào lò nướng ở nhiệt độ 220C/200C quạt/gas 6. Chia hỗn hợp thành 12 phần bằng nhau, mỗi phần khoảng 85g. Nếu bạn muốn xiên chúng, hãy chia thành 8 phần bằng nhau và vo thành từng viên tròn. Using wet hands, thread the balls onto the end of the skewers, massaging the mixture down the skewers in between the palms of your hands, until evenly distributed. Đảm bảo hỗn hợp được quấn chặt quanh xiên mà không để lộ phần kim loại nào. Ngoài ra, hãy đặt chúng lên một khay nướng lớn có lót giấy da nếu nấu trong lò hoặc giấy bạc nếu nấu dưới vỉ nướng. Tạo hình thành köfte dài 20cm. Làm ướt ngón tay của bạn bằng một ít nước lạnh và tạo các vết lõm dọc theo köfte để có hình dạng truyền thống."
+  ]
 }
