@@ -19,6 +19,7 @@ CREATE TABLE Recipes(
   cookingTime NVARCHAR(20) NOT NULL,
   ration INT NOT NULL,
   viewCount INT NOT NULL DEFAULT 0,
+  status NVARCHAR(20) NOT NULL DEFAULT 'approved',
   userId INT FOREIGN KEY REFERENCES Users(userId),
   createdAt DATETIME DEFAULT GETDATE()
 );

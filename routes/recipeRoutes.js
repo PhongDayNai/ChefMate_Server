@@ -13,6 +13,8 @@ router.get('/trending-v2', recipeController.getTrendingV2);
 router.get('/tags', recipeController.getAllTags);
 router.post('/search-by-tag', recipeController.searchRecipesByTag);
 router.post('/user-recipes', recipeController.getRecipesByUserId);
+router.get('/admin/pending', recipeController.getPendingRecipes);
+router.patch('/admin/review', recipeController.reviewRecipe);
 router.get('/growth-report', recipeController.getRecipeGrowthByMonth);
 
 module.exports = router;

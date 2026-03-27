@@ -23,6 +23,7 @@ CREATE TABLE IF NOT EXISTS Recipes (
   cookingTime VARCHAR(20) NOT NULL,
   ration INT NOT NULL,
   viewCount INT NOT NULL DEFAULT 0,
+  status ENUM('pending', 'approved', 'rejected') NOT NULL DEFAULT 'approved',
   userId INT NOT NULL,
   createdAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT fk_recipes_user FOREIGN KEY (userId) REFERENCES Users(userId)
