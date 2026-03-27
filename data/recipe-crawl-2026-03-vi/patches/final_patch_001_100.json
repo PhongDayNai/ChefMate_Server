@@ -1,0 +1,590 @@
+[
+  {
+    "recipeIndex": 1,
+    "ingredientIndex": 7,
+    "new": {
+      "ingredientName": "nước dùng",
+      "weight": 850,
+      "unit": "ml",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Bỏ mệnh đề lựa chọn kiểu \"hoặc\" trong ingredientName; giữ nghĩa tổng quát của stock."
+  },
+  {
+    "recipeIndex": 3,
+    "ingredientIndex": 6,
+    "new": {
+      "ingredientName": "màu thực phẩm (vàng, hồng, tím)",
+      "weight": 1,
+      "unit": "giọt",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "EN là food colouring nhiều màu; đổi unit \"đơn vị\" -> \"giọt\"."
+  },
+  {
+    "recipeIndex": 8,
+    "ingredientIndex": 7,
+    "new": {
+      "ingredientName": "vài giọt màu thực phẩm màu hồng",
+      "weight": 1,
+      "unit": "giọt",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "EN là \"a few drops\"; đổi unit \"đơn vị\" -> \"giọt\"."
+  },
+  {
+    "recipeIndex": 8,
+    "ingredientIndex": 14,
+    "new": {
+      "ingredientName": "vài giọt màu thực phẩm màu hồng",
+      "weight": 1,
+      "unit": "giọt",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "EN là \"a few drops\"; đổi unit \"đơn vị\" -> \"giọt\"."
+  },
+  {
+    "recipeIndex": 9,
+    "ingredientIndex": 14,
+    "new": {
+      "ingredientName": "cà chua chín",
+      "weight": 3,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit từ \"đơn vị\" sang đơn vị cụ thể theo EN (tomatoes -> quả)."
+  },
+  {
+    "recipeIndex": 13,
+    "ingredientIndex": 7,
+    "new": {
+      "ingredientName": "trứng",
+      "weight": 2,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit từ \"đơn vị\" sang \"quả\" theo EN (eggs)."
+  },
+  {
+    "recipeIndex": 14,
+    "ingredientIndex": 10,
+    "new": {
+      "ingredientName": "nhục đậu khấu bào",
+      "weight": 1,
+      "unit": "nhúm",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Dịch sai nghĩa rõ ràng: \"grating of nutmeg\" không phải \"đậu\"."
+  },
+  {
+    "recipeIndex": 15,
+    "ingredientIndex": 4,
+    "new": {
+      "ingredientName": "bánh mì tròn",
+      "weight": 2,
+      "unit": "cái",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit từ \"đơn vị\" sang \"cái\" theo EN (bagels)."
+  },
+  {
+    "recipeIndex": 16,
+    "ingredientIndex": 4,
+    "new": {
+      "ingredientName": "trứng",
+      "weight": 3,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit từ \"đơn vị\" sang \"quả\" theo EN (eggs)."
+  },
+  {
+    "recipeIndex": 17,
+    "ingredientIndex": 7,
+    "new": {
+      "ingredientName": "đùi gà có xương",
+      "weight": 8,
+      "unit": "cái",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit từ \"đơn vị\" sang \"cái\" theo EN (chicken thighs đếm chiếc)."
+  },
+  {
+    "recipeIndex": 20,
+    "ingredientIndex": 1,
+    "new": {
+      "ingredientName": "phi-lê",
+      "weight": 4,
+      "unit": "miếng",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Đổi unit từ \"đơn vị\" sang \"miếng\" theo EN (fillets)."
+  },
+  {
+    "recipeIndex": 21,
+    "ingredientIndex": 0,
+    "new": {
+      "ingredientName": "ức gà",
+      "weight": 3,
+      "unit": "miếng",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Đổi unit từ \"đơn vị\" sang \"miếng\" theo EN (chicken breasts strips)."
+  },
+  {
+    "recipeIndex": 22,
+    "ingredientIndex": 1,
+    "new": {
+      "ingredientName": "thảo quả",
+      "weight": 8,
+      "unit": "quả",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Chuẩn nghĩa + unit cụ thể theo EN (cardamom pods)."
+  },
+  {
+    "recipeIndex": 22,
+    "ingredientIndex": 2,
+    "new": {
+      "ingredientName": "đinh hương",
+      "weight": 4,
+      "unit": "nụ",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Đổi unit từ \"đơn vị\" sang \"nụ\" theo EN (cloves - gia vị)."
+  },
+  {
+    "recipeIndex": 22,
+    "ingredientIndex": 3,
+    "new": {
+      "ingredientName": "tiêu",
+      "weight": 6,
+      "unit": "hạt",
+      "isMain": false,
+      "isCommon": true
+    },
+    "reason": "Đổi unit từ \"đơn vị\" sang \"hạt\" theo EN (peppercorns)."
+  },
+  {
+    "recipeIndex": 22,
+    "ingredientIndex": 4,
+    "new": {
+      "ingredientName": "hồi",
+      "weight": 1,
+      "unit": "hoa",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit từ \"đơn vị\" sang \"hoa\" theo EN (star anise)."
+  },
+  {
+    "recipeIndex": 22,
+    "ingredientIndex": 6,
+    "new": {
+      "ingredientName": "túi trà",
+      "weight": 3,
+      "unit": "túi",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit từ \"đơn vị\" sang \"túi\" theo EN (teabag)."
+  },
+  {
+    "recipeIndex": 26,
+    "ingredientIndex": 3,
+    "new": {
+      "ingredientName": "trứng",
+      "weight": 3,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit từ \"đơn vị\" sang \"quả\" theo EN (eggs)."
+  },
+  {
+    "recipeIndex": 32,
+    "ingredientIndex": 7,
+    "new": {
+      "ingredientName": "đùi gà không xương",
+      "weight": 6,
+      "unit": "cái",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit từ \"đơn vị\" sang \"cái\" theo EN (chicken thighs pieces)."
+  },
+  {
+    "recipeIndex": 39,
+    "ingredientIndex": 2,
+    "new": {
+      "ingredientName": "trứng",
+      "weight": 4,
+      "unit": "quả",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Đổi unit từ \"đơn vị\" sang \"quả\" theo EN (eggs)."
+  },
+  {
+    "recipeIndex": 40,
+    "ingredientIndex": 6,
+    "new": {
+      "ingredientName": "trứng",
+      "weight": 2,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit từ \"đơn vị\" sang \"quả\" theo EN (eggs)."
+  },
+  {
+    "recipeIndex": 43,
+    "ingredientIndex": 2,
+    "new": {
+      "ingredientName": "phô mai mozzarella",
+      "weight": 1,
+      "unit": "viên",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Dịch sai nghĩa rõ ràng: \"ball drained\" (mozzarella ball) bị dịch thành \"bóng cạn nước\"."
+  },
+  {
+    "recipeIndex": 44,
+    "ingredientIndex": 0,
+    "new": {
+      "ingredientName": "phi lê cá thu hun khói ăn liền",
+      "weight": 2,
+      "unit": "miếng",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Đổi unit từ \"đơn vị\" sang \"miếng\" theo EN (mackerel fillets)."
+  },
+  {
+    "recipeIndex": 44,
+    "ingredientIndex": 6,
+    "new": {
+      "ingredientName": "bánh crumpet",
+      "weight": 4,
+      "unit": "cái",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Dịch sai nghĩa rõ ràng: \"crumpets\" bị dịch thành \"bánh vụn\"."
+  },
+  {
+    "recipeIndex": 44,
+    "ingredientIndex": 9,
+    "new": {
+      "ingredientName": "củ cải đỏ",
+      "weight": 1,
+      "unit": "củ",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Dịch sai nghĩa rõ ràng: \"radishes\" không phải \"cải\" chung chung."
+  },
+  {
+    "recipeIndex": 45,
+    "ingredientIndex": 3,
+    "new": {
+      "ingredientName": "thảo quả",
+      "weight": 3,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Chuẩn nghĩa + unit cụ thể theo EN (cardamom pods)."
+  },
+  {
+    "recipeIndex": 49,
+    "ingredientIndex": 0,
+    "new": {
+      "ingredientName": "ức gà",
+      "weight": 4,
+      "unit": "miếng",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Dịch sai nghĩa rõ ràng: \"breasts\" trong ngữ cảnh là ức gà, không phải \"ngực\"."
+  },
+  {
+    "recipeIndex": 49,
+    "ingredientIndex": 2,
+    "new": {
+      "ingredientName": "trứng",
+      "weight": 2,
+      "unit": "quả",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Đổi unit từ \"đơn vị\" sang \"quả\" theo EN (eggs)."
+  },
+  {
+    "recipeIndex": 50,
+    "ingredientIndex": 4,
+    "new": {
+      "ingredientName": "hồi",
+      "weight": 2,
+      "unit": "hoa",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit từ \"đơn vị\" sang \"hoa\" theo EN (anise)."
+  },
+  {
+    "recipeIndex": 54,
+    "ingredientIndex": 0,
+    "new": {
+      "ingredientName": "củ cần tây",
+      "weight": 1,
+      "unit": "củ",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Dịch sai nghĩa: \"celeriac\" là củ cần tây, không phải cần tây thân."
+  },
+  {
+    "recipeIndex": 59,
+    "ingredientIndex": 2,
+    "new": {
+      "ingredientName": "thảo quả",
+      "weight": 6,
+      "unit": "quả",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Dịch sai nghĩa rõ ràng: \"pods\" (cardamom) bị rơi thành \"loại\"."
+  },
+  {
+    "recipeIndex": 59,
+    "ingredientIndex": 6,
+    "new": {
+      "ingredientName": "thảo quả",
+      "weight": 8,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Dịch sai nghĩa rõ ràng: \"pods\" (cardamom) không phải \"vỏ quả bị\"."
+  },
+  {
+    "recipeIndex": 59,
+    "ingredientIndex": 12,
+    "new": {
+      "ingredientName": "thảo quả",
+      "weight": 8,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Dịch sai nghĩa rõ ràng: \"pods\" (cardamom) không phải \"vỏ quả\"."
+  },
+  {
+    "recipeIndex": 65,
+    "ingredientIndex": 17,
+    "new": {
+      "ingredientName": "xà lách gem",
+      "weight": 1,
+      "unit": "cây",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Dịch sai nghĩa rõ ràng: \"Gem shredded\" bị dịch thành \"đá quý vụn\"."
+  },
+  {
+    "recipeIndex": 66,
+    "ingredientIndex": 5,
+    "new": {
+      "ingredientName": "đùi gà không xương",
+      "weight": 4,
+      "unit": "cái",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit từ \"đơn vị\" sang \"cái\" theo EN (chicken thighs)."
+  },
+  {
+    "recipeIndex": 69,
+    "ingredientIndex": 0,
+    "new": {
+      "ingredientName": "tôm sống",
+      "weight": 12,
+      "unit": "con",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Đổi unit từ \"đơn vị\" sang \"con\" theo EN (raw prawns)."
+  },
+  {
+    "recipeIndex": 72,
+    "ingredientIndex": 3,
+    "new": {
+      "ingredientName": "trứng",
+      "weight": 2,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit từ \"đơn vị\" sang \"quả\" theo EN (eggs)."
+  },
+  {
+    "recipeIndex": 74,
+    "ingredientIndex": 0,
+    "new": {
+      "ingredientName": "đùi",
+      "weight": 2,
+      "unit": "cái",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Đổi unit từ \"đơn vị\" sang \"cái\" theo EN (chicken thighs)."
+  },
+  {
+    "recipeIndex": 79,
+    "ingredientIndex": 6,
+    "new": {
+      "ingredientName": "nhục đậu khấu xay",
+      "weight": 1,
+      "unit": "nhúm",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Dịch sai nghĩa rõ ràng: \"ground nutmeg\" không phải \"đậu\"."
+  },
+  {
+    "recipeIndex": 80,
+    "ingredientIndex": 4,
+    "new": {
+      "ingredientName": "bánh mì sourdough",
+      "weight": 4,
+      "unit": "lát",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Dịch sai nghĩa rõ ràng: \"slices\" ở đây là lát bánh mì sourdough, không phải tên nguyên liệu \"lát\"."
+  },
+  {
+    "recipeIndex": 89,
+    "ingredientIndex": 3,
+    "new": {
+      "ingredientName": "đá viên",
+      "weight": 1,
+      "unit": "viên",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit từ \"đơn vị\" sang \"viên\" theo EN (ice cubes)."
+  },
+  {
+    "recipeIndex": 90,
+    "ingredientIndex": 1,
+    "new": {
+      "ingredientName": "nước sốt Worcestershire",
+      "weight": 2,
+      "unit": "muỗng canh",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Bỏ mệnh đề thay thế trong ingredientName (\"... thay thế thuần chay\")."
+  },
+  {
+    "recipeIndex": 91,
+    "ingredientIndex": 14,
+    "new": {
+      "ingredientName": "tấm nori",
+      "weight": 4,
+      "unit": "lá",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit từ \"đơn vị\" sang \"lá\" theo EN (nori sheets)."
+  },
+  {
+    "recipeIndex": 93,
+    "ingredientIndex": 0,
+    "new": {
+      "ingredientName": "đá",
+      "weight": 1,
+      "unit": "viên",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Đổi unit từ \"đơn vị\" sang \"viên\" cho đá dùng pha đồ uống."
+  },
+  {
+    "recipeIndex": 95,
+    "ingredientIndex": 11,
+    "new": {
+      "ingredientName": "bánh wrap",
+      "weight": 4,
+      "unit": "cái",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Dịch sai nghĩa rõ ràng: \"wraps\" bị dịch thành \"kết thúc tốt đẹp\"."
+  },
+  {
+    "recipeIndex": 96,
+    "ingredientIndex": 0,
+    "new": {
+      "ingredientName": "bắp ngô",
+      "weight": 4,
+      "unit": "trái",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Dịch sai nghĩa rõ ràng: \"cobs\" là bắp ngô nguyên trái, không phải lõi ngô."
+  },
+  {
+    "recipeIndex": 97,
+    "ingredientIndex": 2,
+    "new": {
+      "ingredientName": "trứng",
+      "weight": 4,
+      "unit": "quả",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Đổi unit từ \"đơn vị\" sang \"quả\" theo EN (eggs)."
+  },
+  {
+    "recipeIndex": 98,
+    "ingredientIndex": 7,
+    "new": {
+      "ingredientName": "naan",
+      "weight": 2,
+      "unit": "cái",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit từ \"đơn vị\" sang \"cái\" theo EN (naans)."
+  },
+  {
+    "recipeIndex": 100,
+    "ingredientIndex": 6,
+    "new": {
+      "ingredientName": "bánh mì cuộn brioche",
+      "weight": 6,
+      "unit": "cái",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Dịch sai nghĩa rõ ràng: \"rolls halved\" không phải \"bánh cuốn\"."
+  }
+]

@@ -1,0 +1,686 @@
+[
+  {
+    "recipeIndex": 504,
+    "ingredientIndex": 0,
+    "new": {
+      "ingredientName": "thịt ức bò không xương",
+      "weight": 800,
+      "unit": "g",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Sửa tên nguyên liệu bị lỗi parse \"g-1kg ...\"."
+  },
+  {
+    "recipeIndex": 504,
+    "ingredientIndex": 7,
+    "new": {
+      "ingredientName": "mỡ bò",
+      "weight": 1,
+      "unit": "muỗng canh",
+      "isMain": false,
+      "isCommon": true
+    },
+    "reason": "Sửa dịch sai nghĩa rõ ràng: \"beef dripping\" không phải \"thịt bò nhỏ giọt\"."
+  },
+  {
+    "recipeIndex": 504,
+    "ingredientIndex": 20,
+    "new": {
+      "ingredientName": "kem chua",
+      "weight": 100,
+      "unit": "g",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Loại bỏ mệnh đề thay thế \"hoặc ...\" trong ingredientName."
+  },
+  {
+    "recipeIndex": 504,
+    "ingredientIndex": 22,
+    "new": {
+      "ingredientName": "khoai tây nướng nguyên vỏ",
+      "weight": 1,
+      "unit": "củ",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Sửa dịch sai nghĩa rõ ràng: \"jacket potatoes\"."
+  },
+  {
+    "recipeIndex": 507,
+    "ingredientIndex": 2,
+    "new": {
+      "ingredientName": "hẹ tây nhỏ",
+      "weight": 1,
+      "unit": "củ",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Loại bỏ tiền tố thay thế \"hoặc ...\" trong ingredientName."
+  },
+  {
+    "recipeIndex": 508,
+    "ingredientIndex": 11,
+    "new": {
+      "ingredientName": "dầu ô liu",
+      "weight": 250,
+      "unit": "ml",
+      "isMain": false,
+      "isCommon": true
+    },
+    "reason": "Loại bỏ mệnh đề thay thế \"hoặc ...\" trong ingredientName."
+  },
+  {
+    "recipeIndex": 510,
+    "ingredientIndex": 4,
+    "new": {
+      "ingredientName": "dầu dừa",
+      "weight": 3,
+      "unit": "muỗng cà phê",
+      "isMain": false,
+      "isCommon": true
+    },
+    "reason": "Loại bỏ mệnh đề thay thế \"hoặc ...\" trong ingredientName."
+  },
+  {
+    "recipeIndex": 510,
+    "ingredientIndex": 9,
+    "new": {
+      "ingredientName": "tamari",
+      "weight": 2,
+      "unit": "muỗng canh",
+      "isMain": false,
+      "isCommon": true
+    },
+    "reason": "Loại bỏ mệnh đề thay thế \"hoặc ...\" trong ingredientName."
+  },
+  {
+    "recipeIndex": 513,
+    "ingredientIndex": 1,
+    "new": {
+      "ingredientName": "dầu thực vật",
+      "weight": 0.5,
+      "unit": "muỗng canh",
+      "isMain": true,
+      "isCommon": true
+    },
+    "reason": "Loại bỏ mệnh đề thay thế \"hoặc ...\" trong ingredientName."
+  },
+  {
+    "recipeIndex": 514,
+    "ingredientIndex": 6,
+    "new": {
+      "ingredientName": "tương ớt chipotle",
+      "weight": 1,
+      "unit": "muỗng cà phê",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Sửa từ dịch máy sai nghĩa: \"dán chipotle\"."
+  },
+  {
+    "recipeIndex": 514,
+    "ingredientIndex": 8,
+    "new": {
+      "ingredientName": "cà chua hộp cắt nhỏ",
+      "weight": 400,
+      "unit": "g",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Sửa ingredientName rỗng nghĩa \"có thể\" (lỗi parse từ \"can\")."
+  },
+  {
+    "recipeIndex": 514,
+    "ingredientIndex": 10,
+    "new": {
+      "ingredientName": "đậu đen đóng hộp",
+      "weight": 400,
+      "unit": "g",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Loại bỏ prep-step thừa trong ingredientName, giữ tên nguyên liệu chính."
+  },
+  {
+    "recipeIndex": 514,
+    "ingredientIndex": 12,
+    "new": {
+      "ingredientName": "bánh tortilla",
+      "weight": 1,
+      "unit": "phần",
+      "isMain": false,
+      "isCommon": true
+    },
+    "reason": "Loại bỏ mệnh đề thay thế và sửa unit sai rõ ràng (không thể là \"củ\")."
+  },
+  {
+    "recipeIndex": 515,
+    "ingredientIndex": 4,
+    "new": {
+      "ingredientName": "dưa chuột",
+      "weight": 400,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Loại bỏ mệnh đề thay thế \"hoặc ...\" trong ingredientName."
+  },
+  {
+    "recipeIndex": 516,
+    "ingredientIndex": 8,
+    "new": {
+      "ingredientName": "bắp cải nhọn",
+      "weight": 250,
+      "unit": "g",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Loại bỏ mệnh đề thay thế \"hoặc ...\" trong ingredientName."
+  },
+  {
+    "recipeIndex": 517,
+    "ingredientIndex": 20,
+    "new": {
+      "ingredientName": "cà chua nho theo mùa",
+      "weight": 2,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Loại bỏ tiền tố thay thế \"hoặc ...\" trong ingredientName."
+  },
+  {
+    "recipeIndex": 518,
+    "ingredientIndex": 14,
+    "new": {
+      "ingredientName": "bột mace",
+      "weight": 0.5,
+      "unit": "muỗng cà phê",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Loại bỏ mệnh đề thay thế và sửa cụm dịch sai \"lưỡi dao ...\"."
+  },
+  {
+    "recipeIndex": 518,
+    "ingredientIndex": 18,
+    "new": {
+      "ingredientName": "hạt tiêu đen",
+      "weight": 0.75,
+      "unit": "muỗng canh",
+      "isMain": false,
+      "isCommon": true
+    },
+    "reason": "Loại bỏ mệnh đề thay thế \"hoặc ...\" trong ingredientName."
+  },
+  {
+    "recipeIndex": 521,
+    "ingredientIndex": 0,
+    "new": {
+      "ingredientName": "cá rô phi nguyên con",
+      "weight": 2,
+      "unit": "cái",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Loại bỏ mệnh đề thay thế \"hoặc ...\" trong ingredientName."
+  },
+  {
+    "recipeIndex": 521,
+    "ingredientIndex": 4,
+    "new": {
+      "ingredientName": "sắn lát chiên",
+      "weight": 1,
+      "unit": "cái",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Loại bỏ mệnh đề thay thế \"hoặc ...\" trong ingredientName."
+  },
+  {
+    "recipeIndex": 527,
+    "ingredientIndex": 11,
+    "new": {
+      "ingredientName": "đậu lăng puy nấu chín",
+      "weight": 250,
+      "unit": "g",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Sửa lỗi parse tiền tố \"g ...\" trong ingredientName."
+  },
+  {
+    "recipeIndex": 528,
+    "ingredientIndex": 0,
+    "new": {
+      "ingredientName": "đậu edamame đông lạnh",
+      "weight": 320,
+      "unit": "g",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Loại bỏ mệnh đề thay thế \"hoặc ...\" trong ingredientName."
+  },
+  {
+    "recipeIndex": 528,
+    "ingredientIndex": 4,
+    "new": {
+      "ingredientName": "cải xoăn",
+      "weight": 200,
+      "unit": "g",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Loại bỏ mệnh đề thay thế \"hoặc ...\" trong ingredientName."
+  },
+  {
+    "recipeIndex": 530,
+    "ingredientIndex": 0,
+    "new": {
+      "ingredientName": "sô cô la sữa",
+      "weight": 200,
+      "unit": "g",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Sửa dịch sai nghĩa rõ ràng: \"milk chocolate\" bị dịch thành \"sữa\"."
+  },
+  {
+    "recipeIndex": 539,
+    "ingredientIndex": 4,
+    "new": {
+      "ingredientName": "kem tươi",
+      "weight": 2,
+      "unit": "muỗng canh",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Loại bỏ mệnh đề thay thế \"hoặc ...\" trong ingredientName."
+  },
+  {
+    "recipeIndex": 540,
+    "ingredientIndex": 6,
+    "new": {
+      "ingredientName": "sữa chua tự nhiên",
+      "weight": 2,
+      "unit": "muỗng canh",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Loại bỏ mệnh đề thay thế \"hoặc ...\" trong ingredientName."
+  },
+  {
+    "recipeIndex": 540,
+    "ingredientIndex": 7,
+    "new": {
+      "ingredientName": "chiết xuất vani",
+      "weight": 1,
+      "unit": "muỗng cà phê",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Loại bỏ mệnh đề thay thế \"hoặc ...\" trong ingredientName."
+  },
+  {
+    "recipeIndex": 540,
+    "ingredientIndex": 10,
+    "new": {
+      "ingredientName": "kem đặc đông",
+      "weight": 1,
+      "unit": "cái",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Loại bỏ mệnh đề thay thế \"hoặc ...\" trong ingredientName."
+  },
+  {
+    "recipeIndex": 542,
+    "ingredientIndex": 1,
+    "new": {
+      "ingredientName": "dầu hướng dương",
+      "weight": 2,
+      "unit": "muỗng canh",
+      "isMain": true,
+      "isCommon": true
+    },
+    "reason": "Loại bỏ mệnh đề thay thế \"hoặc ...\" trong ingredientName."
+  },
+  {
+    "recipeIndex": 542,
+    "ingredientIndex": 9,
+    "new": {
+      "ingredientName": "dầu hướng dương",
+      "weight": 2,
+      "unit": "muỗng canh",
+      "isMain": false,
+      "isCommon": true
+    },
+    "reason": "Loại bỏ mệnh đề thay thế \"hoặc ...\" trong ingredientName."
+  },
+  {
+    "recipeIndex": 543,
+    "ingredientIndex": 0,
+    "new": {
+      "ingredientName": "phi lê cá hồi",
+      "weight": 2,
+      "unit": "phi lê",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Sửa lỗi parse nặng ở ingredientName/weight/unit (EN: 2 x 140g fillets)."
+  },
+  {
+    "recipeIndex": 550,
+    "ingredientIndex": 0,
+    "new": {
+      "ingredientName": "dầu trung tính",
+      "weight": 2,
+      "unit": "muỗng canh",
+      "isMain": true,
+      "isCommon": true
+    },
+    "reason": "Loại bỏ mệnh đề thay thế \"hoặc ...\" trong ingredientName."
+  },
+  {
+    "recipeIndex": 550,
+    "ingredientIndex": 6,
+    "new": {
+      "ingredientName": "ức gà",
+      "weight": 400,
+      "unit": "g",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Loại bỏ mệnh đề thay thế \"hoặc ...\" trong ingredientName."
+  },
+  {
+    "recipeIndex": 550,
+    "ingredientIndex": 13,
+    "new": {
+      "ingredientName": "me cô đặc",
+      "weight": 2,
+      "unit": "muỗng canh",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Loại bỏ cụm prep/định lượng thừa \"hoặc nếm thử\" trong ingredientName."
+  },
+  {
+    "recipeIndex": 551,
+    "ingredientIndex": 14,
+    "new": {
+      "ingredientName": "quýt",
+      "weight": 1,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Loại bỏ mệnh đề thay thế/đúp từ trong ingredientName."
+  },
+  {
+    "recipeIndex": 551,
+    "ingredientIndex": 15,
+    "new": {
+      "ingredientName": "bơ lạnh cắt miếng nhỏ",
+      "weight": 175,
+      "unit": "g",
+      "isMain": false,
+      "isCommon": true
+    },
+    "reason": "Sửa lỗi parse: thiếu tên nguyên liệu và sai weight (EN tổng 175g)."
+  },
+  {
+    "recipeIndex": 553,
+    "ingredientIndex": 5,
+    "new": {
+      "ingredientName": "mứt hành tây",
+      "weight": 60,
+      "unit": "g",
+      "isMain": false,
+      "isCommon": true
+    },
+    "reason": "Loại bỏ mệnh đề thay thế và sửa unit sai rõ ràng (không thể là \"củ\")."
+  },
+  {
+    "recipeIndex": 562,
+    "ingredientIndex": 10,
+    "new": {
+      "ingredientName": "nước tương",
+      "weight": 1,
+      "unit": "muỗng canh",
+      "isMain": false,
+      "isCommon": true
+    },
+    "reason": "Loại bỏ mệnh đề thay thế \"hoặc ...\" trong ingredientName."
+  },
+  {
+    "recipeIndex": 563,
+    "ingredientIndex": 1,
+    "new": {
+      "ingredientName": "tép tỏi đập dẹt để nguyên",
+      "weight": 1,
+      "unit": "tép",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Sửa dịch sai nghĩa rõ ràng: garlic clove bị dịch thành \"đinh hương\"."
+  },
+  {
+    "recipeIndex": 563,
+    "ingredientIndex": 8,
+    "new": {
+      "ingredientName": "bánh mì tươi",
+      "weight": 1,
+      "unit": "cái",
+      "isMain": false,
+      "isCommon": true
+    },
+    "reason": "Loại bỏ mệnh đề thay thế/thông tin brand dài trong ingredientName."
+  },
+  {
+    "recipeIndex": 568,
+    "ingredientIndex": 6,
+    "new": {
+      "ingredientName": "sô cô la",
+      "weight": 100,
+      "unit": "g",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Sửa lỗi parse tiền tố \"g ...\" trong ingredientName."
+  },
+  {
+    "recipeIndex": 568,
+    "ingredientIndex": 9,
+    "new": {
+      "ingredientName": "rượu mùi kem Baileys",
+      "weight": 1,
+      "unit": "muỗng canh",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Loại bỏ mệnh đề thay thế \"hoặc ...\" trong ingredientName."
+  },
+  {
+    "recipeIndex": 568,
+    "ingredientIndex": 12,
+    "new": {
+      "ingredientName": "rượu mùi kem Baileys",
+      "weight": 50,
+      "unit": "ml",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Loại bỏ mệnh đề thay thế \"hoặc ...\" trong ingredientName."
+  },
+  {
+    "recipeIndex": 571,
+    "ingredientIndex": 3,
+    "new": {
+      "ingredientName": "tỏi băm nhuyễn",
+      "weight": 1,
+      "unit": "tép",
+      "isMain": false,
+      "isCommon": true
+    },
+    "reason": "Sửa dịch sai nghĩa rõ ràng: garlic clove ≠ đinh hương; đồng thời bỏ mệnh đề thay thế."
+  },
+  {
+    "recipeIndex": 572,
+    "ingredientIndex": 7,
+    "new": {
+      "ingredientName": "paste vani",
+      "weight": 0.5,
+      "unit": "muỗng cà phê",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Loại bỏ mệnh đề thay thế \"hoặc ...\" trong ingredientName."
+  },
+  {
+    "recipeIndex": 576,
+    "ingredientIndex": 3,
+    "new": {
+      "ingredientName": "dầu thực vật",
+      "weight": 0.5,
+      "unit": "muỗng canh",
+      "isMain": false,
+      "isCommon": true
+    },
+    "reason": "Loại bỏ mệnh đề thay thế \"hoặc ...\" trong ingredientName."
+  },
+  {
+    "recipeIndex": 581,
+    "ingredientIndex": 4,
+    "new": {
+      "ingredientName": "bột cà ri nhẹ",
+      "weight": 2,
+      "unit": "muỗng canh",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Loại bỏ mệnh đề thay thế \"hoặc ...\" trong ingredientName."
+  },
+  {
+    "recipeIndex": 581,
+    "ingredientIndex": 15,
+    "new": {
+      "ingredientName": "đậu phộng rang muối",
+      "weight": 50,
+      "unit": "g",
+      "isMain": false,
+      "isCommon": true
+    },
+    "reason": "Loại bỏ mệnh đề thay thế \"hoặc ...\" trong ingredientName."
+  },
+  {
+    "recipeIndex": 584,
+    "ingredientIndex": 13,
+    "new": {
+      "ingredientName": "gà tây quay còn dư",
+      "weight": 200,
+      "unit": "g",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Loại bỏ mệnh đề thay thế \"hoặc ...\" trong ingredientName."
+  },
+  {
+    "recipeIndex": 586,
+    "ingredientIndex": 3,
+    "new": {
+      "ingredientName": "crème fraîche",
+      "weight": 4,
+      "unit": "muỗng canh",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Loại bỏ mệnh đề thay thế \"hoặc ...\" trong ingredientName."
+  },
+  {
+    "recipeIndex": 591,
+    "ingredientIndex": 8,
+    "new": {
+      "ingredientName": "dầu ô liu",
+      "weight": 1,
+      "unit": "muỗng canh",
+      "isMain": false,
+      "isCommon": true
+    },
+    "reason": "Loại bỏ mệnh đề thay thế \"hoặc ...\" trong ingredientName."
+  },
+  {
+    "recipeIndex": 592,
+    "ingredientIndex": 2,
+    "new": {
+      "ingredientName": "phi lê cá tuyết",
+      "weight": 4,
+      "unit": "phi lê",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Loại bỏ mệnh đề thay thế \"hoặc ...\" trong ingredientName."
+  },
+  {
+    "recipeIndex": 593,
+    "ingredientIndex": 11,
+    "new": {
+      "ingredientName": "cà chua hộp cắt nhỏ",
+      "weight": 4,
+      "unit": "lon",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Sửa lỗi parse nặng ở ingredientName/weight/unit (EN: 4 x 400g cans)."
+  },
+  {
+    "recipeIndex": 595,
+    "ingredientIndex": 9,
+    "new": {
+      "ingredientName": "kem lạnh",
+      "weight": 1,
+      "unit": "cái",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Loại bỏ mệnh đề thay thế \"hoặc ...\" trong ingredientName."
+  },
+  {
+    "recipeIndex": 598,
+    "ingredientIndex": 10,
+    "new": {
+      "ingredientName": "cà chua hộp cắt nhỏ",
+      "weight": 400,
+      "unit": "g",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Sửa ingredientName rỗng nghĩa \"có thể\" (lỗi parse từ \"can\")."
+  },
+  {
+    "recipeIndex": 598,
+    "ingredientIndex": 13,
+    "new": {
+      "ingredientName": "khoai tây nướng nguyên vỏ",
+      "weight": 1,
+      "unit": "phần",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Sửa dịch sai nghĩa \"jacket ...\" và bỏ mệnh đề thay thế."
+  },
+  {
+    "recipeIndex": 600,
+    "ingredientIndex": 0,
+    "new": {
+      "ingredientName": "súp lơ khoảng 1kg",
+      "weight": 1,
+      "unit": "cái",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Sửa unit khớp EN hợp lý: \"1 large cauliflower\" không phải đơn vị kg."
+  }
+]

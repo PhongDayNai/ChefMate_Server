@@ -1,0 +1,1634 @@
+[
+  {
+    "recipeIndex": 401,
+    "ingredientIndex": 3,
+    "new": {
+      "ingredientName": "tỏi",
+      "weight": 2,
+      "unit": "tép",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: sửa ingredientName dịch sai/literal theo EN; Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 401,
+    "ingredientIndex": 5,
+    "new": {
+      "ingredientName": "hành tây",
+      "weight": 3,
+      "unit": "cọng",
+      "isMain": false,
+      "isCommon": true
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 401,
+    "ingredientIndex": 6,
+    "new": {
+      "ingredientName": "hạt tiêu",
+      "weight": 6,
+      "unit": "hạt",
+      "isMain": false,
+      "isCommon": true
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn); Final QA EN↔VI: tinh chỉnh nghĩa theo ngữ cảnh EN gốc"
+  },
+  {
+    "recipeIndex": 401,
+    "ingredientIndex": 9,
+    "new": {
+      "ingredientName": "chanh vàng",
+      "weight": 1,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 402,
+    "ingredientIndex": 3,
+    "new": {
+      "ingredientName": "thịt xông khói hun khói",
+      "weight": 4,
+      "unit": "lát",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 402,
+    "ingredientIndex": 4,
+    "new": {
+      "ingredientName": "hành tây",
+      "weight": 1,
+      "unit": "củ",
+      "isMain": false,
+      "isCommon": true
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 402,
+    "ingredientIndex": 5,
+    "new": {
+      "ingredientName": "tỏi",
+      "weight": 1,
+      "unit": "tép",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: sửa ingredientName dịch sai/literal theo EN; Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 405,
+    "ingredientIndex": 2,
+    "new": {
+      "ingredientName": "chanh xanh",
+      "weight": 1,
+      "unit": "quả",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 405,
+    "ingredientIndex": 6,
+    "new": {
+      "ingredientName": "quả bơ",
+      "weight": 1,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn); Final QA EN↔VI: tinh chỉnh nghĩa theo ngữ cảnh EN gốc"
+  },
+  {
+    "recipeIndex": 405,
+    "ingredientIndex": 9,
+    "new": {
+      "ingredientName": "hành đỏ",
+      "weight": 1,
+      "unit": "củ",
+      "isMain": false,
+      "isCommon": true
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 406,
+    "ingredientIndex": 3,
+    "new": {
+      "ingredientName": "vỏ chanh bào",
+      "weight": 1,
+      "unit": "quả",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 406,
+    "ingredientIndex": 6,
+    "new": {
+      "ingredientName": "tỏi",
+      "weight": 1,
+      "unit": "tép",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: sửa ingredientName dịch sai/literal theo EN; Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 409,
+    "ingredientIndex": 3,
+    "new": {
+      "ingredientName": "tỏi",
+      "weight": 1,
+      "unit": "tép",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: sửa ingredientName dịch sai/literal theo EN; Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 410,
+    "ingredientIndex": 8,
+    "new": {
+      "ingredientName": "hành đỏ",
+      "weight": 1,
+      "unit": "củ",
+      "isMain": false,
+      "isCommon": true
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn); Final QA EN↔VI: tinh chỉnh nghĩa theo ngữ cảnh EN gốc"
+  },
+  {
+    "recipeIndex": 411,
+    "ingredientIndex": 14,
+    "new": {
+      "ingredientName": "vỏ cam",
+      "weight": 1,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 412,
+    "ingredientIndex": 2,
+    "new": {
+      "ingredientName": "dưa chuột",
+      "weight": 1,
+      "unit": "quả",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 412,
+    "ingredientIndex": 10,
+    "new": {
+      "ingredientName": "hành tây",
+      "weight": 2,
+      "unit": "cọng",
+      "isMain": false,
+      "isCommon": true
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 413,
+    "ingredientIndex": 11,
+    "new": {
+      "ingredientName": "hành lá",
+      "weight": 6,
+      "unit": "cọng",
+      "isMain": false,
+      "isCommon": true
+    },
+    "reason": "Final QA EN↔VI: sửa ingredientName dịch sai/literal theo EN; Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 413,
+    "ingredientIndex": 14,
+    "new": {
+      "ingredientName": "trứng",
+      "weight": 2,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 413,
+    "ingredientIndex": 19,
+    "new": {
+      "ingredientName": "chanh xanh",
+      "weight": 1,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 415,
+    "ingredientIndex": 16,
+    "new": {
+      "ingredientName": "ớt đỏ",
+      "weight": 1,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 418,
+    "ingredientIndex": 8,
+    "new": {
+      "ingredientName": "chanh vàng",
+      "weight": 1,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 419,
+    "ingredientIndex": 2,
+    "new": {
+      "ingredientName": "hành tây",
+      "weight": 1,
+      "unit": "củ",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn); Final QA EN↔VI: tinh chỉnh nghĩa theo ngữ cảnh EN gốc"
+  },
+  {
+    "recipeIndex": 419,
+    "ingredientIndex": 4,
+    "new": {
+      "ingredientName": "tỏi",
+      "weight": 5,
+      "unit": "tép",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: sửa ingredientName dịch sai/literal theo EN; Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 419,
+    "ingredientIndex": 7,
+    "new": {
+      "ingredientName": "chanh vàng",
+      "weight": 1,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 420,
+    "ingredientIndex": 9,
+    "new": {
+      "ingredientName": "tép tỏi",
+      "weight": 1,
+      "unit": "tép",
+      "isMain": false,
+      "isCommon": true
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 422,
+    "ingredientIndex": 3,
+    "new": {
+      "ingredientName": "tỏi",
+      "weight": 2,
+      "unit": "tép",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: sửa ingredientName dịch sai/literal theo EN; Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 422,
+    "ingredientIndex": 6,
+    "new": {
+      "ingredientName": "trứng",
+      "weight": 1,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn); Final QA EN↔VI: tinh chỉnh nghĩa theo ngữ cảnh EN gốc"
+  },
+  {
+    "recipeIndex": 422,
+    "ingredientIndex": 10,
+    "new": {
+      "ingredientName": "tỏi",
+      "weight": 2,
+      "unit": "tép",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: sửa ingredientName dịch sai/literal theo EN; Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 424,
+    "ingredientIndex": 5,
+    "new": {
+      "ingredientName": "chanh vàng",
+      "weight": 1,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 425,
+    "ingredientIndex": 7,
+    "new": {
+      "ingredientName": "chanh xanh",
+      "weight": 1,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 426,
+    "ingredientIndex": 2,
+    "new": {
+      "ingredientName": "hành tây",
+      "weight": 4,
+      "unit": "cọng",
+      "isMain": true,
+      "isCommon": true
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 426,
+    "ingredientIndex": 4,
+    "new": {
+      "ingredientName": "chanh xanh",
+      "weight": 1,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 426,
+    "ingredientIndex": 5,
+    "new": {
+      "ingredientName": "trứng",
+      "weight": 2,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 427,
+    "ingredientIndex": 9,
+    "new": {
+      "ingredientName": "vỏ chanh bào",
+      "weight": 1,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 428,
+    "ingredientIndex": 2,
+    "new": {
+      "ingredientName": "hành tím",
+      "weight": 1,
+      "unit": "củ",
+      "isMain": true,
+      "isCommon": true
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn); Final QA EN↔VI: tinh chỉnh nghĩa theo ngữ cảnh EN gốc"
+  },
+  {
+    "recipeIndex": 429,
+    "ingredientIndex": 5,
+    "new": {
+      "ingredientName": "trứng",
+      "weight": 1,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 429,
+    "ingredientIndex": 6,
+    "new": {
+      "ingredientName": "tỏi",
+      "weight": 2,
+      "unit": "tép",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: sửa ingredientName dịch sai/literal theo EN; Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 430,
+    "ingredientIndex": 5,
+    "new": {
+      "ingredientName": "ớt xanh",
+      "weight": 1,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": true
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 432,
+    "ingredientIndex": 4,
+    "new": {
+      "ingredientName": "ớt xanh",
+      "weight": 1,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 433,
+    "ingredientIndex": 3,
+    "new": {
+      "ingredientName": "ớt xanh",
+      "weight": 1,
+      "unit": "quả",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 434,
+    "ingredientIndex": 2,
+    "new": {
+      "ingredientName": "hành lá",
+      "weight": 1,
+      "unit": "bó",
+      "isMain": true,
+      "isCommon": true
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 434,
+    "ingredientIndex": 3,
+    "new": {
+      "ingredientName": "cà rốt",
+      "weight": 1,
+      "unit": "củ",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 434,
+    "ingredientIndex": 4,
+    "new": {
+      "ingredientName": "tỏi",
+      "weight": 2,
+      "unit": "tép",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: sửa ingredientName dịch sai/literal theo EN; Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 434,
+    "ingredientIndex": 8,
+    "new": {
+      "ingredientName": "trứng",
+      "weight": 2,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 436,
+    "ingredientIndex": 1,
+    "new": {
+      "ingredientName": "hành tây",
+      "weight": 1,
+      "unit": "củ",
+      "isMain": true,
+      "isCommon": true
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn); Final QA EN↔VI: tinh chỉnh nghĩa theo ngữ cảnh EN gốc"
+  },
+  {
+    "recipeIndex": 437,
+    "ingredientIndex": 3,
+    "new": {
+      "ingredientName": "hành tây",
+      "weight": 1,
+      "unit": "củ",
+      "isMain": true,
+      "isCommon": true
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 437,
+    "ingredientIndex": 4,
+    "new": {
+      "ingredientName": "tỏi",
+      "weight": 2,
+      "unit": "tép",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: sửa ingredientName dịch sai/literal theo EN; Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 437,
+    "ingredientIndex": 10,
+    "new": {
+      "ingredientName": "chanh vàng",
+      "weight": 1,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: sửa ingredientName dịch sai/literal theo EN; Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 438,
+    "ingredientIndex": 2,
+    "new": {
+      "ingredientName": "tỏi",
+      "weight": 1,
+      "unit": "tép",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: sửa ingredientName dịch sai/literal theo EN; Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 439,
+    "ingredientIndex": 2,
+    "new": {
+      "ingredientName": "tỏi",
+      "weight": 4,
+      "unit": "tép",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: sửa ingredientName dịch sai/literal theo EN; Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 439,
+    "ingredientIndex": 10,
+    "new": {
+      "ingredientName": "hành tây",
+      "weight": 1,
+      "unit": "cọng",
+      "isMain": false,
+      "isCommon": true
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 439,
+    "ingredientIndex": 11,
+    "new": {
+      "ingredientName": "tỏi",
+      "weight": 1,
+      "unit": "tép",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: sửa ingredientName dịch sai/literal theo EN; Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 439,
+    "ingredientIndex": 15,
+    "new": {
+      "ingredientName": "ớt đỏ",
+      "weight": 2,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 439,
+    "ingredientIndex": 16,
+    "new": {
+      "ingredientName": "tỏi",
+      "weight": 1,
+      "unit": "tép",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: sửa ingredientName dịch sai/literal theo EN; Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 440,
+    "ingredientIndex": 4,
+    "new": {
+      "ingredientName": "hành tây hoặc hẹ",
+      "weight": 1,
+      "unit": "củ",
+      "isMain": false,
+      "isCommon": true
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 440,
+    "ingredientIndex": 5,
+    "new": {
+      "ingredientName": "cà rốt",
+      "weight": 1,
+      "unit": "củ",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 440,
+    "ingredientIndex": 7,
+    "new": {
+      "ingredientName": "tỏi",
+      "weight": 1,
+      "unit": "tép",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: sửa ingredientName dịch sai/literal theo EN; Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 441,
+    "ingredientIndex": 3,
+    "new": {
+      "ingredientName": "bơ lạnh",
+      "weight": 2,
+      "unit": "thanh",
+      "isMain": true,
+      "isCommon": true
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 441,
+    "ingredientIndex": 5,
+    "new": {
+      "ingredientName": "lòng đỏ",
+      "weight": 2,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 441,
+    "ingredientIndex": 10,
+    "new": {
+      "ingredientName": "lòng trắng trứng",
+      "weight": 1,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 442,
+    "ingredientIndex": 2,
+    "new": {
+      "ingredientName": "ớt chuông",
+      "weight": 1,
+      "unit": "quả",
+      "isMain": true,
+      "isCommon": true
+    },
+    "reason": "Final QA EN↔VI: sửa ingredientName dịch sai/literal theo EN; Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 442,
+    "ingredientIndex": 3,
+    "new": {
+      "ingredientName": "ớt vàng",
+      "weight": 1,
+      "unit": "quả",
+      "isMain": true,
+      "isCommon": true
+    },
+    "reason": "Final QA EN↔VI: sửa ingredientName dịch sai/literal theo EN; Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 442,
+    "ingredientIndex": 4,
+    "new": {
+      "ingredientName": "hành đỏ",
+      "weight": 1,
+      "unit": "củ",
+      "isMain": false,
+      "isCommon": true
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 442,
+    "ingredientIndex": 7,
+    "new": {
+      "ingredientName": "chanh xanh",
+      "weight": 1,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 444,
+    "ingredientIndex": 2,
+    "new": {
+      "ingredientName": "hành tây",
+      "weight": 1,
+      "unit": "củ",
+      "isMain": true,
+      "isCommon": true
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 444,
+    "ingredientIndex": 3,
+    "new": {
+      "ingredientName": "tỏi",
+      "weight": 2,
+      "unit": "tép",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: sửa ingredientName dịch sai/literal theo EN; Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 445,
+    "ingredientIndex": 2,
+    "new": {
+      "ingredientName": "hành tây",
+      "weight": 1,
+      "unit": "củ",
+      "isMain": true,
+      "isCommon": true
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 445,
+    "ingredientIndex": 3,
+    "new": {
+      "ingredientName": "tỏi",
+      "weight": 2,
+      "unit": "tép",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: sửa ingredientName dịch sai/literal theo EN; Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 446,
+    "ingredientIndex": 8,
+    "new": {
+      "ingredientName": "lòng đỏ",
+      "weight": 1,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 447,
+    "ingredientIndex": 6,
+    "new": {
+      "ingredientName": "tỏi",
+      "weight": 4,
+      "unit": "tép",
+      "isMain": false,
+      "isCommon": true
+    },
+    "reason": "Final QA EN↔VI: sửa ingredientName dịch sai/literal theo EN; Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 447,
+    "ingredientIndex": 12,
+    "new": {
+      "ingredientName": "vỏ chanh bào",
+      "weight": 1,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 447,
+    "ingredientIndex": 13,
+    "new": {
+      "ingredientName": "tỏi",
+      "weight": 1,
+      "unit": "tép",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: sửa ingredientName dịch sai/literal theo EN; Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 450,
+    "ingredientIndex": 2,
+    "new": {
+      "ingredientName": "chanh xanh",
+      "weight": 1,
+      "unit": "quả",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 450,
+    "ingredientIndex": 3,
+    "new": {
+      "ingredientName": "cộng thêm 3 lòng đỏ trứng",
+      "weight": 2,
+      "unit": "quả",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 450,
+    "ingredientIndex": 14,
+    "new": {
+      "ingredientName": "vỏ chanh bào",
+      "weight": 1,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 451,
+    "ingredientIndex": 2,
+    "new": {
+      "ingredientName": "hành tây",
+      "weight": 1,
+      "unit": "củ",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn); Final QA EN↔VI: tinh chỉnh nghĩa theo ngữ cảnh EN gốc"
+  },
+  {
+    "recipeIndex": 451,
+    "ingredientIndex": 4,
+    "new": {
+      "ingredientName": "tỏi",
+      "weight": 2,
+      "unit": "tép",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: sửa ingredientName dịch sai/literal theo EN; Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 451,
+    "ingredientIndex": 8,
+    "new": {
+      "ingredientName": "ớt đỏ",
+      "weight": 1,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 452,
+    "ingredientIndex": 2,
+    "new": {
+      "ingredientName": "hành tây",
+      "weight": 1,
+      "unit": "củ",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: sửa ingredientName dịch sai/literal theo EN; Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 452,
+    "ingredientIndex": 8,
+    "new": {
+      "ingredientName": "trứng",
+      "weight": 1,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 453,
+    "ingredientIndex": 1,
+    "new": {
+      "ingredientName": "thịt xông khói sọc",
+      "weight": 8,
+      "unit": "lát",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 453,
+    "ingredientIndex": 6,
+    "new": {
+      "ingredientName": "hành tây",
+      "weight": 1,
+      "unit": "đơn vị",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: sửa ingredientName dịch sai/literal theo EN"
+  },
+  {
+    "recipeIndex": 453,
+    "ingredientIndex": 8,
+    "new": {
+      "ingredientName": "tỏi",
+      "weight": 1,
+      "unit": "tép",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: sửa ingredientName dịch sai/literal theo EN; Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 454,
+    "ingredientIndex": 10,
+    "new": {
+      "ingredientName": "chanh vàng",
+      "weight": 1,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn); Final QA EN↔VI: tinh chỉnh nghĩa theo ngữ cảnh EN gốc"
+  },
+  {
+    "recipeIndex": 457,
+    "ingredientIndex": 2,
+    "new": {
+      "ingredientName": "trứng",
+      "weight": 1,
+      "unit": "quả",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 458,
+    "ingredientIndex": 3,
+    "new": {
+      "ingredientName": "hành tây",
+      "weight": 2,
+      "unit": "đơn vị",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: sửa ingredientName dịch sai/literal theo EN"
+  },
+  {
+    "recipeIndex": 458,
+    "ingredientIndex": 5,
+    "new": {
+      "ingredientName": "cà rốt",
+      "weight": 2,
+      "unit": "củ",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 458,
+    "ingredientIndex": 6,
+    "new": {
+      "ingredientName": "tỏi",
+      "weight": 1,
+      "unit": "tép",
+      "isMain": false,
+      "isCommon": true
+    },
+    "reason": "Final QA EN↔VI: sửa ingredientName dịch sai/literal theo EN; Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 459,
+    "ingredientIndex": 3,
+    "new": {
+      "ingredientName": "trứng",
+      "weight": 1,
+      "unit": "quả",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 461,
+    "ingredientIndex": 5,
+    "new": {
+      "ingredientName": "tỏi",
+      "weight": 3,
+      "unit": "tép",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: sửa ingredientName dịch sai/literal theo EN; Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 462,
+    "ingredientIndex": 3,
+    "new": {
+      "ingredientName": "tỏi",
+      "weight": 2,
+      "unit": "tép",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: sửa ingredientName dịch sai/literal theo EN; Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 462,
+    "ingredientIndex": 6,
+    "new": {
+      "ingredientName": "chanh vàng",
+      "weight": 1,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 463,
+    "ingredientIndex": 2,
+    "new": {
+      "ingredientName": "tỏi",
+      "weight": 2,
+      "unit": "tép",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: sửa ingredientName dịch sai/literal theo EN; Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 463,
+    "ingredientIndex": 3,
+    "new": {
+      "ingredientName": "thì là tây",
+      "weight": 0.5,
+      "unit": "đơn vị",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: sửa ingredientName dịch sai/literal theo EN"
+  },
+  {
+    "recipeIndex": 465,
+    "ingredientIndex": 1,
+    "new": {
+      "ingredientName": "trứng",
+      "weight": 3,
+      "unit": "quả",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 466,
+    "ingredientIndex": 5,
+    "new": {
+      "ingredientName": "cộng thêm 1 lòng đỏ trứng",
+      "weight": 1,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 466,
+    "ingredientIndex": 8,
+    "new": {
+      "ingredientName": "trứng",
+      "weight": 3,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: sửa ingredientName dịch sai/literal theo EN; Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 467,
+    "ingredientIndex": 4,
+    "new": {
+      "ingredientName": "cà rốt",
+      "weight": 3,
+      "unit": "củ",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 468,
+    "ingredientIndex": 3,
+    "new": {
+      "ingredientName": "hành tây",
+      "weight": 5,
+      "unit": "cọng",
+      "isMain": true,
+      "isCommon": true
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 468,
+    "ingredientIndex": 4,
+    "new": {
+      "ingredientName": "tỏi",
+      "weight": 2,
+      "unit": "tép",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: sửa ingredientName dịch sai/literal theo EN; Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 469,
+    "ingredientIndex": 2,
+    "new": {
+      "ingredientName": "hành tây",
+      "weight": 6,
+      "unit": "cọng",
+      "isMain": true,
+      "isCommon": true
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 470,
+    "ingredientIndex": 3,
+    "new": {
+      "ingredientName": "tỏi",
+      "weight": 1,
+      "unit": "tép",
+      "isMain": true,
+      "isCommon": true
+    },
+    "reason": "Final QA EN↔VI: sửa ingredientName dịch sai/literal theo EN; Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 473,
+    "ingredientIndex": 2,
+    "new": {
+      "ingredientName": "lòng trắng trứng",
+      "weight": 6,
+      "unit": "quả",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: sửa ingredientName dịch sai/literal theo EN; Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 474,
+    "ingredientIndex": 4,
+    "new": {
+      "ingredientName": "hành tây",
+      "weight": 1,
+      "unit": "củ",
+      "isMain": false,
+      "isCommon": true
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 474,
+    "ingredientIndex": 7,
+    "new": {
+      "ingredientName": "tỏi",
+      "weight": 5,
+      "unit": "tép",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: sửa ingredientName dịch sai/literal theo EN; Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 475,
+    "ingredientIndex": 4,
+    "new": {
+      "ingredientName": "tỏi",
+      "weight": 2,
+      "unit": "tép",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: sửa ingredientName dịch sai/literal theo EN; Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 475,
+    "ingredientIndex": 5,
+    "new": {
+      "ingredientName": "hành lá",
+      "weight": 4,
+      "unit": "cọng",
+      "isMain": false,
+      "isCommon": true
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn); Final QA EN↔VI: tinh chỉnh nghĩa theo ngữ cảnh EN gốc"
+  },
+  {
+    "recipeIndex": 476,
+    "ingredientIndex": 2,
+    "new": {
+      "ingredientName": "tỏi",
+      "weight": 2,
+      "unit": "tép",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: sửa ingredientName dịch sai/literal theo EN; Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 476,
+    "ingredientIndex": 4,
+    "new": {
+      "ingredientName": "ớt đỏ",
+      "weight": 1,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 476,
+    "ingredientIndex": 11,
+    "new": {
+      "ingredientName": "tỏi",
+      "weight": 1,
+      "unit": "tép",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: sửa ingredientName dịch sai/literal theo EN; Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 479,
+    "ingredientIndex": 4,
+    "new": {
+      "ingredientName": "vỏ chanh bào",
+      "weight": 1,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 479,
+    "ingredientIndex": 5,
+    "new": {
+      "ingredientName": "vỏ chanh bào",
+      "weight": 1,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 479,
+    "ingredientIndex": 6,
+    "new": {
+      "ingredientName": "lòng đỏ",
+      "weight": 7,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 480,
+    "ingredientIndex": 3,
+    "new": {
+      "ingredientName": "hành tây",
+      "weight": 1,
+      "unit": "củ",
+      "isMain": true,
+      "isCommon": true
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 480,
+    "ingredientIndex": 5,
+    "new": {
+      "ingredientName": "tỏi",
+      "weight": 3,
+      "unit": "tép",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: sửa ingredientName dịch sai/literal theo EN; Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 483,
+    "ingredientIndex": 20,
+    "new": {
+      "ingredientName": "ớt đỏ",
+      "weight": 1,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 483,
+    "ingredientIndex": 22,
+    "new": {
+      "ingredientName": "chanh vàng",
+      "weight": 1,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: sửa ingredientName dịch sai/literal theo EN; Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 484,
+    "ingredientIndex": 7,
+    "new": {
+      "ingredientName": "bỏ lõi và",
+      "weight": 1,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 485,
+    "ingredientIndex": 6,
+    "new": {
+      "ingredientName": "tỏi",
+      "weight": 3,
+      "unit": "tép",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: sửa ingredientName dịch sai/literal theo EN; Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 485,
+    "ingredientIndex": 7,
+    "new": {
+      "ingredientName": "tỏi tây",
+      "weight": 1,
+      "unit": "củ",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 485,
+    "ingredientIndex": 20,
+    "new": {
+      "ingredientName": "chanh vàng",
+      "weight": 1,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn); Final QA EN↔VI: tinh chỉnh nghĩa theo ngữ cảnh EN gốc"
+  },
+  {
+    "recipeIndex": 486,
+    "ingredientIndex": 5,
+    "new": {
+      "ingredientName": "hành tây",
+      "weight": 1,
+      "unit": "củ",
+      "isMain": false,
+      "isCommon": true
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 487,
+    "ingredientIndex": 12,
+    "new": {
+      "ingredientName": "tỏi",
+      "weight": 2,
+      "unit": "tép",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: sửa ingredientName dịch sai/literal theo EN; Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 487,
+    "ingredientIndex": 14,
+    "new": {
+      "ingredientName": "hành lá",
+      "weight": 4,
+      "unit": "cọng",
+      "isMain": false,
+      "isCommon": true
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn); Final QA EN↔VI: tinh chỉnh nghĩa theo ngữ cảnh EN gốc"
+  },
+  {
+    "recipeIndex": 487,
+    "ingredientIndex": 15,
+    "new": {
+      "ingredientName": "ớt đỏ",
+      "weight": 2,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": true
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 490,
+    "ingredientIndex": 4,
+    "new": {
+      "ingredientName": "trứng",
+      "weight": 2,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 494,
+    "ingredientIndex": 2,
+    "new": {
+      "ingredientName": "chanh vàng",
+      "weight": 1,
+      "unit": "quả",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 495,
+    "ingredientIndex": 7,
+    "new": {
+      "ingredientName": "hành đỏ",
+      "weight": 1,
+      "unit": "củ",
+      "isMain": false,
+      "isCommon": true
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn); Final QA EN↔VI: tinh chỉnh nghĩa theo ngữ cảnh EN gốc"
+  },
+  {
+    "recipeIndex": 495,
+    "ingredientIndex": 13,
+    "new": {
+      "ingredientName": "chanh vàng",
+      "weight": 1,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 496,
+    "ingredientIndex": 5,
+    "new": {
+      "ingredientName": "tỏi",
+      "weight": 1,
+      "unit": "tép",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: sửa ingredientName dịch sai/literal theo EN; Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 497,
+    "ingredientIndex": 1,
+    "new": {
+      "ingredientName": "tỏi",
+      "weight": 1,
+      "unit": "tép",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: sửa ingredientName dịch sai/literal theo EN; Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 498,
+    "ingredientIndex": 3,
+    "new": {
+      "ingredientName": "trứng",
+      "weight": 4,
+      "unit": "quả",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 499,
+    "ingredientIndex": 1,
+    "new": {
+      "ingredientName": "tỏi tây",
+      "weight": 2,
+      "unit": "củ",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  },
+  {
+    "recipeIndex": 500,
+    "ingredientIndex": 6,
+    "new": {
+      "ingredientName": "hành đỏ",
+      "weight": 1,
+      "unit": "củ",
+      "isMain": false,
+      "isCommon": true
+    },
+    "reason": "Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn); Final QA EN↔VI: tinh chỉnh nghĩa theo ngữ cảnh EN gốc"
+  },
+  {
+    "recipeIndex": 500,
+    "ingredientIndex": 8,
+    "new": {
+      "ingredientName": "tỏi",
+      "weight": 3,
+      "unit": "tép",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Final QA EN↔VI: sửa ingredientName dịch sai/literal theo EN; Final QA EN↔VI: chuẩn hóa unit theo EN (thay 'đơn vị' khi suy ra chắc chắn)"
+  }
+]
