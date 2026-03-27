@@ -1,0 +1,175 @@
+{
+  "batch": "301-400",
+  "sourceFile": "/home/dhpho/workspace/projects/chefmate-server/data/recipe-crawl-2026-03-vi/recipes.vi.json",
+  "note": "Chỉ tạo patch đề xuất; KHÔNG sửa trực tiếp dataset chính.",
+  "patches": [
+    {
+      "index": 305,
+      "changes": {
+        "recipeName": "Nữ hoàng pudding mâm xôi đen",
+        "importPayloadTemplate.recipeName": "Nữ hoàng pudding mâm xôi đen"
+      },
+      "reason": "Tên món dịch sát nghĩa “Blackberry queen of puddings”; tránh giữ nguyên Blackberry như tên riêng."
+    },
+    {
+      "index": 307,
+      "changes": {
+        "recipeName": "Nước ép nam việt quất nấu gia vị nóng",
+        "importPayloadTemplate.recipeName": "Nước ép nam việt quất nấu gia vị nóng"
+      },
+      "reason": "“Mulled” là đồ uống nấu nóng với gia vị, không phải “nghiền”."
+    },
+    {
+      "index": 310,
+      "changes": {
+        "recipeName": "Khoai tây nướng hoàn hảo",
+        "importPayloadTemplate.recipeName": "Khoai tây nướng hoàn hảo"
+      },
+      "reason": "“Ultimate” nên dịch theo nghĩa chất lượng món."
+    },
+    {
+      "index": 318,
+      "changes": {
+        "recipeName": "Lasagne nấm ancho nướng",
+        "importPayloadTemplate.recipeName": "Lasagne nấm ancho nướng"
+      },
+      "reason": "Sửa “neo” -> “ancho” (tên nguyên liệu)."
+    },
+    {
+      "index": 321,
+      "changes": {
+        "recipeName": "Martini eggnog espresso",
+        "importPayloadTemplate.recipeName": "Martini eggnog espresso"
+      },
+      "reason": "Bản cũ mất nghĩa “eggnog”. Giữ cấu trúc tên cocktail phổ biến."
+    },
+    {
+      "index": 335,
+      "changes": {
+        "recipeName": "Bánh pie kiểu Scotland",
+        "importPayloadTemplate.recipeName": "Bánh pie kiểu Scotland"
+      },
+      "reason": "Tự nhiên hơn “Bánh pie Scotland”."
+    },
+    {
+      "index": 339,
+      "changes": {
+        "recipeName": "Gà sốt kem kiểu Tuscan",
+        "importPayloadTemplate.recipeName": "Gà sốt kem kiểu Tuscan"
+      },
+      "reason": "Tự nhiên hơn “Gà Tuscan kem”."
+    },
+    {
+      "index": 341,
+      "changes": {
+        "recipeName": "Saag đậu bơ",
+        "importPayloadTemplate.recipeName": "Saag đậu bơ"
+      },
+      "reason": "Bản cũ dịch sai thành “Sườn đậu bơ”."
+    },
+    {
+      "index": 349,
+      "changes": {
+        "recipeName": "Bữa tối nướng cần tây củ và đồ ăn kèm",
+        "importPayloadTemplate.recipeName": "Bữa tối nướng cần tây củ và đồ ăn kèm"
+      },
+      "reason": "“Celeriac” là cần tây củ; “trimmings” là đồ ăn kèm."
+    },
+    {
+      "index": 358,
+      "changes": {
+        "recipeName": "Chili đậu và thịt bò với ớt jalapeño, rau mùi và sốt hạt bí",
+        "importPayloadTemplate.recipeName": "Chili đậu và thịt bò với ớt jalapeño, rau mùi và sốt hạt bí"
+      },
+      "reason": "“Chilli” là tên món; bản cũ “Gia vị đậu...” sai ngữ nghĩa."
+    },
+    {
+      "index": 359,
+      "changes": {
+        "recipeName": "Củ cải vàng nướng Marmite và si-rô phong",
+        "importPayloadTemplate.recipeName": "Củ cải vàng nướng Marmite và si-rô phong"
+      },
+      "reason": "“Parsnips” là củ cải vàng; “maple” là si-rô phong."
+    },
+    {
+      "index": 360,
+      "changes": {
+        "recipeName": "Cá hồi en papillote với kem thì là",
+        "importPayloadTemplate.recipeName": "Cá hồi en papillote với kem thì là"
+      },
+      "reason": "Bản cũ dùng “nhân papillote” sai cấu trúc món."
+    },
+    {
+      "index": 361,
+      "changes": {
+        "recipeName": "Bánh gấp nhân phô mai, cà chua và giăm bông",
+        "importPayloadTemplate.recipeName": "Bánh gấp nhân phô mai, cà chua và giăm bông"
+      },
+      "reason": "“Turnovers” dịch sai thành “Doanh thu”."
+    },
+    {
+      "index": 365,
+      "changes": {
+        "recipeName": "Gyros gà BBQ với salad thì là và bắp cải",
+        "importPayloadTemplate.recipeName": "Gyros gà BBQ với salad thì là và bắp cải"
+      },
+      "reason": "Bản cũ mất nghĩa “gyros”."
+    },
+    {
+      "index": 367,
+      "changes": {
+        "recipeName": "Cá hồi suối, khoai tây và ô liu nướng khay với sốt xanh chanh rau mùi tây",
+        "importPayloadTemplate.recipeName": "Cá hồi suối, khoai tây và ô liu nướng khay với sốt xanh chanh rau mùi tây"
+      },
+      "reason": "“Trout” không phải “cá hồi” thông thường; “traybake” là nướng khay."
+    },
+    {
+      "index": 368,
+      "changes": {
+        "recipeName": "Gà gô nướng một nồi với đậu cannellini và thịt xông khói",
+        "importPayloadTemplate.recipeName": "Gà gô nướng một nồi với đậu cannellini và thịt xông khói"
+      },
+      "reason": "Sửa chính tả/thuật ngữ “partridge”."
+    },
+    {
+      "index": 378,
+      "changes": {
+        "recipeName": "Bánh rán hot cross bun nhân custard sô cô la",
+        "importPayloadTemplate.recipeName": "Bánh rán hot cross bun nhân custard sô cô la"
+      },
+      "reason": "Bản cũ rút gọn quá mức, mất thành phần “hot cross bun” + “custard”."
+    },
+    {
+      "index": 385,
+      "changes": {
+        "recipeName": "Pizza Cobb salad",
+        "importPayloadTemplate.recipeName": "Pizza Cobb salad"
+      },
+      "reason": "Chuẩn thứ tự tên món; bản cũ gượng."
+    },
+    {
+      "index": 386,
+      "changes": {
+        "recipeName": "Nhân nhồi Lễ Tạ ơn",
+        "importPayloadTemplate.recipeName": "Nhân nhồi Lễ Tạ ơn"
+      },
+      "reason": "Bản cũ sai ngữ nghĩa."
+    },
+    {
+      "index": 391,
+      "changes": {
+        "recipeName": "Kem sundae baklava dâu và hạt dẻ cười",
+        "importPayloadTemplate.recipeName": "Kem sundae baklava dâu và hạt dẻ cười"
+      },
+      "reason": "Bản cũ mất nghĩa “sundae”."
+    },
+    {
+      "index": 398,
+      "changes": {
+        "recipeName": "Tôm Bloody Mary kiểu chia sẻ",
+        "importPayloadTemplate.recipeName": "Tôm Bloody Mary kiểu chia sẻ"
+      },
+      "reason": "Bản cũ dịch máy “mary đẫm máu”."
+    }
+  ]
+}

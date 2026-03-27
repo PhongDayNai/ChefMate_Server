@@ -1,0 +1,46 @@
+{
+  "batch": "101-200",
+  "totalRecipesReviewed": 100,
+  "totalProposedPatches": 27,
+  "coverage": {
+    "recipeName": 27,
+    "ingredients": 0,
+    "cookingSteps": 0,
+    "tags": 0
+  },
+  "categories": {
+    "wrong_semantics": 18,
+    "awkward_or_literal_title": 6,
+    "proper_noun_or_term_fix": 3
+  },
+  "indicesPatched": [
+    104,
+    105,
+    110,
+    123,
+    126,
+    127,
+    138,
+    139,
+    142,
+    143,
+    144,
+    145,
+    153,
+    154,
+    159,
+    160,
+    166,
+    169,
+    175,
+    178,
+    180,
+    185,
+    186,
+    191,
+    193,
+    197,
+    199
+  ],
+  "ruleApplied": "Theo cùng tiêu chí batch 01: ưu tiên sửa lỗi sai nghĩa rõ ràng, dịch máy literal/thô, tên món lệch ngữ nghĩa; giữ nguyên các thuật ngữ ẩm thực/tên riêng phổ biến khi cần."
+}

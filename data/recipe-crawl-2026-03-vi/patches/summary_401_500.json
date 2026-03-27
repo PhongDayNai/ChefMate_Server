@@ -1,0 +1,103 @@
+{
+  "range": {
+    "from": 401,
+    "to": 500
+  },
+  "totalPatches": 25,
+  "recipesAffected": 20,
+  "patchesPerRecipe": [
+    {
+      "recipeIndex": 411,
+      "count": 1
+    },
+    {
+      "recipeIndex": 413,
+      "count": 2
+    },
+    {
+      "recipeIndex": 415,
+      "count": 1
+    },
+    {
+      "recipeIndex": 422,
+      "count": 1
+    },
+    {
+      "recipeIndex": 427,
+      "count": 1
+    },
+    {
+      "recipeIndex": 436,
+      "count": 1
+    },
+    {
+      "recipeIndex": 438,
+      "count": 1
+    },
+    {
+      "recipeIndex": 441,
+      "count": 1
+    },
+    {
+      "recipeIndex": 447,
+      "count": 1
+    },
+    {
+      "recipeIndex": 451,
+      "count": 3
+    },
+    {
+      "recipeIndex": 452,
+      "count": 1
+    },
+    {
+      "recipeIndex": 462,
+      "count": 1
+    },
+    {
+      "recipeIndex": 467,
+      "count": 1
+    },
+    {
+      "recipeIndex": 470,
+      "count": 1
+    },
+    {
+      "recipeIndex": 474,
+      "count": 1
+    },
+    {
+      "recipeIndex": 478,
+      "count": 3
+    },
+    {
+      "recipeIndex": 484,
+      "count": 1
+    },
+    {
+      "recipeIndex": 486,
+      "count": 1
+    },
+    {
+      "recipeIndex": 496,
+      "count": 1
+    },
+    {
+      "recipeIndex": 497,
+      "count": 1
+    }
+  ],
+  "reasonStats": {
+    "Làm sạch ingredientName: bỏ cụm dịch lỗi/không tự nhiên": 25,
+    "Đổi unit 'đơn vị' -> 'cây' suy ra từ EN": 1,
+    "Đổi unit 'đơn vị' -> 'tép' suy ra từ EN": 1,
+    "Đổi unit 'đơn vị' -> 'lb' suy ra từ EN": 1,
+    "Đổi unit 'đơn vị' -> 'miếng' suy ra từ EN": 1,
+    "Đổi unit 'đơn vị' -> 'cái' suy ra từ EN": 1
+  },
+  "files": {
+    "en": "/home/dhpho/workspace/projects/chefmate-server/data/recipe-crawl-2026-03/recipes.json",
+    "vi": "/home/dhpho/workspace/projects/chefmate-server/data/recipe-crawl-2026-03-vi/recipes.vi.json",
+    "patch": "/home/dhpho/workspace/projects/chefmate-server/data/recipe-crawl-2026-03-vi/patches/patch_401_500.json"
+  }
+}

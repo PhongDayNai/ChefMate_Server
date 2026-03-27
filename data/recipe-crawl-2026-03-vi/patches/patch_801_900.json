@@ -1,0 +1,2078 @@
+[
+  {
+    "recipeIndex": 802,
+    "ingredientIndex": 6,
+    "new": {
+      "ingredientName": "trứng (đánh tan, để ở nhiệt độ phòng)",
+      "weight": 2,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'quả' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 803,
+    "ingredientIndex": 2,
+    "new": {
+      "ingredientName": "hành tây trắng băm nhuyễn",
+      "weight": 1,
+      "unit": "củ",
+      "isMain": true,
+      "isCommon": true
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'củ' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 803,
+    "ingredientIndex": 3,
+    "new": {
+      "ingredientName": "cần tây (thân) băm nhuyễn",
+      "weight": 3,
+      "unit": "thân",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'thân' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 803,
+    "ingredientIndex": 4,
+    "new": {
+      "ingredientName": "hoa hồi",
+      "weight": 1,
+      "unit": "cánh",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'cánh' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 803,
+    "ingredientIndex": 6,
+    "new": {
+      "ingredientName": "tỏi đập dập",
+      "weight": 3,
+      "unit": "tép",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'tép' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 803,
+    "ingredientIndex": 18,
+    "new": {
+      "ingredientName": "nước cốt chanh xanh",
+      "weight": 1,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'quả' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 804,
+    "ingredientIndex": 2,
+    "new": {
+      "ingredientName": "hành lá (tách phần trắng và xanh)",
+      "weight": 4,
+      "unit": "nhánh",
+      "isMain": true,
+      "isCommon": true
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'nhánh' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 804,
+    "ingredientIndex": 10,
+    "new": {
+      "ingredientName": "bánh mì baguette nhỏ",
+      "weight": 2,
+      "unit": "ổ",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'ổ' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 804,
+    "ingredientIndex": 11,
+    "new": {
+      "ingredientName": "cà rốt nhỏ",
+      "weight": 2,
+      "unit": "củ",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'củ' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 805,
+    "ingredientIndex": 1,
+    "new": {
+      "ingredientName": "súp lơ (bỏ lá, tách miếng)",
+      "weight": 1,
+      "unit": "cái",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'cái' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 806,
+    "ingredientIndex": 4,
+    "new": {
+      "ingredientName": "hành tây đỏ băm hạt lựu",
+      "weight": 3,
+      "unit": "củ",
+      "isMain": false,
+      "isCommon": true
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'củ' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 806,
+    "ingredientIndex": 5,
+    "new": {
+      "ingredientName": "cần tây (thân) băm hạt lựu",
+      "weight": 3,
+      "unit": "thân",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'thân' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 806,
+    "ingredientIndex": 9,
+    "new": {
+      "ingredientName": "tỏi",
+      "weight": 4,
+      "unit": "tép",
+      "isMain": false,
+      "isCommon": true
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'tép' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 806,
+    "ingredientIndex": 20,
+    "new": {
+      "ingredientName": "vỏ chanh bào (tuỳ chọn)",
+      "weight": 1,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'quả' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 808,
+    "ingredientIndex": 1,
+    "new": {
+      "ingredientName": "trứng (đánh tan, để quét mặt)",
+      "weight": 1,
+      "unit": "quả",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'quả' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 809,
+    "ingredientIndex": 3,
+    "new": {
+      "ingredientName": "tỏi",
+      "weight": 2,
+      "unit": "tép",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'tép' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 809,
+    "ingredientIndex": 6,
+    "new": {
+      "ingredientName": "lá nguyệt quế",
+      "weight": 1,
+      "unit": "lá",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'lá' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 810,
+    "ingredientIndex": 6,
+    "new": {
+      "ingredientName": "hành tây băm thô",
+      "weight": 2,
+      "unit": "củ",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'củ' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 810,
+    "ingredientIndex": 7,
+    "new": {
+      "ingredientName": "tỏi băm nhuyễn",
+      "weight": 4,
+      "unit": "tép",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'tép' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 810,
+    "ingredientIndex": 10,
+    "new": {
+      "ingredientName": "đùi gà bỏ da, còn xương",
+      "weight": 8,
+      "unit": "miếng",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'miếng' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 811,
+    "ingredientIndex": 6,
+    "new": {
+      "ingredientName": "hành tây thái lát",
+      "weight": 3,
+      "unit": "củ",
+      "isMain": false,
+      "isCommon": true
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'củ' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 811,
+    "ingredientIndex": 10,
+    "new": {
+      "ingredientName": "bánh mì baguette (mỗi ổ cắt 4)",
+      "weight": 2,
+      "unit": "ổ",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'ổ' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 812,
+    "ingredientIndex": 4,
+    "new": {
+      "ingredientName": "tỏi bào nhuyễn",
+      "weight": 2,
+      "unit": "tép",
+      "isMain": false,
+      "isCommon": true
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'tép' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 812,
+    "ingredientIndex": 5,
+    "new": {
+      "ingredientName": "chanh xanh (1 quả bào vỏ và vắt nước, 1 quả cắt múi để dùng kèm)",
+      "weight": 2,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'quả' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 812,
+    "ingredientIndex": 9,
+    "new": {
+      "ingredientName": "đùi gà lọc xương, bỏ da",
+      "weight": 6,
+      "unit": "miếng",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'miếng' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 812,
+    "ingredientIndex": 11,
+    "new": {
+      "ingredientName": "hành tím thái khoanh mỏng",
+      "weight": 4,
+      "unit": "củ",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'củ' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 812,
+    "ingredientIndex": 13,
+    "new": {
+      "ingredientName": "cà rốt cắt sợi",
+      "weight": 2,
+      "unit": "củ",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'củ' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 812,
+    "ingredientIndex": 14,
+    "new": {
+      "ingredientName": "dưa leo baby thái lát",
+      "weight": 6,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'quả' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 813,
+    "ingredientIndex": 1,
+    "new": {
+      "ingredientName": "hành tây",
+      "weight": 1,
+      "unit": "củ",
+      "isMain": true,
+      "isCommon": true
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'củ' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 813,
+    "ingredientIndex": 2,
+    "new": {
+      "ingredientName": "ớt chuông đỏ",
+      "weight": 1,
+      "unit": "quả",
+      "isMain": true,
+      "isCommon": true
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'quả' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 813,
+    "ingredientIndex": 3,
+    "new": {
+      "ingredientName": "tỏi",
+      "weight": 2,
+      "unit": "tép",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'tép' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 813,
+    "ingredientIndex": 9,
+    "new": {
+      "ingredientName": "viên nước dùng bò",
+      "weight": 1,
+      "unit": "viên",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'viên' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 815,
+    "ingredientIndex": 3,
+    "new": {
+      "ingredientName": "hành tây thái lát",
+      "weight": 2,
+      "unit": "củ",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'củ' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 815,
+    "ingredientIndex": 4,
+    "new": {
+      "ingredientName": "tỏi bào nhuyễn",
+      "weight": 4,
+      "unit": "tép",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'tép' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 815,
+    "ingredientIndex": 6,
+    "new": {
+      "ingredientName": "ớt đỏ bỏ hạt, băm nhuyễn",
+      "weight": 1,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'quả' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 817,
+    "ingredientIndex": 2,
+    "new": {
+      "ingredientName": "hành tím thái mỏng",
+      "weight": 1,
+      "unit": "củ",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'củ' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 818,
+    "ingredientIndex": 3,
+    "new": {
+      "ingredientName": "hành tây thái lát mỏng",
+      "weight": 4,
+      "unit": "củ",
+      "isMain": true,
+      "isCommon": true
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'củ' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 818,
+    "ingredientIndex": 6,
+    "new": {
+      "ingredientName": "xúc xích heo",
+      "weight": 6,
+      "unit": "cây",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'cây' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 818,
+    "ingredientIndex": 8,
+    "new": {
+      "ingredientName": "bánh mì hot dog",
+      "weight": 6,
+      "unit": "cái",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'cái' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 821,
+    "ingredientIndex": 2,
+    "new": {
+      "ingredientName": "chanh xanh (1/2 vắt nước, 1/2 cắt múi)",
+      "weight": 1,
+      "unit": "quả",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'quả' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 821,
+    "ingredientIndex": 4,
+    "new": {
+      "ingredientName": "tỏi",
+      "weight": 1,
+      "unit": "tép",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'tép' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 824,
+    "ingredientIndex": 3,
+    "new": {
+      "ingredientName": "hành lá thái mỏng",
+      "weight": 2,
+      "unit": "nhánh",
+      "isMain": true,
+      "isCommon": true
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'nhánh' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 824,
+    "ingredientIndex": 4,
+    "new": {
+      "ingredientName": "hành tây băm nhuyễn",
+      "weight": 1,
+      "unit": "củ",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'củ' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 824,
+    "ingredientIndex": 5,
+    "new": {
+      "ingredientName": "lá tía tô thái sợi, thêm một ít để dùng kèm",
+      "weight": 5,
+      "unit": "lá",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'lá' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 825,
+    "ingredientIndex": 2,
+    "new": {
+      "ingredientName": "hành tây băm nhuyễn",
+      "weight": 1,
+      "unit": "củ",
+      "isMain": true,
+      "isCommon": true
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'củ' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 825,
+    "ingredientIndex": 11,
+    "new": {
+      "ingredientName": "ớt chuông đỏ thái lát",
+      "weight": 1,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": true
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'quả' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 826,
+    "ingredientIndex": 9,
+    "new": {
+      "ingredientName": "hành tây đỏ thái lát",
+      "weight": 1,
+      "unit": "củ",
+      "isMain": false,
+      "isCommon": true
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'củ' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 827,
+    "ingredientIndex": 3,
+    "new": {
+      "ingredientName": "tỏi bóc vỏ, đập dập",
+      "weight": 1,
+      "unit": "tép",
+      "isMain": true,
+      "isCommon": true
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'tép' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 827,
+    "ingredientIndex": 4,
+    "new": {
+      "ingredientName": "chanh vàng (vắt nước, bào vỏ 1/2 quả)",
+      "weight": 1,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'quả' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 828,
+    "ingredientIndex": 8,
+    "new": {
+      "ingredientName": "ớt chuông xanh cắt hạt lựu 1cm",
+      "weight": 1,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": true
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'quả' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 830,
+    "ingredientIndex": 3,
+    "new": {
+      "ingredientName": "ức gà cắt miếng nhỏ",
+      "weight": 2,
+      "unit": "miếng",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'miếng' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 830,
+    "ingredientIndex": 4,
+    "new": {
+      "ingredientName": "hành tây băm nhuyễn",
+      "weight": 1,
+      "unit": "củ",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'củ' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 830,
+    "ingredientIndex": 5,
+    "new": {
+      "ingredientName": "tỏi băm nhuyễn",
+      "weight": 3,
+      "unit": "tép",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'tép' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 831,
+    "ingredientIndex": 1,
+    "new": {
+      "ingredientName": "hành tây",
+      "weight": 1,
+      "unit": "củ",
+      "isMain": true,
+      "isCommon": true
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'củ' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 831,
+    "ingredientIndex": 5,
+    "new": {
+      "ingredientName": "trứng gà đánh tan",
+      "weight": 2,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'quả' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 832,
+    "ingredientIndex": 1,
+    "new": {
+      "ingredientName": "bánh brioche burger nguyên ổ (chưa cắt)",
+      "weight": 1,
+      "unit": "cái",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'cái' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 833,
+    "ingredientIndex": 2,
+    "new": {
+      "ingredientName": "hành tây đỏ băm nhuyễn",
+      "weight": 0.5,
+      "unit": "củ",
+      "isMain": true,
+      "isCommon": true
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'củ' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 833,
+    "ingredientIndex": 3,
+    "new": {
+      "ingredientName": "tỏi đập dập",
+      "weight": 2,
+      "unit": "tép",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'tép' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 834,
+    "ingredientIndex": 1,
+    "new": {
+      "ingredientName": "xúc xích heo",
+      "weight": 8,
+      "unit": "cây",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'cây' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 834,
+    "ingredientIndex": 2,
+    "new": {
+      "ingredientName": "súp lơ cỡ vừa (tách bông nhỏ, băm lá)",
+      "weight": 1,
+      "unit": "cái",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'cái' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 834,
+    "ingredientIndex": 4,
+    "new": {
+      "ingredientName": "hành tây đỏ cắt múi cau",
+      "weight": 1,
+      "unit": "củ",
+      "isMain": false,
+      "isCommon": true
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'củ' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 834,
+    "ingredientIndex": 11,
+    "new": {
+      "ingredientName": "tỏi đập dập",
+      "weight": 3,
+      "unit": "tép",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'tép' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 835,
+    "ingredientIndex": 2,
+    "new": {
+      "ingredientName": "hành tây băm nhuyễn",
+      "weight": 1,
+      "unit": "củ",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'củ' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 835,
+    "ingredientIndex": 3,
+    "new": {
+      "ingredientName": "cần tây (thân) băm nhuyễn",
+      "weight": 2,
+      "unit": "thân",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'thân' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 836,
+    "ingredientIndex": 6,
+    "new": {
+      "ingredientName": "lòng đỏ trứng",
+      "weight": 2,
+      "unit": "lòng đỏ",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'lòng đỏ' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 838,
+    "ingredientIndex": 1,
+    "new": {
+      "ingredientName": "trà hoa cúc túi lọc",
+      "weight": 3,
+      "unit": "túi",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'túi' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 838,
+    "ingredientIndex": 5,
+    "new": {
+      "ingredientName": "đào bổ đôi, bỏ hạt",
+      "weight": 4,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'quả' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 839,
+    "ingredientIndex": 2,
+    "new": {
+      "ingredientName": "hành tây băm nhuyễn",
+      "weight": 1,
+      "unit": "củ",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'củ' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 839,
+    "ingredientIndex": 3,
+    "new": {
+      "ingredientName": "cà rốt băm nhuyễn hoặc bào sợi thô",
+      "weight": 2,
+      "unit": "củ",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'củ' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 839,
+    "ingredientIndex": 5,
+    "new": {
+      "ingredientName": "tỏi bào nhuyễn hoặc đập dập",
+      "weight": 2,
+      "unit": "tép",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'tép' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 840,
+    "ingredientIndex": 5,
+    "new": {
+      "ingredientName": "trứng (đánh tan, để quét mặt)",
+      "weight": 1,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'quả' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 840,
+    "ingredientIndex": 7,
+    "new": {
+      "ingredientName": "chanh vàng (bào vỏ và vắt nước)",
+      "weight": 1,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'quả' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 842,
+    "ingredientIndex": 2,
+    "new": {
+      "ingredientName": "hành tím băm nhuyễn",
+      "weight": 2,
+      "unit": "củ",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'củ' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 842,
+    "ingredientIndex": 3,
+    "new": {
+      "ingredientName": "tỏi đập dập",
+      "weight": 2,
+      "unit": "tép",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'tép' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 843,
+    "ingredientIndex": 3,
+    "new": {
+      "ingredientName": "chanh xanh (bào vỏ và vắt nước)",
+      "weight": 1,
+      "unit": "quả",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'quả' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 843,
+    "ingredientIndex": 4,
+    "new": {
+      "ingredientName": "bánh quy digestive",
+      "weight": 3,
+      "unit": "cái",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'cái' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 843,
+    "ingredientIndex": 7,
+    "new": {
+      "ingredientName": "kem dừa",
+      "weight": 6,
+      "unit": "viên",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'viên' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 844,
+    "ingredientIndex": 6,
+    "new": {
+      "ingredientName": "chanh xanh (vắt nước, thêm 1 quả để dùng kèm)",
+      "weight": 2,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'quả' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 845,
+    "ingredientIndex": 2,
+    "new": {
+      "ingredientName": "trứng (đánh tan)",
+      "weight": 3,
+      "unit": "quả",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'quả' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 846,
+    "ingredientIndex": 5,
+    "new": {
+      "ingredientName": "tỏi đập dập nhẹ",
+      "weight": 2,
+      "unit": "tép",
+      "isMain": false,
+      "isCommon": true
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'tép' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 847,
+    "ingredientIndex": 5,
+    "new": {
+      "ingredientName": "tỏi",
+      "weight": 5,
+      "unit": "tép",
+      "isMain": false,
+      "isCommon": true
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'tép' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 848,
+    "ingredientIndex": 7,
+    "new": {
+      "ingredientName": "hành lá thái mỏng",
+      "weight": 2,
+      "unit": "nhánh",
+      "isMain": false,
+      "isCommon": true
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'nhánh' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 849,
+    "ingredientIndex": 2,
+    "new": {
+      "ingredientName": "tỏi tây (rửa sạch)",
+      "weight": 3,
+      "unit": "cọng",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'cọng' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 849,
+    "ingredientIndex": 3,
+    "new": {
+      "ingredientName": "tỏi đập dập",
+      "weight": 4,
+      "unit": "tép",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'tép' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 849,
+    "ingredientIndex": 5,
+    "new": {
+      "ingredientName": "vỏ chanh bào",
+      "weight": 2,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'quả' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 850,
+    "ingredientIndex": 2,
+    "new": {
+      "ingredientName": "nấm Portobello",
+      "weight": 8,
+      "unit": "cái",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'cái' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 850,
+    "ingredientIndex": 4,
+    "new": {
+      "ingredientName": "hành tím băm nhuyễn",
+      "weight": 2,
+      "unit": "củ",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'củ' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 850,
+    "ingredientIndex": 5,
+    "new": {
+      "ingredientName": "tỏi đập dập",
+      "weight": 3,
+      "unit": "tép",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'tép' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 850,
+    "ingredientIndex": 8,
+    "new": {
+      "ingredientName": "nước cốt chanh vàng",
+      "weight": 0.5,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'quả' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 851,
+    "ingredientIndex": 3,
+    "new": {
+      "ingredientName": "hành tây băm nhuyễn",
+      "weight": 1,
+      "unit": "củ",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'củ' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 852,
+    "ingredientIndex": 1,
+    "new": {
+      "ingredientName": "ớt Romano đỏ (bỏ lõi, bỏ hạt, cắt khúc lớn)",
+      "weight": 2,
+      "unit": "quả",
+      "isMain": true,
+      "isCommon": true
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'quả' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 854,
+    "ingredientIndex": 6,
+    "new": {
+      "ingredientName": "trứng (đánh tan)",
+      "weight": 1,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'quả' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 854,
+    "ingredientIndex": 8,
+    "new": {
+      "ingredientName": "thanh sô cô la đen",
+      "weight": 16,
+      "unit": "thanh",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'thanh' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 857,
+    "ingredientIndex": 5,
+    "new": {
+      "ingredientName": "tỏi bào nhuyễn",
+      "weight": 1,
+      "unit": "tép",
+      "isMain": false,
+      "isCommon": true
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'tép' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 857,
+    "ingredientIndex": 6,
+    "new": {
+      "ingredientName": "lá húng tây (tuốt lá từ nhánh rồi băm nhuyễn)",
+      "weight": 5,
+      "unit": "nhánh",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'nhánh' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 858,
+    "ingredientIndex": 1,
+    "new": {
+      "ingredientName": "cà tím cắt khoanh dày 2cm",
+      "weight": 2,
+      "unit": "quả",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'quả' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 858,
+    "ingredientIndex": 3,
+    "new": {
+      "ingredientName": "hành tây đỏ băm nhuyễn",
+      "weight": 1,
+      "unit": "củ",
+      "isMain": true,
+      "isCommon": true
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'củ' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 858,
+    "ingredientIndex": 5,
+    "new": {
+      "ingredientName": "tỏi bào nhuyễn",
+      "weight": 1,
+      "unit": "tép",
+      "isMain": false,
+      "isCommon": true
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'tép' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 858,
+    "ingredientIndex": 12,
+    "new": {
+      "ingredientName": "ớt đỏ thái lát mỏng",
+      "weight": 1,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'quả' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 858,
+    "ingredientIndex": 17,
+    "new": {
+      "ingredientName": "tỏi bào nhuyễn",
+      "weight": 1,
+      "unit": "tép",
+      "isMain": false,
+      "isCommon": true
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'tép' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 858,
+    "ingredientIndex": 18,
+    "new": {
+      "ingredientName": "chanh vàng (bào vỏ và vắt nước)",
+      "weight": 1,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'quả' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 859,
+    "ingredientIndex": 5,
+    "new": {
+      "ingredientName": "hành tây đỏ",
+      "weight": 1,
+      "unit": "củ",
+      "isMain": false,
+      "isCommon": true
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'củ' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 861,
+    "ingredientIndex": 4,
+    "new": {
+      "ingredientName": "tỏi bào nhuyễn",
+      "weight": 1,
+      "unit": "tép",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'tép' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 861,
+    "ingredientIndex": 6,
+    "new": {
+      "ingredientName": "ớt chuông đỏ thái lát",
+      "weight": 1,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": true
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'quả' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 861,
+    "ingredientIndex": 7,
+    "new": {
+      "ingredientName": "tỏi tây thái lát mỏng",
+      "weight": 2,
+      "unit": "cọng",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'cọng' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 862,
+    "ingredientIndex": 5,
+    "new": {
+      "ingredientName": "vỏ chanh bào",
+      "weight": 1,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'quả' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 863,
+    "ingredientIndex": 5,
+    "new": {
+      "ingredientName": "lát cam",
+      "weight": 1,
+      "unit": "lát",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'lát' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 864,
+    "ingredientIndex": 9,
+    "new": {
+      "ingredientName": "tỏi đập dập",
+      "weight": 6,
+      "unit": "tép",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'tép' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 864,
+    "ingredientIndex": 10,
+    "new": {
+      "ingredientName": "chanh vàng bổ đôi",
+      "weight": 1,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'quả' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 865,
+    "ingredientIndex": 4,
+    "new": {
+      "ingredientName": "tỏi bào nhuyễn",
+      "weight": 2,
+      "unit": "tép",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'tép' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 865,
+    "ingredientIndex": 8,
+    "new": {
+      "ingredientName": "hành tây đỏ thái lát",
+      "weight": 2,
+      "unit": "củ",
+      "isMain": false,
+      "isCommon": true
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'củ' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 865,
+    "ingredientIndex": 10,
+    "new": {
+      "ingredientName": "dưa leo cắt thô",
+      "weight": 1,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'quả' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 865,
+    "ingredientIndex": 11,
+    "new": {
+      "ingredientName": "cà chua cắt thô",
+      "weight": 2,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'quả' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 866,
+    "ingredientIndex": 2,
+    "new": {
+      "ingredientName": "hành lá",
+      "weight": 4,
+      "unit": "nhánh",
+      "isMain": true,
+      "isCommon": true
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'nhánh' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 867,
+    "ingredientIndex": 3,
+    "new": {
+      "ingredientName": "phi lê ức gà cắt miếng nhỏ",
+      "weight": 4,
+      "unit": "miếng",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'miếng' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 867,
+    "ingredientIndex": 8,
+    "new": {
+      "ingredientName": "tỏi đập dập",
+      "weight": 4,
+      "unit": "tép",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'tép' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 867,
+    "ingredientIndex": 11,
+    "new": {
+      "ingredientName": "viên nước dùng gà",
+      "weight": 1,
+      "unit": "viên",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'viên' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 867,
+    "ingredientIndex": 13,
+    "new": {
+      "ingredientName": "chanh vàng (bào vỏ và vắt nước)",
+      "weight": 1,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'quả' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 868,
+    "ingredientIndex": 4,
+    "new": {
+      "ingredientName": "hành lá thái lát",
+      "weight": 4,
+      "unit": "nhánh",
+      "isMain": false,
+      "isCommon": true
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'nhánh' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 868,
+    "ingredientIndex": 6,
+    "new": {
+      "ingredientName": "ớt chuông nhỏ (nhiều màu), thái lát",
+      "weight": 3,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": true
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'quả' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 869,
+    "ingredientIndex": 1,
+    "new": {
+      "ingredientName": "hành tây",
+      "weight": 1,
+      "unit": "củ",
+      "isMain": true,
+      "isCommon": true
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'củ' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 869,
+    "ingredientIndex": 2,
+    "new": {
+      "ingredientName": "tỏi",
+      "weight": 6,
+      "unit": "tép",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'tép' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 869,
+    "ingredientIndex": 3,
+    "new": {
+      "ingredientName": "ớt đỏ",
+      "weight": 2,
+      "unit": "quả",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'quả' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 869,
+    "ingredientIndex": 7,
+    "new": {
+      "ingredientName": "cam",
+      "weight": 2,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'quả' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 870,
+    "ingredientIndex": 1,
+    "new": {
+      "ingredientName": "bít tết cá ngừ dày",
+      "weight": 2,
+      "unit": "miếng",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'miếng' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 871,
+    "ingredientIndex": 3,
+    "new": {
+      "ingredientName": "hành tây băm nhuyễn",
+      "weight": 1,
+      "unit": "củ",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'củ' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 871,
+    "ingredientIndex": 4,
+    "new": {
+      "ingredientName": "tỏi đập dập",
+      "weight": 2,
+      "unit": "tép",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'tép' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 873,
+    "ingredientIndex": 4,
+    "new": {
+      "ingredientName": "trứng gà",
+      "weight": 3,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'quả' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 874,
+    "ingredientIndex": 1,
+    "new": {
+      "ingredientName": "ớt chuông (1 đỏ, 1 vàng), cắt nhỏ",
+      "weight": 2,
+      "unit": "quả",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'quả' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 874,
+    "ingredientIndex": 2,
+    "new": {
+      "ingredientName": "bí ngòi cắt nhỏ",
+      "weight": 2,
+      "unit": "quả",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'quả' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 874,
+    "ingredientIndex": 3,
+    "new": {
+      "ingredientName": "hành tây đỏ cắt nhỏ",
+      "weight": 2,
+      "unit": "củ",
+      "isMain": true,
+      "isCommon": true
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'củ' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 874,
+    "ingredientIndex": 4,
+    "new": {
+      "ingredientName": "cà tím cắt nhỏ",
+      "weight": 1,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'quả' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 874,
+    "ingredientIndex": 6,
+    "new": {
+      "ingredientName": "tỏi để nguyên vỏ",
+      "weight": 12,
+      "unit": "tép",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'tép' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 875,
+    "ingredientIndex": 6,
+    "new": {
+      "ingredientName": "hành tây cắt thô",
+      "weight": 1,
+      "unit": "củ",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'củ' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 875,
+    "ingredientIndex": 7,
+    "new": {
+      "ingredientName": "tỏi bóc vỏ, để nguyên tép",
+      "weight": 5,
+      "unit": "tép",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'tép' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 877,
+    "ingredientIndex": 1,
+    "new": {
+      "ingredientName": "ức gà cắt khối",
+      "weight": 1,
+      "unit": "miếng",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'miếng' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 877,
+    "ingredientIndex": 4,
+    "new": {
+      "ingredientName": "hành tây băm nhuyễn",
+      "weight": 1,
+      "unit": "củ",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'củ' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 877,
+    "ingredientIndex": 5,
+    "new": {
+      "ingredientName": "tỏi bào nhuyễn",
+      "weight": 2,
+      "unit": "tép",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'tép' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 878,
+    "ingredientIndex": 2,
+    "new": {
+      "ingredientName": "hành tây băm nhuyễn",
+      "weight": 2,
+      "unit": "củ",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'củ' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 878,
+    "ingredientIndex": 3,
+    "new": {
+      "ingredientName": "cà rốt băm nhuyễn",
+      "weight": 4,
+      "unit": "củ",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'củ' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 878,
+    "ingredientIndex": 4,
+    "new": {
+      "ingredientName": "cần tây (thân) băm nhuyễn",
+      "weight": 2,
+      "unit": "thân",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'thân' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 878,
+    "ingredientIndex": 9,
+    "new": {
+      "ingredientName": "chanh vàng (bào vỏ và vắt nước)",
+      "weight": 1,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'quả' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 878,
+    "ingredientIndex": 11,
+    "new": {
+      "ingredientName": "tỏi đập dập",
+      "weight": 2,
+      "unit": "tép",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'tép' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 879,
+    "ingredientIndex": 1,
+    "new": {
+      "ingredientName": "dứa (gọt vỏ, cắt múi)",
+      "weight": 1,
+      "unit": "quả",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'quả' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 880,
+    "ingredientIndex": 5,
+    "new": {
+      "ingredientName": "trứng (đánh tan)",
+      "weight": 2,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'quả' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 881,
+    "ingredientIndex": 6,
+    "new": {
+      "ingredientName": "vỏ chanh bào",
+      "weight": 1,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'quả' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 881,
+    "ingredientIndex": 8,
+    "new": {
+      "ingredientName": "bánh mì baguette mộc, thái lát xéo mỏng",
+      "weight": 1,
+      "unit": "ổ",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'ổ' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 882,
+    "ingredientIndex": 1,
+    "new": {
+      "ingredientName": "khoai tây cắt hạt lựu nhỏ",
+      "weight": 1,
+      "unit": "củ",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'củ' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 882,
+    "ingredientIndex": 3,
+    "new": {
+      "ingredientName": "ớt xanh băm nhuyễn",
+      "weight": 1,
+      "unit": "quả",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'quả' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 882,
+    "ingredientIndex": 5,
+    "new": {
+      "ingredientName": "hành tây đỏ băm nhuyễn",
+      "weight": 1,
+      "unit": "củ",
+      "isMain": false,
+      "isCommon": true
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'củ' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 882,
+    "ingredientIndex": 15,
+    "new": {
+      "ingredientName": "tỏi băm thô",
+      "weight": 3,
+      "unit": "tép",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'tép' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 882,
+    "ingredientIndex": 19,
+    "new": {
+      "ingredientName": "ớt xanh băm thô",
+      "weight": 2,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'quả' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 883,
+    "ingredientIndex": 1,
+    "new": {
+      "ingredientName": "sả đập dập rồi băm thô",
+      "weight": 2,
+      "unit": "cây",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'cây' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 883,
+    "ingredientIndex": 10,
+    "new": {
+      "ingredientName": "chanh xanh (bào vỏ và vắt nước), thêm múi chanh để dùng kèm",
+      "weight": 1,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'quả' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 884,
+    "ingredientIndex": 5,
+    "new": {
+      "ingredientName": "vỏ chanh bào",
+      "weight": 2,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'quả' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 884,
+    "ingredientIndex": 7,
+    "new": {
+      "ingredientName": "trứng để ở nhiệt độ phòng",
+      "weight": 4,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'quả' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 886,
+    "ingredientIndex": 7,
+    "new": {
+      "ingredientName": "trứng (đánh tan)",
+      "weight": 1,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'quả' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 888,
+    "ingredientIndex": 11,
+    "new": {
+      "ingredientName": "lòng đỏ trứng",
+      "weight": 1,
+      "unit": "lòng đỏ",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'lòng đỏ' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 889,
+    "ingredientIndex": 7,
+    "new": {
+      "ingredientName": "trứng",
+      "weight": 1,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'quả' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 890,
+    "ingredientIndex": 7,
+    "new": {
+      "ingredientName": "chanh xanh bào vỏ rồi bổ đôi",
+      "weight": 1,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'quả' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 891,
+    "ingredientIndex": 7,
+    "new": {
+      "ingredientName": "lê chín bổ đôi",
+      "weight": 3,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'quả' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 892,
+    "ingredientIndex": 3,
+    "new": {
+      "ingredientName": "hành tây băm nhuyễn",
+      "weight": 1,
+      "unit": "củ",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'củ' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 892,
+    "ingredientIndex": 4,
+    "new": {
+      "ingredientName": "ớt chuông xanh băm nhuyễn",
+      "weight": 1,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": true
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'quả' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 892,
+    "ingredientIndex": 12,
+    "new": {
+      "ingredientName": "bánh mì hamburger chẻ đôi",
+      "weight": 4,
+      "unit": "cái",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'cái' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 893,
+    "ingredientIndex": 3,
+    "new": {
+      "ingredientName": "vỏ chanh bào",
+      "weight": 1,
+      "unit": "quả",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'quả' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 893,
+    "ingredientIndex": 4,
+    "new": {
+      "ingredientName": "lòng đỏ trứng",
+      "weight": 4,
+      "unit": "lòng đỏ",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'lòng đỏ' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 894,
+    "ingredientIndex": 4,
+    "new": {
+      "ingredientName": "hạt từ quả vani (cạo ra)",
+      "weight": 1,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'quả' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 895,
+    "ingredientIndex": 7,
+    "new": {
+      "ingredientName": "ớt chuông đỏ bỏ hạt, cắt khối",
+      "weight": 1,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": true
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'quả' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 895,
+    "ingredientIndex": 8,
+    "new": {
+      "ingredientName": "ớt đỏ (1 quả cắt khối, 2 quả bổ đôi bỏ hạt)",
+      "weight": 3,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'quả' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 895,
+    "ingredientIndex": 10,
+    "new": {
+      "ingredientName": "hoa hồi",
+      "weight": 4,
+      "unit": "cánh",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'cánh' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 897,
+    "ingredientIndex": 1,
+    "new": {
+      "ingredientName": "hạt dẻ (hoặc nhiều hơn tuỳ nhu cầu)",
+      "weight": 16,
+      "unit": "hạt",
+      "isMain": true,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'hạt' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 898,
+    "ingredientIndex": 15,
+    "new": {
+      "ingredientName": "lá húng tây (tuốt lá)",
+      "weight": 3,
+      "unit": "nhánh",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'nhánh' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  },
+  {
+    "recipeIndex": 900,
+    "ingredientIndex": 8,
+    "new": {
+      "ingredientName": "vỏ chanh bào",
+      "weight": 1,
+      "unit": "quả",
+      "isMain": false,
+      "isCommon": false
+    },
+    "reason": "Đổi unit 'đơn vị' -> 'quả' suy ra từ EN; Làm sạch ingredientName: sửa dịch sai/thiếu tự nhiên theo EN"
+  }
+]

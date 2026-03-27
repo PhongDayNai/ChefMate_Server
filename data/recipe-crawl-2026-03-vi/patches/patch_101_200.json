@@ -1,0 +1,223 @@
+{
+  "batch": "101-200",
+  "sourceFile": "/home/dhpho/workspace/projects/chefmate-server/data/recipe-crawl-2026-03-vi/recipes.vi.json",
+  "note": "Chỉ tạo patch đề xuất; KHÔNG sửa trực tiếp dataset chính.",
+  "patches": [
+    {
+      "index": 104,
+      "changes": {
+        "recipeName": "Cá hake chần trong nước dùng cà chua, ớt và gừng",
+        "importPayloadTemplate.recipeName": "Cá hake chần trong nước dùng cà chua, ớt và gừng"
+      },
+      "reason": "EN là hake (không phải cod/cá tuyết); bản cũ lệch nguyên liệu chính."
+    },
+    {
+      "index": 105,
+      "changes": {
+        "recipeName": "Đậu mùa hè và sốt aïoli xanh thảo mộc",
+        "importPayloadTemplate.recipeName": "Đậu mùa hè và sốt aïoli xanh thảo mộc"
+      },
+      "reason": "Bổ sung thành phần chính “aïoli” bị rơi mất trong bản dịch cũ."
+    },
+    {
+      "index": 110,
+      "changes": {
+        "recipeName": "Bánh Stargazy",
+        "importPayloadTemplate.recipeName": "Bánh Stargazy"
+      },
+      "reason": "Tên món đặc thù; bản cũ dịch sát chữ “chiếc bánh đầy sao” gây sai ngữ dụng."
+    },
+    {
+      "index": 123,
+      "changes": {
+        "recipeName": "Cơm kiểu Thổ Nhĩ Kỳ (cơm vermicelli)",
+        "importPayloadTemplate.recipeName": "Cơm kiểu Thổ Nhĩ Kỳ (cơm vermicelli)"
+      },
+      "reason": "Vermicelli rice là cơm nấu với vermicelli, không phải “bún gạo”."
+    },
+    {
+      "index": 126,
+      "changes": {
+        "recipeName": "Kẹo bạc hà vỏ cây",
+        "importPayloadTemplate.recipeName": "Kẹo bạc hà vỏ cây"
+      },
+      "reason": "Peppermint bark là tên món kẹo; bản cũ “vỏ cây bạc hà” bị literal quá mức."
+    },
+    {
+      "index": 127,
+      "changes": {
+        "recipeName": "Hành caramel Harissa dẻo",
+        "importPayloadTemplate.recipeName": "Hành caramel Harissa dẻo"
+      },
+      "reason": "“Sticky onions” nên dịch theo ngữ cảnh món ăn; “hành nếp” sai nghĩa."
+    },
+    {
+      "index": 138,
+      "changes": {
+        "recipeName": "Thịt heo xé sốt dứa",
+        "importPayloadTemplate.recipeName": "Thịt heo xé sốt dứa"
+      },
+      "reason": "“Pulled pork” là thịt heo xé; bản cũ “thịt lợn kéo” không tự nhiên."
+    },
+    {
+      "index": 139,
+      "changes": {
+        "recipeName": "Bò rib-eye với bơ cacio e pepe",
+        "importPayloadTemplate.recipeName": "Bò rib-eye với bơ cacio e pepe"
+      },
+      "reason": "Chuẩn hoá thuật ngữ cắt thịt; “mắt sườn” gượng, thiếu tự nhiên."
+    },
+    {
+      "index": 142,
+      "changes": {
+        "recipeName": "Cá hồi suối nướng với gnocchi và sốt kem Dijon",
+        "importPayloadTemplate.recipeName": "Cá hồi suối nướng với gnocchi và sốt kem Dijon"
+      },
+      "reason": "EN là trout; bản cũ dịch thành cá hồi (salmon) sai nguyên liệu."
+    },
+    {
+      "index": 143,
+      "changes": {
+        "recipeName": "Toad-in-the-hole súp lơ phô mai nướng kèm sốt hành tím",
+        "importPayloadTemplate.recipeName": "Toad-in-the-hole súp lơ phô mai nướng kèm sốt hành tím"
+      },
+      "reason": "Bản cũ làm mất thành phần món “toad-in-the-hole”, gây lệch nghĩa tên món."
+    },
+    {
+      "index": 144,
+      "changes": {
+        "recipeName": "Bánh calzone salami và ớt",
+        "importPayloadTemplate.recipeName": "Bánh calzone salami và ớt"
+      },
+      "reason": "Calzones là loại bánh; bản cũ “xúc xích & sốt ớt” sai hẳn ngữ nghĩa."
+    },
+    {
+      "index": 145,
+      "changes": {
+        "recipeName": "Bánh crumble đại hoàng và custard",
+        "importPayloadTemplate.recipeName": "Bánh crumble đại hoàng và custard"
+      },
+      "reason": "Custard bị dịch nhầm thành “mãng cầu”; chỉnh lại đúng thành phần món."
+    },
+    {
+      "index": 153,
+      "changes": {
+        "recipeName": "Bánh pancake soufflé Nhật Bản mềm xốp",
+        "importPayloadTemplate.recipeName": "Bánh pancake soufflé Nhật Bản mềm xốp"
+      },
+      "reason": "Bản cũ dùng “bánh xèo” gây sai loại món; đây là pancake soufflé."
+    },
+    {
+      "index": 154,
+      "changes": {
+        "recipeName": "Gà tây nướng chanh thảo mộc ngon nhất kèm sốt gravy",
+        "importPayloadTemplate.recipeName": "Gà tây nướng chanh thảo mộc ngon nhất kèm sốt gravy"
+      },
+      "reason": "Cụm hiện tại lủng củng “nước xốt và vương miện...”; chuẩn hoá lại tên món tự nhiên hơn."
+    },
+    {
+      "index": 159,
+      "changes": {
+        "recipeName": "Salad Caesar cá hồi suối",
+        "importPayloadTemplate.recipeName": "Salad Caesar cá hồi suối"
+      },
+      "reason": "EN là trout; bản cũ dịch thành cá hồi sai nguyên liệu."
+    },
+    {
+      "index": 160,
+      "changes": {
+        "recipeName": "Mac 'n' cheese prosciutto và tarragon",
+        "importPayloadTemplate.recipeName": "Mac 'n' cheese prosciutto và tarragon"
+      },
+      "reason": "Bản cũ đảo trật tự, thiếu “cheese” rõ nghĩa trong tên món."
+    },
+    {
+      "index": 166,
+      "changes": {
+        "recipeName": "Cocktail Sex on the Beach",
+        "importPayloadTemplate.recipeName": "Cocktail Sex on the Beach"
+      },
+      "reason": "Giữ tên cocktail chuẩn; bản dịch literal gây thô và không tự nhiên."
+    },
+    {
+      "index": 169,
+      "changes": {
+        "recipeName": "Bữa chiên kiểu Anh cho một người",
+        "importPayloadTemplate.recipeName": "Bữa chiên kiểu Anh cho một người"
+      },
+      "reason": "“Fry-up for one” là bữa ăn; bản cũ “Chiên cho một cái” sai ngữ nghĩa."
+    },
+    {
+      "index": 175,
+      "changes": {
+        "recipeName": "Bữa sáng potato farl",
+        "importPayloadTemplate.recipeName": "Bữa sáng potato farl"
+      },
+      "reason": "Potato farl là tên món; bản cũ dịch thành “khoai tây chiên” không đúng."
+    },
+    {
+      "index": 178,
+      "changes": {
+        "recipeName": "Shakshuka ớt chuông nướng",
+        "importPayloadTemplate.recipeName": "Shakshuka ớt chuông nướng"
+      },
+      "reason": "“Roasted pepper” là ớt chuông nướng; bản cũ “tiêu nướng” sai nghĩa."
+    },
+    {
+      "index": 180,
+      "changes": {
+        "recipeName": "Bông cải xanh nồi chiên không dầu",
+        "importPayloadTemplate.recipeName": "Bông cải xanh nồi chiên không dầu"
+      },
+      "reason": "Chuẩn hoá cách gọi tự nhiên tiếng Việt cho “air fryer broccoli”."
+    },
+    {
+      "index": 185,
+      "changes": {
+        "recipeName": "Giá đỗ sốt mật ong xì dầu",
+        "importPayloadTemplate.recipeName": "Giá đỗ sốt mật ong xì dầu"
+      },
+      "reason": "Bản cũ thiếu thành phần “soy”; “sprouts” ở ngữ cảnh này là giá đỗ."
+    },
+    {
+      "index": 186,
+      "changes": {
+        "recipeName": "Bánh loaf mật ong và hạnh nhân giòn",
+        "importPayloadTemplate.recipeName": "Bánh loaf mật ong và hạnh nhân giòn"
+      },
+      "reason": "“Loaf cake” là bánh cake khuôn dài; bản cũ dịch thành “bánh mì” gây lệch loại món."
+    },
+    {
+      "index": 191,
+      "changes": {
+        "recipeName": "Pizza gia đình làm nhanh gọn",
+        "importPayloadTemplate.recipeName": "Pizza gia đình làm nhanh gọn"
+      },
+      "reason": "“Fuss-free” mang nghĩa tiện/làm nhanh; “thoải mái” chưa đúng sắc thái."
+    },
+    {
+      "index": 193,
+      "changes": {
+        "recipeName": "Bloody Mary",
+        "importPayloadTemplate.recipeName": "Bloody Mary"
+      },
+      "reason": "Tên cocktail chuẩn; bản cũ “Mary đẫm máu” là dịch máy literal."
+    },
+    {
+      "index": 197,
+      "changes": {
+        "recipeName": "Mac 'n' cheese kiểu cheeseboard với vụn bánh cracker",
+        "importPayloadTemplate.recipeName": "Mac 'n' cheese kiểu cheeseboard với vụn bánh cracker"
+      },
+      "reason": "Bản cũ lặp “phô mai” và tối nghĩa; chỉnh lại theo cấu trúc EN."
+    },
+    {
+      "index": 199,
+      "changes": {
+        "recipeName": "Kẹo hạt giòn",
+        "importPayloadTemplate.recipeName": "Kẹo hạt giòn"
+      },
+      "reason": "“Nut brittle” là kẹo giòn, không chỉ “hạt giòn”."
+    }
+  ]
+}

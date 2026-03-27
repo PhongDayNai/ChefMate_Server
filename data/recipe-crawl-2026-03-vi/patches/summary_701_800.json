@@ -1,0 +1,53 @@
+{
+  "batch": "701-800",
+  "totalRecipesReviewed": 100,
+  "totalProposedPatches": 34,
+  "coverage": {
+    "recipeName": 34,
+    "ingredients": 0,
+    "cookingSteps": 0,
+    "tags": 0
+  },
+  "categories": {
+    "wrong_semantics": 23,
+    "awkward_or_literal_title": 8,
+    "proper_noun_or_term_fix": 3
+  },
+  "indicesPatched": [
+    703,
+    704,
+    711,
+    712,
+    713,
+    714,
+    720,
+    721,
+    722,
+    723,
+    729,
+    735,
+    736,
+    739,
+    742,
+    746,
+    747,
+    749,
+    753,
+    758,
+    759,
+    761,
+    763,
+    767,
+    777,
+    778,
+    779,
+    780,
+    782,
+    784,
+    785,
+    786,
+    796,
+    798
+  ],
+  "ruleApplied": "Theo cùng tiêu chí batch 06: ưu tiên sửa lỗi sai nghĩa rõ ràng, dịch máy literal/thô, thuật ngữ món bị lệch ngữ nghĩa; không can thiệp sâu vào phong cách nếu vẫn hiểu đúng."
+}
