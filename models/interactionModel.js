@@ -7,7 +7,7 @@ exports.likeRecipe = async (userId, recipeId) => {
         await conn.beginTransaction();
 
         const [recipeRows] = await conn.query(
-            'SELECT likeQuantity FROM Recipes WHERE recipeId = ? LIMIT 1',
+            "SELECT likeQuantity FROM Recipes WHERE recipeId = ? AND status = 'approved' LIMIT 1",
             [recipeId]
         );
 
@@ -91,7 +91,7 @@ exports.addComment = async (userId, recipeId, content) => {
         }
 
         const [recipeRows] = await conn.query(
-            'SELECT COUNT(*) AS recipeCount FROM Recipes WHERE recipeId = ?',
+            "SELECT COUNT(*) AS recipeCount FROM Recipes WHERE recipeId = ? AND status = 'approved'",
             [recipeId]
         );
 
@@ -158,7 +158,7 @@ exports.increaseViewCount = async (recipeId) => {
         }
 
         const [updateResult] = await pool.query(
-            'UPDATE Recipes SET viewCount = viewCount + 1 WHERE recipeId = ?',
+            "UPDATE Recipes SET viewCount = viewCount + 1 WHERE recipeId = ? AND status = 'approved'",
             [recipeId]
         );
 

@@ -427,6 +427,7 @@ async function getRecipeContext(recipeId) {
          FROM Recipes r
          JOIN Users u ON r.userId = u.userId
          WHERE r.recipeId = ?
+           AND r.status = 'approved'
          LIMIT 1`,
         [parsedRecipeId]
     );
@@ -910,6 +911,7 @@ async function getRecipeRecommendationsFromPantry({ userId, limit, activeDietNot
     const [recipeRows] = await pool.query(
         `SELECT recipeId, recipeName, image, cookingTime, ration, likeQuantity, viewCount
          FROM Recipes
+         WHERE status = 'approved'
          ORDER BY viewCount DESC, likeQuantity DESC, createdAt DESC
          LIMIT 300`
     );

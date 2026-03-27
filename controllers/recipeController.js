@@ -314,6 +314,72 @@ exports.getRecipesByUserId = async (req, res) => {
     }
 };
 
+exports.getPendingRecipes = async (req, res) => {
+    const userId = Number(req.query.userId || req.body?.userId || 0) || null;
+
+    try {
+        const result = await recipeModel.getPendingRecipes({ userId });
+        return res.status(200).json(result);
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            success: false,
+            data: null,
+            message: `Failed to get pending recipes: ${error.message}`
+        });
+    }
+};
+
+exports.reviewRecipe = async (req, res) => {
+    const { recipeId, status } = req.body || {};
+    const parsedRecipeId = Number(recipeId);
+
+    if (!parsedRecipeId || parsedRecipeId <= 0) {
+        return res.status(400).json({
+            success: false,
+            data: null,
+            message: 'recipeId is required and must be a positive number'
+        });
+    }
+
+    if (!status || typeof status !== 'string') {
+        return res.status(400).json({
+            success: false,
+            data: null,
+            message: 'status is required and must be a string'
+        });
+    }
+
+    try {
+        const result = await recipeModel.reviewRecipe({
+            recipeId: parsedRecipeId,
+            status
+        });
+
+        if (!result.success && result.message === 'Recipe not found') {
+            return res.status(404).json(result);
+        }
+
+        return res.status(200).json(result);
+    } catch (error) {
+        const message = String(error?.message || '');
+        if (message.includes('status must be one of')) {
+            return res.status(400).json({
+                success: false,
+                data: null,
+                message
+            });
+        }
+
+        console.error(error);
+        return res.status(500).json({
+            success: false,
+            data: null,
+            message: `Failed to review recipe: ${error.message}`
+        });
+    }
+};
+
 exports.getRecipeGrowthByMonth = async (req, res) => {
     try {
         const result = await recipeModel.getRecipeGrowthByMonth();

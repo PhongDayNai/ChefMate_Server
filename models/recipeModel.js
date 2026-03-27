@@ -1,5 +1,17 @@
 const { pool } = require('../config/dbConfig');
 
+const RECIPE_STATUS = {
+    PENDING: 'pending',
+    APPROVED: 'approved',
+    REJECTED: 'rejected'
+};
+
+const ALLOWED_REVIEW_STATUS = new Set([
+    RECIPE_STATUS.APPROVED,
+    RECIPE_STATUS.REJECTED,
+    RECIPE_STATUS.PENDING
+]);
+
 function makeInClauseParams(values) {
     return {
         placeholders: values.map(() => '?').join(','),
@@ -130,8 +142,9 @@ exports.getAllRecipes = async () => {
                 u.fullName AS userName
             FROM Recipes r
             JOIN Users u ON r.userId = u.userId
+            WHERE r.status = ?
             ORDER BY r.createdAt DESC
-        `);
+        `, [RECIPE_STATUS.APPROVED]);
 
         const recipeIds = recipesRows.map(r => Number(r.recipeId));
         if (recipeIds.length === 0) {
@@ -166,17 +179,12 @@ exports.createRecipe = async (recipeName, image, cookingTime, ration, ingredient
         await conn.beginTransaction();
 
         const [recipeResult] = await conn.query(
-            `INSERT INTO Recipes (recipeName, image, cookingTime, ration, likeQuantity, userId)
-             VALUES (?, ?, ?, ?, 0, ?)`,
-            [recipeName, image, cookingTime, ration, userId]
+            `INSERT INTO Recipes (recipeName, image, cookingTime, ration, likeQuantity, userId, status)
+             VALUES (?, ?, ?, ?, 0, ?, ?)`,
+            [recipeName, image, cookingTime, ration, userId, RECIPE_STATUS.PENDING]
         );
 
         const recipeId = recipeResult.insertId;
-
-        await conn.query(
-            'UPDATE Users SET recipeCount = recipeCount + 1 WHERE userId = ?',
-            [userId]
-        );
 
         for (const ingredient of ingredients) {
             let ingredientId;
@@ -266,9 +274,10 @@ exports.searchRecipe = async (recipeName, userId = null) => {
                 u.fullName AS userName
              FROM Recipes r
              JOIN Users u ON r.userId = u.userId
-             WHERE r.recipeName LIKE CONCAT('%', ?, '%') COLLATE utf8mb4_unicode_ci
+             WHERE r.status = ?
+               AND r.recipeName LIKE CONCAT('%', ?, '%') COLLATE utf8mb4_unicode_ci
              ORDER BY r.viewCount DESC`,
-            [recipeName]
+            [RECIPE_STATUS.APPROVED, recipeName]
         );
 
         const recipeIds = recipesRows.map(r => Number(r.recipeId));
@@ -335,9 +344,9 @@ exports.getTrendingFeed = async ({ userId = null, page = 1, limit = 20, period =
         const periodDays = resolvePeriodDays(period);
 
         const periodClause = periodDays
-            ? 'WHERE r.createdAt >= DATE_SUB(NOW(), INTERVAL ? DAY)'
-            : '';
-        const countParams = periodDays ? [periodDays] : [];
+            ? 'WHERE r.status = ? AND r.createdAt >= DATE_SUB(NOW(), INTERVAL ? DAY)'
+            : 'WHERE r.status = ?';
+        const countParams = periodDays ? [RECIPE_STATUS.APPROVED, periodDays] : [RECIPE_STATUS.APPROVED];
 
         const [[countRow]] = await pool.query(
             `SELECT COUNT(*) AS total
@@ -347,8 +356,8 @@ exports.getTrendingFeed = async ({ userId = null, page = 1, limit = 20, period =
         );
 
         const listParams = periodDays
-            ? [periodDays, parsedLimit, offset]
-            : [parsedLimit, offset];
+            ? [RECIPE_STATUS.APPROVED, periodDays, parsedLimit, offset]
+            : [RECIPE_STATUS.APPROVED, parsedLimit, offset];
 
         const [rows] = await pool.query(
             `SELECT 
@@ -431,8 +440,10 @@ exports.getTopTrending = async (userId = null) => {
                 u.fullName AS userName
              FROM Recipes r
              JOIN Users u ON r.userId = u.userId
+             WHERE r.status = ?
              ORDER BY r.viewCount DESC
-             LIMIT 30`
+             LIMIT 30`,
+            [RECIPE_STATUS.APPROVED]
         );
 
         const recipeIds = topRows.map(r => Number(r.recipeId));
@@ -496,9 +507,10 @@ exports.searchRecipesByTag = async (tagName, userId = null) => {
              JOIN Users u ON r.userId = u.userId
              JOIN RecipesTags rt ON r.recipeId = rt.recipeId
              JOIN Tags t ON rt.tagId = t.tagId
-             WHERE t.tagName LIKE CONCAT('%', ?, '%') COLLATE utf8mb4_unicode_ci
+             WHERE r.status = ?
+               AND t.tagName LIKE CONCAT('%', ?, '%') COLLATE utf8mb4_unicode_ci
              ORDER BY r.viewCount DESC`,
-            [tagName]
+            [RECIPE_STATUS.APPROVED, tagName]
         );
 
         const recipeIds = recipesRows.map(r => Number(r.recipeId));
@@ -552,8 +564,9 @@ exports.getRecipesByUserId = async (userId) => {
              FROM Recipes r
              JOIN Users u ON r.userId = u.userId
              WHERE r.userId = ?
+               AND r.status = ?
              ORDER BY r.createdAt DESC`,
-            [userId]
+            [userId, RECIPE_STATUS.APPROVED]
         );
 
         const recipeIds = recipesRows.map(r => Number(r.recipeId));
@@ -589,6 +602,148 @@ exports.getRecipesByUserId = async (userId) => {
     }
 };
 
+exports.getPendingRecipes = async ({ userId = null } = {}) => {
+    try {
+        const [recipesRows] = await pool.query(
+            `SELECT
+                r.recipeId,
+                r.recipeName,
+                r.image,
+                r.cookingTime,
+                r.ration,
+                r.viewCount,
+                r.likeQuantity,
+                r.createdAt,
+                r.status,
+                u.fullName AS userName
+             FROM Recipes r
+             JOIN Users u ON r.userId = u.userId
+             WHERE r.status = ?
+             ORDER BY r.createdAt ASC`,
+            [RECIPE_STATUS.PENDING]
+        );
+
+        const recipeIds = recipesRows.map(r => Number(r.recipeId));
+        if (recipeIds.length === 0) {
+            return {
+                success: true,
+                data: [],
+                message: 'No pending recipes found'
+            };
+        }
+
+        const related = await fetchRecipeRelatedData(recipeIds, userId);
+
+        const recipes = recipesRows.map(recipe => ({
+            ...mapRecipePayload(
+                recipe,
+                related.cookingStepsRows,
+                related.ingredientsRows,
+                related.commentsRows,
+                related.tagsRows,
+                related.likedRecipes
+            ),
+            status: recipe.status
+        }));
+
+        return {
+            success: true,
+            data: recipes,
+            message: 'Get pending recipes successfully'
+        };
+    } catch (error) {
+        console.error('Error in getPendingRecipes:', error);
+        throw error;
+    }
+};
+
+exports.reviewRecipe = async ({ recipeId, status }) => {
+    const parsedRecipeId = Number(recipeId);
+    const normalizedStatus = String(status || '').trim().toLowerCase();
+
+    if (!parsedRecipeId || parsedRecipeId <= 0) {
+        throw new Error('recipeId must be a positive number');
+    }
+
+    if (!ALLOWED_REVIEW_STATUS.has(normalizedStatus)) {
+        throw new Error('status must be one of: approved, rejected, pending');
+    }
+
+    const conn = await pool.getConnection();
+    try {
+        await conn.beginTransaction();
+
+        const [recipeRows] = await conn.query(
+            `SELECT recipeId, userId, status
+             FROM Recipes
+             WHERE recipeId = ?
+             LIMIT 1
+             FOR UPDATE`,
+            [parsedRecipeId]
+        );
+
+        if (recipeRows.length === 0) {
+            await conn.rollback();
+            return {
+                success: false,
+                data: null,
+                message: 'Recipe not found'
+            };
+        }
+
+        const currentStatus = String(recipeRows[0].status || '').toLowerCase();
+        const ownerUserId = Number(recipeRows[0].userId);
+
+        if (currentStatus === normalizedStatus) {
+            await conn.commit();
+            return {
+                success: true,
+                data: {
+                    recipeId: parsedRecipeId,
+                    status: normalizedStatus
+                },
+                message: 'Recipe status updated successfully'
+            };
+        }
+
+        await conn.query(
+            'UPDATE Recipes SET status = ? WHERE recipeId = ?',
+            [normalizedStatus, parsedRecipeId]
+        );
+
+        if (currentStatus !== RECIPE_STATUS.APPROVED && normalizedStatus === RECIPE_STATUS.APPROVED) {
+            await conn.query(
+                'UPDATE Users SET recipeCount = recipeCount + 1 WHERE userId = ?',
+                [ownerUserId]
+            );
+        }
+
+        if (currentStatus === RECIPE_STATUS.APPROVED && normalizedStatus !== RECIPE_STATUS.APPROVED) {
+            await conn.query(
+                'UPDATE Users SET recipeCount = GREATEST(recipeCount - 1, 0) WHERE userId = ?',
+                [ownerUserId]
+            );
+        }
+
+        await conn.commit();
+
+        return {
+            success: true,
+            data: {
+                recipeId: parsedRecipeId,
+                status: normalizedStatus
+            },
+            message: 'Recipe status updated successfully'
+        };
+    } catch (error) {
+        await conn.rollback();
+        console.error('Error in reviewRecipe:', error);
+        throw error;
+    } finally {
+        conn.release();
+    }
+};
+
 exports.getRecipeGrowthByMonth = async () => {
     try {
         const [rows] = await pool.query(`
@@ -597,9 +752,10 @@ exports.getRecipeGrowthByMonth = async () => {
                 MONTH(createdAt) AS month,
                 COUNT(*) AS recipeCount
             FROM Recipes
+            WHERE status = ?
             GROUP BY YEAR(createdAt), MONTH(createdAt)
             ORDER BY YEAR(createdAt) DESC, MONTH(createdAt) DESC
-        `);
+        `, [RECIPE_STATUS.APPROVED]);
 
         const report = rows.map(row => ({
             year: Number(row.year),
