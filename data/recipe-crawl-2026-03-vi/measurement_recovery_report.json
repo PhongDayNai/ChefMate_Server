@@ -1,0 +1,265 @@
+{
+  "measurementRecoveryChanged": 635,
+  "examples": [
+    {
+      "recipeIndex": 1,
+      "ingredientIndex": 1,
+      "en": "cauliflower (1.5kg), cut into florets",
+      "old": {
+        "w": 1,
+        "u": "đơn vị"
+      },
+      "new": {
+        "w": 1.5,
+        "u": "kg"
+      }
+    },
+    {
+      "recipeIndex": 1,
+      "ingredientIndex": 2,
+      "en": "½ tbsp ground cumin",
+      "old": {
+        "w": 1,
+        "u": "đơn vị"
+      },
+      "new": {
+        "w": 0.5,
+        "u": "muỗng canh"
+      }
+    },
+    {
+      "recipeIndex": 1,
+      "ingredientIndex": 8,
+      "en": "750-850ml veg or chicken stock",
+      "old": {
+        "w": 1,
+        "u": "đơn vị"
+      },
+      "new": {
+        "w": 850,
+        "u": "ml"
+      }
+    },
+    {
+      "recipeIndex": 4,
+      "ingredientIndex": 7,
+      "en": "½ tsp ground cinnamon",
+      "old": {
+        "w": 1,
+        "u": "đơn vị"
+      },
+      "new": {
+        "w": 0.5,
+        "u": "muỗng cà phê"
+      }
+    },
+    {
+      "recipeIndex": 4,
+      "ingredientIndex": 8,
+      "en": "½ tsp chilli flakes",
+      "old": {
+        "w": 1,
+        "u": "đơn vị"
+      },
+      "new": {
+        "w": 0.5,
+        "u": "muỗng cà phê"
+      }
+    },
+    {
+      "recipeIndex": 5,
+      "ingredientIndex": 5,
+      "en": "½ tsp cumin seeds",
+      "old": {
+        "w": 1,
+        "u": "đơn vị"
+      },
+      "new": {
+        "w": 0.5,
+        "u": "muỗng cà phê"
+      }
+    },
+    {
+      "recipeIndex": 5,
+      "ingredientIndex": 13,
+      "en": "½ tsp ground turmeric",
+      "old": {
+        "w": 1,
+        "u": "đơn vị"
+      },
+      "new": {
+        "w": 0.5,
+        "u": "muỗng cà phê"
+      }
+    },
+    {
+      "recipeIndex": 6,
+      "ingredientIndex": 15,
+      "en": "½ tbsp  sesame oil",
+      "old": {
+        "w": 1,
+        "u": "đơn vị"
+      },
+      "new": {
+        "w": 0.5,
+        "u": "muỗng canh"
+      }
+    },
+    {
+      "recipeIndex": 6,
+      "ingredientIndex": 18,
+      "en": "¾ tbsp  light brown soft sugar",
+      "old": {
+        "w": 1,
+        "u": "đơn vị"
+      },
+      "new": {
+        "w": 0.75,
+        "u": "muỗng canh"
+      }
+    },
+    {
+      "recipeIndex": 7,
+      "ingredientIndex": 3,
+      "en": "(about 800g)",
+      "old": {
+        "w": 1,
+        "u": "đơn vị"
+      },
+      "new": {
+        "w": 800,
+        "u": "g"
+      }
+    },
+    {
+      "recipeIndex": 9,
+      "ingredientIndex": 10,
+      "en": "½ cinnamon stick or 1 tsp ground cinnamon",
+      "old": {
+        "w": 1,
+        "u": "đơn vị"
+      },
+      "new": {
+        "w": 1,
+        "u": "muỗng cà phê"
+      }
+    },
+    {
+      "recipeIndex": 10,
+      "ingredientIndex": 15,
+      "en": "1-2 tbsp  light soy sauce",
+      "old": {
+        "w": 1,
+        "u": "đơn vị"
+      },
+      "new": {
+        "w": 2,
+        "u": "muỗng canh"
+      }
+    },
+    {
+      "recipeIndex": 11,
+      "ingredientIndex": 1,
+      "en": "courgette (approx 120g), coarsely grated",
+      "old": {
+        "w": 1,
+        "u": "đơn vị"
+      },
+      "new": {
+        "w": 120,
+        "u": "g"
+      }
+    },
+    {
+      "recipeIndex": 11,
+      "ingredientIndex": 3,
+      "en": "½ tsp baking powder",
+      "old": {
+        "w": 1,
+        "u": "đơn vị"
+      },
+      "new": {
+        "w": 0.5,
+        "u": "muỗng cà phê"
+      }
+    },
+    {
+      "recipeIndex": 11,
+      "ingredientIndex": 8,
+      "en": "4-5 tbsp milk plus extra for brushing",
+      "old": {
+        "w": 1,
+        "u": "đơn vị"
+      },
+      "new": {
+        "w": 5,
+        "u": "muỗng canh"
+      }
+    },
+    {
+      "recipeIndex": 12,
+      "ingredientIndex": 9,
+      "en": "¼ tsp  salt",
+      "old": {
+        "w": 1,
+        "u": "đơn vị"
+      },
+      "new": {
+        "w": 0.25,
+        "u": "muỗng cà phê"
+      }
+    },
+    {
+      "recipeIndex": 12,
+      "ingredientIndex": 13,
+      "en": "½ tsp  almond extract",
+      "old": {
+        "w": 1,
+        "u": "đơn vị"
+      },
+      "new": {
+        "w": 0.5,
+        "u": "muỗng cà phê"
+      }
+    },
+    {
+      "recipeIndex": 20,
+      "ingredientIndex": 8,
+      "en": "½ tsp sweet smoked paprika",
+      "old": {
+        "w": 1,
+        "u": "đơn vị"
+      },
+      "new": {
+        "w": 0.5,
+        "u": "muỗng cà phê"
+      }
+    },
+    {
+      "recipeIndex": 21,
+      "ingredientIndex": 6,
+      "en": "½ tsp  ground turmeric",
+      "old": {
+        "w": 1,
+        "u": "đơn vị"
+      },
+      "new": {
+        "w": 0.5,
+        "u": "muỗng cà phê"
+      }
+    },
+    {
+      "recipeIndex": 21,
+      "ingredientIndex": 7,
+      "en": "½ tsp  chilli powder",
+      "old": {
+        "w": 1,
+        "u": "đơn vị"
+      },
+      "new": {
+        "w": 0.5,
+        "u": "muỗng cà phê"
+      }
+    }
+  ]
+}
