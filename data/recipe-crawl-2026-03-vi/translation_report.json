@@ -1,0 +1,9 @@
+{
+  "totalRecipes": 1000,
+  "totalSteps": 3893,
+  "suspiciousEnglishSteps": 3462,
+  "stepVietnameseCoveragePercent": 11.07,
+  "totalIngredients": 11232,
+  "suspiciousEnglishIngredients": 149,
+  "ingredientVietnameseCoveragePercent": 98.67
+}
