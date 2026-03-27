@@ -1,0 +1,201 @@
+{
+  "range": {
+    "from": 601,
+    "to": 700
+  },
+  "totalPatches": 57,
+  "recipesAffected": 44,
+  "patchesPerRecipe": [
+    {
+      "recipeIndex": 601,
+      "count": 1
+    },
+    {
+      "recipeIndex": 602,
+      "count": 3
+    },
+    {
+      "recipeIndex": 606,
+      "count": 1
+    },
+    {
+      "recipeIndex": 609,
+      "count": 1
+    },
+    {
+      "recipeIndex": 612,
+      "count": 2
+    },
+    {
+      "recipeIndex": 613,
+      "count": 1
+    },
+    {
+      "recipeIndex": 614,
+      "count": 2
+    },
+    {
+      "recipeIndex": 617,
+      "count": 1
+    },
+    {
+      "recipeIndex": 618,
+      "count": 1
+    },
+    {
+      "recipeIndex": 622,
+      "count": 2
+    },
+    {
+      "recipeIndex": 625,
+      "count": 1
+    },
+    {
+      "recipeIndex": 628,
+      "count": 1
+    },
+    {
+      "recipeIndex": 629,
+      "count": 1
+    },
+    {
+      "recipeIndex": 631,
+      "count": 2
+    },
+    {
+      "recipeIndex": 633,
+      "count": 2
+    },
+    {
+      "recipeIndex": 637,
+      "count": 1
+    },
+    {
+      "recipeIndex": 639,
+      "count": 2
+    },
+    {
+      "recipeIndex": 640,
+      "count": 2
+    },
+    {
+      "recipeIndex": 643,
+      "count": 1
+    },
+    {
+      "recipeIndex": 645,
+      "count": 1
+    },
+    {
+      "recipeIndex": 646,
+      "count": 1
+    },
+    {
+      "recipeIndex": 647,
+      "count": 1
+    },
+    {
+      "recipeIndex": 648,
+      "count": 1
+    },
+    {
+      "recipeIndex": 650,
+      "count": 1
+    },
+    {
+      "recipeIndex": 651,
+      "count": 1
+    },
+    {
+      "recipeIndex": 656,
+      "count": 1
+    },
+    {
+      "recipeIndex": 659,
+      "count": 1
+    },
+    {
+      "recipeIndex": 666,
+      "count": 1
+    },
+    {
+      "recipeIndex": 667,
+      "count": 1
+    },
+    {
+      "recipeIndex": 668,
+      "count": 1
+    },
+    {
+      "recipeIndex": 669,
+      "count": 1
+    },
+    {
+      "recipeIndex": 670,
+      "count": 2
+    },
+    {
+      "recipeIndex": 674,
+      "count": 2
+    },
+    {
+      "recipeIndex": 675,
+      "count": 1
+    },
+    {
+      "recipeIndex": 678,
+      "count": 1
+    },
+    {
+      "recipeIndex": 679,
+      "count": 1
+    },
+    {
+      "recipeIndex": 685,
+      "count": 1
+    },
+    {
+      "recipeIndex": 688,
+      "count": 3
+    },
+    {
+      "recipeIndex": 693,
+      "count": 1
+    },
+    {
+      "recipeIndex": 694,
+      "count": 1
+    },
+    {
+      "recipeIndex": 695,
+      "count": 1
+    },
+    {
+      "recipeIndex": 696,
+      "count": 1
+    },
+    {
+      "recipeIndex": 698,
+      "count": 1
+    },
+    {
+      "recipeIndex": 699,
+      "count": 1
+    }
+  ],
+  "reasonStats": {
+    "Đổi unit 'đơn vị' -> 'tép' suy ra từ EN": 35,
+    "Làm sạch ingredientName: bỏ cụm dịch lỗi/không tự nhiên": 57,
+    "Đổi unit 'đơn vị' -> 'cái' suy ra từ EN": 1,
+    "Đổi unit 'đơn vị' -> 'lá' suy ra từ EN": 1,
+    "Đổi unit 'đơn vị' -> 'nhánh' suy ra từ EN": 2,
+    "Đổi unit 'đơn vị' -> 'cây' suy ra từ EN": 2,
+    "Đổi unit 'đơn vị' -> 'thanh' suy ra từ EN": 2,
+    "Đổi unit 'đơn vị' -> 'nhúm' suy ra từ EN": 1
+  },
+  "files": {
+    "en": "/home/dhpho/workspace/projects/chefmate-server/data/recipe-crawl-2026-03/recipes.json",
+    "vi": "/home/dhpho/workspace/projects/chefmate-server/data/recipe-crawl-2026-03-vi/recipes.vi.json",
+    "patch": "/home/dhpho/workspace/projects/chefmate-server/data/recipe-crawl-2026-03-vi/patches/patch_601_700.json"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "batch": "201-300",
+  "range": {
+    "start": 201,
+    "end": 300
+  },
+  "recipesScanned": 100,
+  "recipesFlagged": 40,
+  "totalFieldChanges": 52,
+  "categoryCounts": {
+    "garlic_clove_mistranslation": 22,
+    "brand_or_html_entity_cleanup": 3,
+    "loanword_or_term_fix": 8,
+    "phrase_fluency_fix": 13,
+    "recipe_name_fix": 3,
+    "spelling_fix": 3
+  },
+  "notes": [
+    "Không chỉnh sửa trực tiếp recipes.vi.json; chỉ xuất patch + summary.",
+    "Trọng tâm sửa lỗi dịch sai \"clove\" (tỏi vs đinh hương), lỗi HTML entity m&amp, và các cụm dịch máy thiếu tự nhiên.",
+    "Một số tên món quốc tế được giữ nguyên có chủ đích, chỉ sửa các tên bị dịch sai nghĩa rõ ràng (ví dụ Old fashioned)."
+  ],
+  "outputFiles": {
+    "patch": "/home/dhpho/workspace/projects/chefmate-server/data/recipe-crawl-2026-03-vi/patches/patch_201_300.json",
+    "summary": "/home/dhpho/workspace/projects/chefmate-server/data/recipe-crawl-2026-03-vi/patches/summary_201_300.json"
+  }
+}
