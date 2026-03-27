@@ -1,7 +1,0 @@
-{
-  "changedRecipes": 876,
-  "splitOperationsAddedTags": 326,
-  "capitalizationFixes": 2542,
-  "totalTagsAfterNormalization": 5839,
-  "rule": "Split tagName by comma/semicolon/pipe/slash; capitalize first character only; keep inner letters as-is; dedupe case-insensitive per recipe."
-}
