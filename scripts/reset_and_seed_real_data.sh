@@ -40,6 +40,9 @@ docker exec -i "$MYSQL_CONTAINER" mysql -uroot -proot < "$SCHEMA_FILE"
 
 echo "[OK] Database đã được tạo lại từ $SCHEMA_FILE"
 
+echo "[2/5] Restart API để làm mới connection pool sau khi drop/create DB..."
+docker restart chefmate-api >/dev/null
+
 echo "[2/5] Chờ API sẵn sàng tại $BASE_URL ..."
 for i in $(seq 1 30); do
   code=$(curl -s -o /dev/null -w "%{http_code}" "$BASE_URL/api/users/all" || true)
