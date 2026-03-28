@@ -336,6 +336,91 @@ function resolvePeriodDays(period = 'all') {
     return null;
 }
 
+function resolveTimeBucket(hour) {
+    if (hour >= 5 && hour <= 10) return 'breakfast';
+    if (hour >= 11 && hour <= 13) return 'lunch';
+    if (hour >= 14 && hour <= 17) return 'afternoon';
+    if (hour >= 18 && hour <= 21) return 'dinner';
+    return 'late-night';
+}
+
+function parseCookingTimeToMinutes(cookingTime) {
+    const text = String(cookingTime || '').toLowerCase().trim();
+    if (!text) return null;
+
+    const hourMatch = text.match(/(\d+)\s*(giờ|hour|hours|hr|h)/i);
+    const minMatch = text.match(/(\d+)\s*(phút|minute|minutes|min|mins|m)/i);
+
+    const hours = hourMatch ? Number(hourMatch[1]) : 0;
+    const minutes = minMatch ? Number(minMatch[1]) : 0;
+
+    if (!hours && !minutes) {
+        const onlyNumber = text.match(/\d+/);
+        return onlyNumber ? Number(onlyNumber[0]) : null;
+    }
+
+    return (hours * 60) + minutes;
+}
+
+function calcMealTimeBonus({ recipeName, tags = [], cookingTime, hour }) {
+    const bucket = resolveTimeBucket(hour);
+    const haystack = `${String(recipeName || '').toLowerCase()} ${tags.map(t => String(t || '').toLowerCase()).join(' ')}`;
+
+    const hasAny = (keywords) => keywords.some(k => haystack.includes(k));
+
+    const kw = {
+        breakfast: ['bữa sáng', 'sáng', 'breakfast', 'toast', 'bánh mì', 'trứng', 'yến mạch', 'pancake', 'cháo', 'phở'],
+        lunch: ['bữa trưa', 'trưa', 'lunch', 'cơm', 'mì', 'bún', 'salad', 'canh'],
+        afternoon: ['ăn vặt', 'snack', 'tráng miệng', 'dessert', 'bánh', 'trà', 'cà phê', 'sinh tố'],
+        dinner: ['bữa tối', 'tối', 'dinner', 'cà ri', 'hầm', 'nướng', 'lẩu', 'súp', 'cá', 'gà', 'bò'],
+        lateNight: ['súp', 'cháo', 'salad', 'nhẹ', 'healthy', 'detox', 'sữa chua', 'trà']
+    };
+
+    const cookingMinutes = parseCookingTimeToMinutes(cookingTime);
+
+    let score = 0;
+
+    if (bucket === 'breakfast') {
+        if (hasAny(kw.breakfast)) score += 22;
+        if (hasAny(kw.afternoon)) score += 4;
+        if (cookingMinutes !== null) {
+            if (cookingMinutes <= 30) score += 6;
+            else if (cookingMinutes > 90) score -= 3;
+        }
+    } else if (bucket === 'lunch') {
+        if (hasAny(kw.lunch)) score += 22;
+        if (hasAny(kw.dinner)) score += 6;
+        if (cookingMinutes !== null) {
+            if (cookingMinutes <= 35) score += 5;
+            else if (cookingMinutes > 120) score -= 4;
+        }
+    } else if (bucket === 'afternoon') {
+        if (hasAny(kw.afternoon)) score += 20;
+        if (hasAny(kw.breakfast)) score += 4;
+        if (cookingMinutes !== null && cookingMinutes <= 25) score += 4;
+    } else if (bucket === 'dinner') {
+        if (hasAny(kw.dinner)) score += 22;
+        if (hasAny(kw.lunch)) score += 5;
+        if (cookingMinutes !== null) {
+            if (cookingMinutes >= 30 && cookingMinutes <= 90) score += 4;
+            else if (cookingMinutes <= 20) score -= 2;
+        }
+    } else {
+        if (hasAny(kw.lateNight)) score += 18;
+        if (hasAny(kw.afternoon)) score += 3;
+        if (cookingMinutes !== null) {
+            if (cookingMinutes <= 20) score += 8;
+            else if (cookingMinutes > 45) score -= 6;
+        }
+    }
+
+    return {
+        score,
+        bucket,
+        cookingMinutes
+    };
+}
+
 exports.getTrendingFeed = async ({ userId = null, page = 1, limit = 20, period = 'all' } = {}) => {
     try {
         const parsedPage = Math.max(Number(page) || 1, 1);
@@ -346,21 +431,10 @@ exports.getTrendingFeed = async ({ userId = null, page = 1, limit = 20, period =
         const periodClause = periodDays
             ? 'WHERE r.status = ? AND r.createdAt >= DATE_SUB(NOW(), INTERVAL ? DAY)'
             : 'WHERE r.status = ?';
-        const countParams = periodDays ? [RECIPE_STATUS.APPROVED, periodDays] : [RECIPE_STATUS.APPROVED];
+        const baseParams = periodDays ? [RECIPE_STATUS.APPROVED, periodDays] : [RECIPE_STATUS.APPROVED];
 
-        const [[countRow]] = await pool.query(
-            `SELECT COUNT(*) AS total
-             FROM Recipes r
-             ${periodClause}`,
-            countParams
-        );
-
-        const listParams = periodDays
-            ? [RECIPE_STATUS.APPROVED, periodDays, parsedLimit, offset]
-            : [RECIPE_STATUS.APPROVED, parsedLimit, offset];
-
-        const [rows] = await pool.query(
-            `SELECT 
+        const [allRows] = await pool.query(
+            `SELECT
                 r.recipeId,
                 r.recipeName,
                 r.image,
@@ -377,18 +451,88 @@ exports.getTrendingFeed = async ({ userId = null, page = 1, limit = 20, period =
                 , 2) AS trendScore
              FROM Recipes r
              JOIN Users u ON r.userId = u.userId
-             ${periodClause}
-             ORDER BY trendScore DESC, r.recipeId DESC
-             LIMIT ? OFFSET ?`,
-            listParams
+             ${periodClause}`,
+            baseParams
         );
 
-        const recipeIds = rows.map(r => Number(r.recipeId));
+        const total = Number(allRows.length || 0);
+        const totalPages = Math.max(Math.ceil(total / parsedLimit), 1);
+
+        const [[timeRow]] = await pool.query('SELECT HOUR(NOW()) AS serverHour');
+        const serverHour = Number(timeRow?.serverHour ?? new Date().getHours());
+
+        if (total === 0) {
+            return {
+                success: true,
+                data: {
+                    items: [],
+                    pagination: {
+                        page: parsedPage,
+                        limit: parsedLimit,
+                        total,
+                        totalPages,
+                        hasMore: false
+                    },
+                    period: periodDays ? `${periodDays}d` : 'all',
+                    timeContext: {
+                        serverHour,
+                        bucket: resolveTimeBucket(serverHour)
+                    }
+                },
+                message: 'Get trending feed successfully'
+            };
+        }
+
+        const allRecipeIds = allRows.map(r => Number(r.recipeId));
+        const { placeholders, params } = makeInClauseParams(allRecipeIds);
+        const [tagsRows] = await pool.query(
+            `SELECT rt.recipeId, t.tagName
+             FROM RecipesTags rt
+             JOIN Tags t ON rt.tagId = t.tagId
+             WHERE rt.recipeId IN (${placeholders})`,
+            params
+        );
+
+        const tagsByRecipeId = new Map();
+        for (const row of tagsRows) {
+            const rid = Number(row.recipeId);
+            if (!tagsByRecipeId.has(rid)) tagsByRecipeId.set(rid, []);
+            tagsByRecipeId.get(rid).push(row.tagName);
+        }
+
+        const rankedRows = allRows
+            .map(r => {
+                const rid = Number(r.recipeId);
+                const tags = tagsByRecipeId.get(rid) || [];
+                const meal = calcMealTimeBonus({
+                    recipeName: r.recipeName,
+                    tags,
+                    cookingTime: r.cookingTime,
+                    hour: serverHour
+                });
+
+                const baseTrendScore = Number(r.trendScore || 0);
+                const finalTrendScore = Number((baseTrendScore + meal.score).toFixed(2));
+
+                return {
+                    ...r,
+                    trendScore: finalTrendScore
+                };
+            })
+            .sort((a, b) => {
+                if (Number(b.trendScore) !== Number(a.trendScore)) {
+                    return Number(b.trendScore) - Number(a.trendScore);
+                }
+                return Number(b.recipeId) - Number(a.recipeId);
+            });
+
+        const pageRows = rankedRows.slice(offset, offset + parsedLimit);
+        const pageRecipeIds = pageRows.map(r => Number(r.recipeId));
 
         let items = [];
-        if (recipeIds.length > 0) {
-            const related = await fetchRecipeRelatedData(recipeIds, userId);
-            items = rows.map(recipe =>
+        if (pageRecipeIds.length > 0) {
+            const related = await fetchRecipeRelatedData(pageRecipeIds, userId);
+            items = pageRows.map(recipe =>
                 mapRecipePayload(
                     recipe,
                     related.cookingStepsRows,
@@ -399,9 +543,6 @@ exports.getTrendingFeed = async ({ userId = null, page = 1, limit = 20, period =
                 )
             );
         }
-
-        const total = Number(countRow.total || 0);
-        const totalPages = Math.max(Math.ceil(total / parsedLimit), 1);
 
         return {
             success: true,
@@ -414,7 +555,11 @@ exports.getTrendingFeed = async ({ userId = null, page = 1, limit = 20, period =
                     totalPages,
                     hasMore: parsedPage < totalPages
                 },
-                period: periodDays ? `${periodDays}d` : 'all'
+                period: periodDays ? `${periodDays}d` : 'all',
+                timeContext: {
+                    serverHour,
+                    bucket: resolveTimeBucket(serverHour)
+                }
             },
             message: 'Get trending feed successfully'
         };
