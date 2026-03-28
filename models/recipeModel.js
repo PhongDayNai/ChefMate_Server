@@ -275,9 +275,31 @@ exports.searchRecipe = async (recipeName, userId = null) => {
              FROM Recipes r
              JOIN Users u ON r.userId = u.userId
              WHERE r.status = ?
-               AND r.recipeName LIKE CONCAT('%', ?, '%') COLLATE utf8mb4_unicode_ci
+               AND (
+                    r.recipeName LIKE CONCAT('%', ?, '%') COLLATE utf8mb4_unicode_ci
+                    OR EXISTS (
+                        SELECT 1
+                        FROM RecipesIngredients ri
+                        JOIN Ingredients i ON ri.ingredientId = i.ingredientId
+                        WHERE ri.recipeId = r.recipeId
+                          AND i.ingredientName LIKE CONCAT('%', ?, '%') COLLATE utf8mb4_unicode_ci
+                    )
+                    OR EXISTS (
+                        SELECT 1
+                        FROM CookingSteps cs
+                        WHERE cs.recipeId = r.recipeId
+                          AND cs.content LIKE CONCAT('%', ?, '%') COLLATE utf8mb4_unicode_ci
+                    )
+                    OR EXISTS (
+                        SELECT 1
+                        FROM RecipesTags rt
+                        JOIN Tags t ON rt.tagId = t.tagId
+                        WHERE rt.recipeId = r.recipeId
+                          AND t.tagName LIKE CONCAT('%', ?, '%') COLLATE utf8mb4_unicode_ci
+                    )
+               )
              ORDER BY r.viewCount DESC`,
-            [RECIPE_STATUS.APPROVED, recipeName]
+            [RECIPE_STATUS.APPROVED, recipeName, recipeName, recipeName, recipeName]
         );
 
         const recipeIds = recipesRows.map(r => Number(r.recipeId));
