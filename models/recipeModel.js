@@ -369,48 +369,70 @@ function calcMealTimeBonus({ recipeName, tags = [], cookingTime, hour }) {
     const hasAny = (keywords) => keywords.some(k => haystack.includes(k));
 
     const kw = {
-        breakfast: ['bữa sáng', 'sáng', 'breakfast', 'toast', 'bánh mì', 'trứng', 'yến mạch', 'pancake', 'cháo', 'phở'],
-        lunch: ['bữa trưa', 'trưa', 'lunch', 'cơm', 'mì', 'bún', 'salad', 'canh'],
-        afternoon: ['ăn vặt', 'snack', 'tráng miệng', 'dessert', 'bánh', 'trà', 'cà phê', 'sinh tố'],
-        dinner: ['bữa tối', 'tối', 'dinner', 'cà ri', 'hầm', 'nướng', 'lẩu', 'súp', 'cá', 'gà', 'bò'],
-        lateNight: ['súp', 'cháo', 'salad', 'nhẹ', 'healthy', 'detox', 'sữa chua', 'trà']
+        breakfast: ['bữa sáng', 'breakfast', 'toast', 'bánh mì', 'trứng', 'yến mạch', 'pancake', 'cháo', 'phở'],
+        lunch: ['bữa trưa', 'lunch', 'cơm', 'mì', 'bún', 'salad', 'canh'],
+        afternoon: ['ăn vặt', 'snack', 'tráng miệng', 'dessert', 'bánh ngọt', 'trà', 'cà phê', 'sinh tố'],
+        dinner: ['bữa tối', 'dinner', 'cà ri', 'hầm', 'nướng', 'lẩu', 'súp', 'cá', 'gà', 'bò'],
+        lateNight: ['súp', 'cháo', 'salad', 'nhẹ', 'healthy', 'detox', 'sữa chua']
+    };
+
+    const match = {
+        breakfast: hasAny(kw.breakfast),
+        lunch: hasAny(kw.lunch),
+        afternoon: hasAny(kw.afternoon),
+        dinner: hasAny(kw.dinner),
+        lateNight: hasAny(kw.lateNight)
     };
 
     const cookingMinutes = parseCookingTimeToMinutes(cookingTime);
-
     let score = 0;
 
     if (bucket === 'breakfast') {
-        if (hasAny(kw.breakfast)) score += 22;
-        if (hasAny(kw.afternoon)) score += 4;
+        if (match.breakfast) score += 24;
+        if (match.lunch) score += 3;
+        if (match.afternoon) score -= 10;
+        if (match.dinner) score -= 14;
+
         if (cookingMinutes !== null) {
-            if (cookingMinutes <= 30) score += 6;
-            else if (cookingMinutes > 90) score -= 3;
+            if (cookingMinutes <= 25) score += 7;
+            else if (cookingMinutes <= 40) score += 3;
+            else if (cookingMinutes > 70) score -= 8;
         }
     } else if (bucket === 'lunch') {
-        if (hasAny(kw.lunch)) score += 22;
-        if (hasAny(kw.dinner)) score += 6;
+        if (match.lunch) score += 24;
+        if (match.dinner) score += 4;
+        if (match.afternoon) score -= 6;
+
         if (cookingMinutes !== null) {
-            if (cookingMinutes <= 35) score += 5;
-            else if (cookingMinutes > 120) score -= 4;
+            if (cookingMinutes <= 40) score += 4;
+            else if (cookingMinutes > 120) score -= 5;
         }
     } else if (bucket === 'afternoon') {
-        if (hasAny(kw.afternoon)) score += 20;
-        if (hasAny(kw.breakfast)) score += 4;
-        if (cookingMinutes !== null && cookingMinutes <= 25) score += 4;
-    } else if (bucket === 'dinner') {
-        if (hasAny(kw.dinner)) score += 22;
-        if (hasAny(kw.lunch)) score += 5;
+        if (match.afternoon) score += 22;
+        if (match.breakfast) score += 3;
+        if (match.dinner) score -= 7;
+
         if (cookingMinutes !== null) {
-            if (cookingMinutes >= 30 && cookingMinutes <= 90) score += 4;
-            else if (cookingMinutes <= 20) score -= 2;
+            if (cookingMinutes <= 25) score += 5;
+            else if (cookingMinutes > 60) score -= 4;
+        }
+    } else if (bucket === 'dinner') {
+        if (match.dinner) score += 24;
+        if (match.lunch) score += 4;
+        if (match.afternoon) score -= 8;
+
+        if (cookingMinutes !== null) {
+            if (cookingMinutes >= 25 && cookingMinutes <= 90) score += 5;
+            else if (cookingMinutes <= 15) score -= 3;
         }
     } else {
-        if (hasAny(kw.lateNight)) score += 18;
-        if (hasAny(kw.afternoon)) score += 3;
+        if (match.lateNight) score += 20;
+        if (match.afternoon) score -= 6;
+        if (match.dinner) score -= 8;
+
         if (cookingMinutes !== null) {
             if (cookingMinutes <= 20) score += 8;
-            else if (cookingMinutes > 45) score -= 6;
+            else if (cookingMinutes > 45) score -= 7;
         }
     }
 
