@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS Users (
 
 CREATE TABLE IF NOT EXISTS Recipes (
   recipeId INT PRIMARY KEY AUTO_INCREMENT,
-  recipeName VARCHAR(100) NOT NULL,
+  recipeName VARCHAR(255) NOT NULL,
   image VARCHAR(1000) NOT NULL,
   likeQuantity INT NOT NULL DEFAULT 0,
   cookingTime VARCHAR(20) NOT NULL,
@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS Recipes (
 
 CREATE TABLE IF NOT EXISTS Tags (
   tagId INT PRIMARY KEY AUTO_INCREMENT,
-  tagName VARCHAR(100) NOT NULL,
+  tagName VARCHAR(255) NOT NULL,
   UNIQUE KEY uq_tag_name (tagName)
 ) ENGINE=InnoDB;
 
@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS RecipesTags (
 
 CREATE TABLE IF NOT EXISTS Ingredients (
   ingredientId INT PRIMARY KEY AUTO_INCREMENT,
-  ingredientName VARCHAR(100) NOT NULL,
+  ingredientName VARCHAR(255) NOT NULL,
   UNIQUE KEY uq_ingredient_name (ingredientName)
 ) ENGINE=InnoDB;
 
