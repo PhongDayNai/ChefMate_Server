@@ -41,6 +41,10 @@
       "description": "Session chat nấu ăn, chọn món, gửi message và history."
     },
     {
+      "name": "AIChatV2",
+      "description": "Meal session chat nhiều món (multi-recipes) với cơ chế chọn focus món chính và xác nhận trước khi chuyển món."
+    },
+    {
       "name": "FlowGuide",
       "description": "Mô tả flow tích hợp gợi ý cho client."
     }
@@ -1384,6 +1388,215 @@
         },
         "operationId": "resolvePreviousChatSession"
       }
+    },
+    "/api/ai-chat/v2/sessions/meal": {
+      "post": {
+        "tags": [
+          "AIChatV2"
+        ],
+        "summary": "Create meal chat session (multi-recipes)",
+        "description": "Tạo session v2 cho 1 bữa có nhiều món. Khi có hơn 1 món, mặc định chưa set activeRecipeId để client hỏi user chọn món focus trước.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MealSessionCreateRequest"
+              },
+              "example": {
+                "userId": 4,
+                "title": "Bữa tối 3 món",
+                "recipeIds": [
+                  123,
+                  124,
+                  125
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          }
+        },
+        "operationId": "createMealSessionV2"
+      }
+    },
+    "/api/ai-chat/v2/sessions/meal/recipes": {
+      "patch": {
+        "tags": [
+          "AIChatV2"
+        ],
+        "summary": "Replace meal recipes in a session",
+        "description": "Thay toàn bộ danh sách món trong session meal v2. Nếu >1 món và primary cũ không còn hợp lệ thì activeRecipeId sẽ để null để client hỏi user chọn focus.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MealSessionReplaceRecipesRequest"
+              },
+              "example": {
+                "userId": 4,
+                "chatSessionId": 88,
+                "recipes": [
+                  {
+                    "recipeId": 124,
+                    "sortOrder": 1,
+                    "status": "cooking",
+                    "note": "Món mở màn"
+                  },
+                  {
+                    "recipeId": 123,
+                    "sortOrder": 2,
+                    "status": "pending"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "operationId": "replaceMealRecipesV2"
+      }
+    },
+    "/api/ai-chat/v2/sessions/meal/primary-recipe": {
+      "patch": {
+        "tags": [
+          "AIChatV2"
+        ],
+        "summary": "Set primary (focus) recipe in meal session",
+        "description": "Set món focus cho chat v2. recipeId có thể null để clear focus. Nếu set recipeId thì món đó phải tồn tại trong meal session và còn pending/cooking.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MealSessionSetPrimaryRequest"
+              },
+              "example": {
+                "userId": 4,
+                "chatSessionId": 88,
+                "recipeId": 124
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "operationId": "setMealPrimaryRecipeV2"
+      }
+    },
+    "/api/ai-chat/v2/sessions/meal/recipes/status": {
+      "patch": {
+        "tags": [
+          "AIChatV2"
+        ],
+        "summary": "Update status of one recipe in meal session",
+        "description": "Đổi trạng thái 1 món trong meal session. Nếu đóng món đang focus (done/skipped), server sẽ trả `code=PENDING_PRIMARY_RECIPE_SWITCH_CONFIRMATION` để client confirm chuyển món focus trước khi chốt.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MealSessionUpdateStatusRequest"
+              },
+              "examples": {
+                "NormalUpdate": {
+                  "value": {
+                    "userId": 4,
+                    "chatSessionId": 88,
+                    "recipeId": 124,
+                    "status": "cooking"
+                  }
+                },
+                "ConfirmSwitchFocus": {
+                  "value": {
+                    "userId": 4,
+                    "chatSessionId": 88,
+                    "recipeId": 124,
+                    "status": "done",
+                    "confirmSwitchPrimary": true,
+                    "nextPrimaryRecipeId": 123
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK (normal hoặc pending confirm switch)"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "operationId": "updateMealRecipeStatusV2"
+      }
+    },
+    "/api/ai-chat/v2/messages": {
+      "post": {
+        "tags": [
+          "AIChatV2"
+        ],
+        "summary": "Chat with AI v2 (multi-recipes context)",
+        "description": "Chat AI v2 với context nhiều món + pantry + diet notes. Nếu không truyền chatSessionId thì dùng session gần nhất khi useUnifiedSession=true.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChatMessageV2Request"
+              },
+              "example": {
+                "userId": 4,
+                "chatSessionId": 88,
+                "message": "Lên timeline nấu 2 món này trong 45 phút giúp tôi",
+                "stream": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "503": {
+            "$ref": "#/components/responses/AIServerBusy"
+          }
+        },
+        "operationId": "sendChatMessageV2"
+      }
     }
   },
   "components": {
@@ -1594,6 +1807,191 @@
             "type": "boolean",
             "default": true,
             "description": "Mặc định true. Nếu false và không có chatSessionId thì server sẽ tạo session mới theo nhánh cũ."
+          }
+        }
+      },
+      "MealRecipeSelection": {
+        "type": "object",
+        "required": [
+          "recipeId"
+        ],
+        "properties": {
+          "recipeId": {
+            "type": "integer"
+          },
+          "sortOrder": {
+            "type": "integer",
+            "nullable": true
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "cooking",
+              "done",
+              "skipped"
+            ],
+            "default": "pending"
+          },
+          "servingsOverride": {
+            "type": "number",
+            "nullable": true
+          },
+          "note": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "MealSessionCreateRequest": {
+        "type": "object",
+        "required": [
+          "userId"
+        ],
+        "properties": {
+          "userId": {
+            "type": "integer"
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "recipeIds": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "nullable": true
+          },
+          "recipes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MealRecipeSelection"
+            },
+            "nullable": true
+          }
+        }
+      },
+      "MealSessionReplaceRecipesRequest": {
+        "type": "object",
+        "required": [
+          "userId",
+          "chatSessionId"
+        ],
+        "properties": {
+          "userId": {
+            "type": "integer"
+          },
+          "chatSessionId": {
+            "type": "integer"
+          },
+          "recipeIds": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "nullable": true
+          },
+          "recipes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MealRecipeSelection"
+            },
+            "nullable": true
+          }
+        }
+      },
+      "MealSessionSetPrimaryRequest": {
+        "type": "object",
+        "required": [
+          "userId",
+          "chatSessionId"
+        ],
+        "properties": {
+          "userId": {
+            "type": "integer"
+          },
+          "chatSessionId": {
+            "type": "integer"
+          },
+          "recipeId": {
+            "type": "integer",
+            "nullable": true,
+            "description": "null để clear focus; nếu có giá trị thì phải là món pending/cooking trong meal session"
+          }
+        }
+      },
+      "MealSessionUpdateStatusRequest": {
+        "type": "object",
+        "required": [
+          "userId",
+          "chatSessionId",
+          "recipeId",
+          "status"
+        ],
+        "properties": {
+          "userId": {
+            "type": "integer"
+          },
+          "chatSessionId": {
+            "type": "integer"
+          },
+          "recipeId": {
+            "type": "integer"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "cooking",
+              "done",
+              "skipped"
+            ]
+          },
+          "note": {
+            "type": "string",
+            "nullable": true
+          },
+          "confirmSwitchPrimary": {
+            "type": "boolean",
+            "default": false,
+            "description": "true để xác nhận chuyển focus khi vừa đóng món đang focus"
+          },
+          "nextPrimaryRecipeId": {
+            "type": "integer",
+            "nullable": true,
+            "description": "chọn món focus tiếp theo trong danh sách pending/cooking"
+          }
+        }
+      },
+      "ChatMessageV2Request": {
+        "type": "object",
+        "required": [
+          "userId",
+          "message"
+        ],
+        "properties": {
+          "userId": {
+            "type": "integer"
+          },
+          "chatSessionId": {
+            "type": "integer",
+            "nullable": true
+          },
+          "message": {
+            "type": "string"
+          },
+          "model": {
+            "type": "string",
+            "nullable": true
+          },
+          "stream": {
+            "type": "boolean",
+            "default": false
+          },
+          "useUnifiedSession": {
+            "type": "boolean",
+            "default": true
           }
         }
       },
