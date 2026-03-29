@@ -358,28 +358,42 @@ async function addChatMessage({ chatSessionId, role, content, meta = null, conn 
     );
 }
 
-async function setSessionPrimaryRecipeByMeal(chatSessionId, userId, conn = null) {
+async function getMealSwitchCandidates(chatSessionId, conn = null) {
     const executor = conn || pool;
 
     const [rows] = await executor.query(
-        `SELECT recipeId
+        `SELECT recipeId, sortOrder
          FROM ChatSessionRecipes
          WHERE chatSessionId = ?
            AND status IN ('pending', 'cooking')
-         ORDER BY sortOrder ASC, chatSessionRecipeId ASC
-         LIMIT 1`,
+         ORDER BY sortOrder ASC, chatSessionRecipeId ASC`,
         [chatSessionId]
     );
 
-    const nextPrimary = rows.length > 0 ? Number(rows[0].recipeId) : null;
+    return rows.map(row => ({
+        recipeId: Number(row.recipeId),
+        sortOrder: Number(row.sortOrder)
+    }));
+}
+
+async function setSessionPrimaryRecipe(chatSessionId, userId, recipeId = null, conn = null) {
+    const executor = conn || pool;
+    const parsedRecipeId = recipeId === null || recipeId === undefined ? null : Number(recipeId);
 
     await executor.query(
         `UPDATE ChatSessions
          SET activeRecipeId = ?, updatedAt = CURRENT_TIMESTAMP
          WHERE chatSessionId = ? AND userId = ?`,
-        [nextPrimary, chatSessionId, userId]
+        [parsedRecipeId, chatSessionId, userId]
     );
 
+    return parsedRecipeId;
+}
+
+async function setSessionPrimaryRecipeByMeal(chatSessionId, userId, conn = null) {
+    const candidates = await getMealSwitchCandidates(chatSessionId, conn);
+    const nextPrimary = candidates.length > 0 ? candidates[0].recipeId : null;
+    await setSessionPrimaryRecipe(chatSessionId, userId, nextPrimary, conn);
     return nextPrimary;
 }
 
@@ -412,7 +426,7 @@ async function createChatSessionWithIntro({ userId, title = DEFAULT_SESSION_TITL
     return chatSessionId;
 }
 
-async function replaceMealRecipes({ chatSessionId, userId, selections = [] }, conn = null) {
+async function replaceMealRecipesInternal({ chatSessionId, userId, selections = [], autoRecomputePrimary = true }, conn = null) {
     const executor = conn || pool;
 
     const normalized = selections
@@ -455,7 +469,11 @@ async function replaceMealRecipes({ chatSessionId, userId, selections = [] }, co
         );
     }
 
-    return setSessionPrimaryRecipeByMeal(chatSessionId, userId, executor);
+    if (autoRecomputePrimary) {
+        return setSessionPrimaryRecipeByMeal(chatSessionId, userId, executor);
+    }
+
+    return null;
 }
 
 async function getMealRecipesBySession(chatSessionId) {
@@ -634,16 +652,19 @@ exports.createMealSession = async ({ userId, title, recipeIds = null, recipes = 
             await ensureRecipesApproved(selections.map(item => item.recipeId), conn);
         }
 
+        const defaultPrimary = selections.length === 1 ? Number(selections[0].recipeId) : null;
+
         const chatSessionId = await createChatSessionWithIntro({
             userId: parsedUserId,
             title: title || DEFAULT_SESSION_TITLE,
-            activeRecipeId: selections.length > 0 ? selections[0].recipeId : null
+            activeRecipeId: defaultPrimary
         }, conn);
 
-        await replaceMealRecipes({
+        await replaceMealRecipesInternal({
             chatSessionId,
             userId: parsedUserId,
-            selections
+            selections,
+            autoRecomputePrimary: false
         }, conn);
 
         await conn.commit();
@@ -658,6 +679,10 @@ exports.createMealSession = async ({ userId, title, recipeIds = null, recipes = 
                 meal: {
                     totalRecipes: mealItems.length,
                     items: mealItems
+                },
+                focus: {
+                    activeRecipeId: session?.activeRecipeId || null,
+                    needsSelection: selections.length > 1 && !session?.activeRecipeId
                 }
             },
             message: 'Create meal chat session successfully'
@@ -697,11 +722,28 @@ exports.replaceMealRecipes = async ({ userId, chatSessionId, recipeIds = null, r
     try {
         await conn.beginTransaction();
 
-        await replaceMealRecipes({
+        await replaceMealRecipesInternal({
             chatSessionId: parsedSessionId,
             userId: parsedUserId,
-            selections
+            selections,
+            autoRecomputePrimary: false
         }, conn);
+
+        if (selections.length === 0) {
+            await setSessionPrimaryRecipe(parsedSessionId, parsedUserId, null, conn);
+        } else if (selections.length === 1) {
+            await setSessionPrimaryRecipe(parsedSessionId, parsedUserId, selections[0].recipeId, conn);
+        } else {
+            // nhiều món: giữ primary cũ nếu còn tồn tại & còn pending/cooking, nếu không thì để null để client hỏi user chọn focus
+            const currentPrimary = session.activeRecipeId ? Number(session.activeRecipeId) : null;
+            const currentStillValid = currentPrimary
+                ? selections.some(item => item.recipeId === currentPrimary && (item.status === 'pending' || item.status === 'cooking'))
+                : false;
+
+            if (!currentStillValid) {
+                await setSessionPrimaryRecipe(parsedSessionId, parsedUserId, null, conn);
+            }
+        }
 
         await addChatMessage({
             chatSessionId: parsedSessionId,
@@ -729,6 +771,10 @@ exports.replaceMealRecipes = async ({ userId, chatSessionId, recipeIds = null, r
                 meal: {
                     totalRecipes: mealItems.length,
                     items: mealItems
+                },
+                focus: {
+                    activeRecipeId: updatedSession?.activeRecipeId || null,
+                    needsSelection: mealItems.length > 1 && !updatedSession?.activeRecipeId
                 }
             },
             message: 'Update meal recipes successfully'
@@ -741,7 +787,7 @@ exports.replaceMealRecipes = async ({ userId, chatSessionId, recipeIds = null, r
     }
 };
 
-exports.updateMealRecipeStatus = async ({ userId, chatSessionId, recipeId, status, note = null }) => {
+exports.updateMealRecipeStatus = async ({ userId, chatSessionId, recipeId, status, note = null, confirmSwitchPrimary = false, nextPrimaryRecipeId = null }) => {
     const parsedUserId = Number(userId);
     const parsedSessionId = Number(chatSessionId);
     const parsedRecipeId = Number(recipeId);
@@ -800,7 +846,66 @@ exports.updateMealRecipeStatus = async ({ userId, chatSessionId, recipeId, statu
             };
         }
 
-        await setSessionPrimaryRecipeByMeal(parsedSessionId, parsedUserId, conn);
+        const currentSession = await getChatSessionById(parsedSessionId, parsedUserId);
+        const currentPrimary = currentSession?.activeRecipeId ? Number(currentSession.activeRecipeId) : null;
+        const isClosingCurrentPrimary = Boolean(currentPrimary && currentPrimary === parsedRecipeId && (normalizedStatus === 'done' || normalizedStatus === 'skipped'));
+
+        const switchCandidates = await getMealSwitchCandidates(parsedSessionId, conn);
+
+        let pendingPrimarySwitch = null;
+
+        if (isClosingCurrentPrimary && switchCandidates.length > 0) {
+            if (!confirmSwitchPrimary) {
+                await conn.rollback();
+
+                const mealItemsPreview = await getMealRecipesBySession(parsedSessionId);
+
+                return {
+                    success: true,
+                    code: 'PENDING_PRIMARY_RECIPE_SWITCH_CONFIRMATION',
+                    data: {
+                        session: currentSession,
+                        recipe: mealItemsPreview.find(item => item.recipeId === parsedRecipeId) || null,
+                        meal: {
+                            totalRecipes: mealItemsPreview.length,
+                            items: mealItemsPreview
+                        },
+                        pendingSwitch: {
+                            reason: 'current_primary_recipe_finished',
+                            closedRecipeId: parsedRecipeId,
+                            closedRecipeStatus: normalizedStatus,
+                            currentPrimaryRecipeId: currentPrimary,
+                            candidateNextPrimaryRecipeIds: switchCandidates.map(item => item.recipeId),
+                            suggestedNextPrimaryRecipeId: switchCandidates[0].recipeId,
+                            confirmField: 'confirmSwitchPrimary',
+                            chooseField: 'nextPrimaryRecipeId'
+                        }
+                    },
+                    message: 'Need confirmation before switching primary recipe'
+                };
+            }
+
+            const candidateRecipeIds = new Set(switchCandidates.map(item => item.recipeId));
+            let chosenPrimary = nextPrimaryRecipeId ? Number(nextPrimaryRecipeId) : switchCandidates[0].recipeId;
+
+            if (!candidateRecipeIds.has(chosenPrimary)) {
+                throw new Error('nextPrimaryRecipeId is not found in meal session pending/cooking items');
+            }
+
+            await setSessionPrimaryRecipe(parsedSessionId, parsedUserId, chosenPrimary, conn);
+            pendingPrimarySwitch = {
+                fromRecipeId: currentPrimary,
+                toRecipeId: chosenPrimary,
+                confirmed: true
+            };
+        } else if (isClosingCurrentPrimary) {
+            await setSessionPrimaryRecipe(parsedSessionId, parsedUserId, null, conn);
+            pendingPrimarySwitch = {
+                fromRecipeId: currentPrimary,
+                toRecipeId: null,
+                confirmed: true
+            };
+        }
 
         await addChatMessage({
             chatSessionId: parsedSessionId,
@@ -810,7 +915,8 @@ exports.updateMealRecipeStatus = async ({ userId, chatSessionId, recipeId, statu
                 mealRecipeStatusUpdate: true,
                 flow: 'meal_v2',
                 recipeId: parsedRecipeId,
-                status: normalizedStatus
+                status: normalizedStatus,
+                primarySwitch: pendingPrimarySwitch
             },
             conn
         });
@@ -829,7 +935,12 @@ exports.updateMealRecipeStatus = async ({ userId, chatSessionId, recipeId, statu
                 meal: {
                     totalRecipes: mealItems.length,
                     items: mealItems
-                }
+                },
+                focus: {
+                    activeRecipeId: updatedSession?.activeRecipeId || null,
+                    needsSelection: mealItems.length > 1 && !updatedSession?.activeRecipeId
+                },
+                primarySwitch: pendingPrimarySwitch
             },
             message: 'Update meal recipe status successfully'
         };
@@ -839,6 +950,74 @@ exports.updateMealRecipeStatus = async ({ userId, chatSessionId, recipeId, statu
     } finally {
         conn.release();
     }
+};
+
+exports.setMealPrimaryRecipe = async ({ userId, chatSessionId, recipeId = null }) => {
+    const parsedUserId = Number(userId);
+    const parsedSessionId = Number(chatSessionId);
+
+    if (!parsedUserId || parsedUserId <= 0) {
+        throw new Error('userId must be a positive number');
+    }
+
+    if (!parsedSessionId || parsedSessionId <= 0) {
+        throw new Error('chatSessionId must be a positive number');
+    }
+
+    const session = await getChatSessionById(parsedSessionId, parsedUserId);
+    if (!session) {
+        return {
+            success: false,
+            data: null,
+            message: 'Chat session not found'
+        };
+    }
+
+    const parsedRecipeId = recipeId === null || recipeId === undefined ? null : Number(recipeId);
+
+    if (parsedRecipeId !== null && (!Number.isFinite(parsedRecipeId) || parsedRecipeId <= 0)) {
+        throw new Error('recipeId must be null or a positive number');
+    }
+
+    if (parsedRecipeId !== null) {
+        const [rows] = await pool.query(
+            `SELECT recipeId, status
+             FROM ChatSessionRecipes
+             WHERE chatSessionId = ? AND recipeId = ?
+             LIMIT 1`,
+            [parsedSessionId, parsedRecipeId]
+        );
+
+        if (rows.length === 0) {
+            throw new Error('nextPrimaryRecipeId is not found in meal session pending/cooking items');
+        }
+
+        const status = String(rows[0].status || '').toLowerCase();
+        if (status !== 'pending' && status !== 'cooking') {
+            throw new Error('nextPrimaryRecipeId is not found in meal session pending/cooking items');
+        }
+    }
+
+    await setSessionPrimaryRecipe(parsedSessionId, parsedUserId, parsedRecipeId);
+
+    const updatedSession = await getChatSessionById(parsedSessionId, parsedUserId);
+    const mealItems = await getMealRecipesBySession(parsedSessionId);
+
+    return {
+        success: true,
+        data: {
+            session: updatedSession,
+            meal: {
+                totalRecipes: mealItems.length,
+                items: mealItems
+            },
+            focus: {
+                activeRecipeId: updatedSession?.activeRecipeId || null,
+                needsSelection: mealItems.length > 1 && !updatedSession?.activeRecipeId
+            }
+        },
+        message: 'Set meal primary recipe successfully'
+    };
 };
 
 exports.sendMessageV2 = async ({
