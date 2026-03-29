@@ -1,5 +1,17 @@
 const aiChatV2Model = require('../models/aiChatV2Model');
 
+function isBadRequestError(error) {
+    const msg = String(error?.message || '').toLowerCase();
+
+    return [
+        'required',
+        'must be',
+        'invalid',
+        'not approved',
+        'not found in meal session'
+    ].some(keyword => msg.includes(keyword));
+}
+
 exports.createMealSession = async (req, res) => {
     const { userId, title, recipeIds, recipes } = req.body || {};
 
@@ -22,7 +34,7 @@ exports.createMealSession = async (req, res) => {
         return res.status(201).json(result);
     } catch (error) {
         console.error('Error in createMealSession:', error);
-        return res.status(500).json({
+        return res.status(isBadRequestError(error) ? 400 : 500).json({
             success: false,
             data: null,
             message: `Failed to create meal chat session: ${error.message}`
@@ -64,7 +76,7 @@ exports.replaceMealRecipes = async (req, res) => {
         return res.status(200).json(result);
     } catch (error) {
         console.error('Error in replaceMealRecipes:', error);
-        return res.status(500).json({
+        return res.status(isBadRequestError(error) ? 400 : 500).json({
             success: false,
             data: null,
             message: `Failed to update meal recipes: ${error.message}`
@@ -73,7 +85,7 @@ exports.replaceMealRecipes = async (req, res) => {
 };
 
 exports.updateMealRecipeStatus = async (req, res) => {
-    const { userId, chatSessionId, recipeId, status, note } = req.body || {};
+    const { userId, chatSessionId, recipeId, status, note, confirmSwitchPrimary, nextPrimaryRecipeId } = req.body || {};
 
     if (!userId || Number(userId) <= 0) {
         return res.status(400).json({
@@ -113,7 +125,11 @@ exports.updateMealRecipeStatus = async (req, res) => {
             chatSessionId: Number(chatSessionId),
             recipeId: Number(recipeId),
             status: String(status),
-            note: note === null || note === undefined ? null : String(note)
+            note: note === null || note === undefined ? null : String(note),
+            confirmSwitchPrimary: confirmSwitchPrimary === true,
+            nextPrimaryRecipeId: nextPrimaryRecipeId === null || nextPrimaryRecipeId === undefined
+                ? null
+                : Number(nextPrimaryRecipeId)
         });
 
         if (!result.success) {
@@ -123,10 +139,51 @@ exports.updateMealRecipeStatus = async (req, res) => {
         return res.status(200).json(result);
     } catch (error) {
         console.error('Error in updateMealRecipeStatus:', error);
-        return res.status(500).json({
+        return res.status(isBadRequestError(error) ? 400 : 500).json({
             success: false,
             data: null,
             message: `Failed to update meal recipe status: ${error.message}`
+        });
+    }
+};
+
+exports.setMealPrimaryRecipe = async (req, res) => {
+    const { userId, chatSessionId, recipeId } = req.body || {};
+
+    if (!userId || Number(userId) <= 0) {
+        return res.status(400).json({
+            success: false,
+            data: null,
+            message: 'userId is required and must be a positive number'
+        });
+    }
+
+    if (!chatSessionId || Number(chatSessionId) <= 0) {
+        return res.status(400).json({
+            success: false,
+            data: null,
+            message: 'chatSessionId is required and must be a positive number'
+        });
+    }
+
+    try {
+        const result = await aiChatV2Model.setMealPrimaryRecipe({
+            userId: Number(userId),
+            chatSessionId: Number(chatSessionId),
+            recipeId: recipeId === null || recipeId === undefined ? null : Number(recipeId)
+        });
+
+        if (!result.success) {
+            return res.status(404).json(result);
+        }
+
+        return res.status(200).json(result);
+    } catch (error) {
+        console.error('Error in setMealPrimaryRecipe:', error);
+        return res.status(isBadRequestError(error) ? 400 : 500).json({
+            success: false,
+            data: null,
+            message: `Failed to set meal primary recipe: ${error.message}`
         });
     }
 };
@@ -171,7 +228,7 @@ exports.sendMessageV2 = async (req, res) => {
         return res.status(200).json(result);
     } catch (error) {
         console.error('Error in sendMessageV2:', error);
-        return res.status(500).json({
+        return res.status(isBadRequestError(error) ? 400 : 500).json({
             success: false,
             data: null,
             message: `Failed to send message v2: ${error.message}`
