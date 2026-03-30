@@ -188,6 +188,51 @@ exports.setMealPrimaryRecipe = async (req, res) => {
     }
 };
 
+exports.completeMealSession = async (req, res) => {
+    const { userId, chatSessionId, completionType, note, markRemainingStatus } = req.body || {};
+
+    if (!userId || Number(userId) <= 0) {
+        return res.status(400).json({
+            success: false,
+            data: null,
+            message: 'userId is required and must be a positive number'
+        });
+    }
+
+    if (!chatSessionId || Number(chatSessionId) <= 0) {
+        return res.status(400).json({
+            success: false,
+            data: null,
+            message: 'chatSessionId is required and must be a positive number'
+        });
+    }
+
+    try {
+        const result = await aiChatV2Model.completeMealSession({
+            userId: Number(userId),
+            chatSessionId: Number(chatSessionId),
+            completionType: completionType === undefined ? 'completed' : String(completionType),
+            note: note === null || note === undefined ? null : String(note),
+            markRemainingStatus: markRemainingStatus === null || markRemainingStatus === undefined
+                ? null
+                : String(markRemainingStatus)
+        });
+
+        if (!result.success) {
+            return res.status(404).json(result);
+        }
+
+        return res.status(200).json(result);
+    } catch (error) {
+        console.error('Error in completeMealSession:', error);
+        return res.status(isBadRequestError(error) ? 400 : 500).json({
+            success: false,
+            data: null,
+            message: `Failed to complete meal session: ${error.message}`
+        });
+    }
+};
+
 exports.sendMessageV2 = async (req, res) => {
     const { userId, chatSessionId, message, model, stream, useUnifiedSession } = req.body || {};
 

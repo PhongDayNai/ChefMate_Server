@@ -39,6 +39,7 @@ Base path: `/api/ai-chat/v2`
 3. `PATCH /sessions/meal/primary-recipe` — set/clear món focus  
 4. `PATCH /sessions/meal/recipes/status` — cập nhật trạng thái 1 món  
 5. `POST /messages` — chat AI v2 theo context multi-recipes
+6. `PATCH /sessions/meal/complete` — đóng phiên nấu (hoàn thành / tạm dừng)
 
 Swagger đã được cập nhật trong `docs/openapi.json` (tag `AIChatV2`).
 
@@ -207,7 +208,35 @@ Lần gọi 2 (confirm):
 
 ---
 
-## 4.5 Gửi chat AI v2
+## 4.5 Đóng phiên nấu (complete meal session)
+
+### Request
+`PATCH /api/ai-chat/v2/sessions/meal/complete`
+
+```json
+{
+  "userId": 4,
+  "chatSessionId": 88,
+  "completionType": "completed",
+  "note": "Đã nấu xong bữa tối",
+  "markRemainingStatus": "done"
+}
+```
+
+### Field semantics
+- `completionType`: `completed | abandoned` (mặc định `completed`)
+- `markRemainingStatus`: `null | done | skipped`
+  - `done/skipped`: backend sẽ auto đổi toàn bộ món còn `pending/cooking` sang trạng thái này trước khi đóng phiên.
+- Backend luôn clear focus (`activeRecipeId = null`) khi đóng phiên.
+
+### Client xử lý
+- Hiển thị trạng thái phiên đã đóng.
+- Disable các action write cho phiên hiện tại (hoặc chuyển sang màn tạo phiên mới).
+- Có thể vẫn cho đọc lịch sử message/session như bình thường.
+
+---
+
+## 4.6 Gửi chat AI v2
 
 ### Request
 `POST /api/ai-chat/v2/messages`
@@ -231,8 +260,12 @@ Lần gọi 2 (confirm):
 - Backend sẽ dùng session gần nhất nếu `useUnifiedSession=true`.
 
 ### Client xử lý
-- Hiển thị `assistantMessage`.
-- Đồng bộ lại `meal` + `focus` từ response mỗi lần gửi chat.
+- Khi `200`: hiển thị `assistantMessage` và đồng bộ `meal + focus`.
+- Khi `503` + `code=AI_SERVER_BUSY`:
+  - Không append assistant fallback message.
+  - Đánh dấu bubble user vừa gửi là `failed` (dùng `failedUserMessage.content` nếu cần sync lại).
+  - Dùng `retryable=true` + `retryAfterMs` để hiện nút `Gửi lại`.
+  - Khi resend: gửi lại đúng payload `message` ban đầu (idempotent phía UI).
 
 ---
 
@@ -259,12 +292,16 @@ Transitions chính:
 
 - `400`: input sai/không hợp lệ (status sai, recipeId sai, nextPrimaryRecipeId không thuộc candidate)
 - `404`: session không tồn tại hoặc không thuộc user
-- `503` (`AI_SERVER_BUSY`): show retry UX cho chat
+- `503` (`AI_SERVER_BUSY`): show retry UX cho chat với contract:
+  - `data.retryable = true`
+  - `data.retryAfterMs` (ms)
+  - `data.failedUserMessage.content`
+  - `data.error.message`
 
 Khuyến nghị UI:
 - 400: toast ngắn + giữ nguyên state local cũ
 - 404: force reload session list/redirect về màn tạo meal mới
-- 503: giữ tin user ở trạng thái failed, cho phép resend
+- 503: giữ tin user ở trạng thái failed, cho phép resend sau `retryAfterMs`
 
 ---
 
@@ -276,8 +313,9 @@ Khuyến nghị UI:
 - [ ] Update status món + xử lý đúng `PENDING_PRIMARY_RECIPE_SWITCH_CONFIRMATION`
 - [ ] Có API set/clear primary recipe
 - [ ] Chat v2 hoạt động cả 2 mode: có sessionId và unified
+- [ ] Có API đóng phiên nấu `PATCH /sessions/meal/complete`
 - [ ] Đồng bộ lại `meal + focus` sau mọi thao tác write
-- [ ] Xử lý chuẩn 400/404/503
+- [ ] Xử lý chuẩn 400/404/503 (bao gồm resend theo `retryable/retryAfterMs`)
 
 ---
 
@@ -339,15 +377,40 @@ async function confirmSwitch(userId: number, recipeId: number, nextPrimaryRecipe
 }
 
 async function sendV2Message(userId: number, text: string) {
-  const res = await api.post('/api/ai-chat/v2/messages', {
+  try {
+    const res = await api.post('/api/ai-chat/v2/messages', {
+      userId,
+      chatSessionId: state.chatSessionId,
+      message: text,
+      stream: false
+    });
+
+    syncMeal(res.data.data);
+    appendAssistantMessage(res.data.data.assistantMessage);
+  } catch (err: any) {
+    const body = err?.response?.data;
+    if (err?.response?.status === 503 && body?.code === 'AI_SERVER_BUSY') {
+      markUserMessageFailed({
+        text: body?.data?.failedUserMessage?.content || text,
+        retryAfterMs: body?.data?.retryAfterMs || 5000,
+        canRetry: body?.data?.retryable === true
+      });
+      return;
+    }
+    throw err;
+  }
+}
+
+async function completeMealSession(userId: number) {
+  const res = await api.patch('/api/ai-chat/v2/sessions/meal/complete', {
     userId,
     chatSessionId: state.chatSessionId,
-    message: text,
-    stream: false
+    completionType: 'completed',
+    markRemainingStatus: 'done'
   });
 
   syncMeal(res.data.data);
-  appendAssistantMessage(res.data.data.assistantMessage);
+  disableWriteActionsForClosedSession();
 }
 ```
 
