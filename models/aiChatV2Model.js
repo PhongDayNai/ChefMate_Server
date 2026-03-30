@@ -1020,6 +1020,115 @@ exports.setMealPrimaryRecipe = async ({ userId, chatSessionId, recipeId = null }
     };
 };
 
+exports.completeMealSession = async ({
+    userId,
+    chatSessionId,
+    completionType = 'completed',
+    note = null,
+    markRemainingStatus = null
+}) => {
+    const parsedUserId = Number(userId);
+    const parsedSessionId = Number(chatSessionId);
+
+    if (!parsedUserId || parsedUserId <= 0) {
+        throw new Error('userId must be a positive number');
+    }
+
+    if (!parsedSessionId || parsedSessionId <= 0) {
+        throw new Error('chatSessionId must be a positive number');
+    }
+
+    const normalizedCompletionType = String(completionType || 'completed').trim().toLowerCase();
+    if (normalizedCompletionType !== 'completed' && normalizedCompletionType !== 'abandoned') {
+        throw new Error('completionType must be one of: completed, abandoned');
+    }
+
+    const normalizedMarkRemainingStatus = markRemainingStatus === null || markRemainingStatus === undefined
+        ? null
+        : String(markRemainingStatus).trim().toLowerCase();
+
+    if (normalizedMarkRemainingStatus !== null && normalizedMarkRemainingStatus !== 'done' && normalizedMarkRemainingStatus !== 'skipped') {
+        throw new Error('markRemainingStatus must be null or one of: done, skipped');
+    }
+
+    const session = await getChatSessionById(parsedSessionId, parsedUserId);
+    if (!session) {
+        return {
+            success: false,
+            data: null,
+            message: 'Chat session not found'
+        };
+    }
+
+    const conn = await pool.getConnection();
+    try {
+        await conn.beginTransaction();
+
+        if (normalizedMarkRemainingStatus) {
+            await conn.query(
+                `UPDATE ChatSessionRecipes
+                 SET status = ?,
+                     resolvedAt = CURRENT_TIMESTAMP
+                 WHERE chatSessionId = ?
+                   AND status IN ('pending', 'cooking')`,
+                [normalizedMarkRemainingStatus, parsedSessionId]
+            );
+        }
+
+        await setSessionPrimaryRecipe(parsedSessionId, parsedUserId, null, conn);
+
+        await addChatMessage({
+            chatSessionId: parsedSessionId,
+            role: 'assistant',
+            content: normalizedCompletionType === 'completed'
+                ? 'Đã hoàn thành phiên nấu cho bữa này. Khi cần mình có thể bắt đầu kế hoạch bữa mới ngay.'
+                : 'Đã đóng phiên nấu hiện tại. Khi cần mình có thể mở kế hoạch mới cho anh.',
+            meta: {
+                flow: 'meal_v2',
+                mealSessionCompleted: true,
+                completion: {
+                    type: normalizedCompletionType,
+                    note: note ? String(note).trim() : null,
+                    markRemainingStatus: normalizedMarkRemainingStatus,
+                    completedAt: new Date().toISOString()
+                }
+            },
+            conn
+        });
+
+        await conn.commit();
+
+        const updatedSession = await getChatSessionById(parsedSessionId, parsedUserId);
+        const mealItems = await getMealRecipesBySession(parsedSessionId);
+
+        return {
+            success: true,
+            data: {
+                session: updatedSession,
+                meal: {
+                    totalRecipes: mealItems.length,
+                    items: mealItems
+                },
+                focus: {
+                    activeRecipeId: updatedSession?.activeRecipeId || null,
+                    needsSelection: mealItems.length > 1 && !updatedSession?.activeRecipeId
+                },
+                completion: {
+                    type: normalizedCompletionType,
+                    note: note ? String(note).trim() : null,
+                    markRemainingStatus: normalizedMarkRemainingStatus
+                }
+            },
+            message: 'Complete meal session successfully'
+        };
+    } catch (error) {
+        await conn.rollback();
+        throw error;
+    } finally {
+        conn.release();
+    }
+};
+
 exports.sendMessageV2 = async ({
     userId,
     chatSessionId = null,
@@ -1110,8 +1219,6 @@ exports.sendMessageV2 = async ({
             .map(msg => ({ role: msg.role, content: msg.content }))
     ];
 
-    const fallbackAssistantMessage = 'Máy chủ AI đang bận hoặc tạm thời không khả dụng, anh vui lòng thử lại sau ít phút.';
-
     try {
         const aiResult = await callAiApi({
             model,
@@ -1149,19 +1256,6 @@ exports.sendMessageV2 = async ({
             message: 'Chat with AI v2 successfully'
         };
     } catch (error) {
-        await addChatMessage({
-            chatSessionId: sessionId,
-            role: 'assistant',
-            content: fallbackAssistantMessage,
-            meta: {
-                flow: 'meal_v2',
-                model,
-                error: error.message,
-                status: error.status || null,
-                payload: error.payload || null
-            }
-        });
-
         const updatedSession = await getChatSessionById(sessionId, parsedUserId);
         const updatedMealItems = await getMealRecipesBySession(sessionId);
 
@@ -1174,7 +1268,15 @@ exports.sendMessageV2 = async ({
                     totalRecipes: updatedMealItems.length,
                     items: updatedMealItems
                 },
-                assistantMessage: fallbackAssistantMessage
+                retryable: true,
+                retryAfterMs: Number(process.env.AI_CHAT_RETRY_AFTER_MS || 5000),
+                failedUserMessage: {
+                    content: String(message).trim()
+                },
+                error: {
+                    message: 'Máy chủ AI đang bận hoặc tạm thời không khả dụng, anh vui lòng thử lại sau ít phút.',
+                    status: error.status || null
+                }
             },
             message: 'AI server is busy'
         };
