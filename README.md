@@ -93,6 +93,15 @@
 - `AI_CHAT_MODEL=gemma3:4b`
 - `AI_CHAT_TIMEOUT_MS=20000`
 
+#### Security (bắt buộc trước khi chạy production)
+
+- Không commit file `.env` lên Git.
+- Dùng `.env.example` làm template và điền secret thật ở môi trường deploy.
+- Với Docker Compose, bắt buộc set các biến sau:
+  - `MYSQL_ROOT_PASSWORD`
+  - `MYSQL_PASSWORD`
+- Nên rotate ngay mọi secret đã từng hardcode hoặc đã commit trước đó (DB password, API key, token...).
+
 #### Migration DB (cho hệ thống đã chạy)
 
 Chạy thêm script:
