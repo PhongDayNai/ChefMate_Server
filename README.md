@@ -1,225 +1,262 @@
-# Hệ thống ứng dụng công thức nấu ăn - ChefMate
+# ChefMate Server API
 
-# [I. Client - Ứng dụng di động](https://github.com/PhongDayNai/ChefMate_Client)
+> Language: **English first** · [Jump to Vietnamese 🇻🇳](#-tiếng-việt)
 
-# II. Server - Máy chủ
+Backend API for ChefMate (mobile cooking assistant app), built with Express + MySQL.
 
-## 1. Công nghệ
+- Client app: https://github.com/PhongDayNai/ChefMate_Client
+- Admin web: https://github.com/PhongDayNai/ChefMate_Admin_Web
 
-- **ExpressJS**: Framework xây dựng RESTful API.
-- **SQL Server**: Quản trị cơ sở dữ liệu quan hệ.
+---
 
-## 2. Kiến trúc: Mô hình MVC API
+## 🇬🇧 English
 
-- **Models**:
-    - **Chức năng**: Định nghĩa cấu trúc dữ liệu và tương tác với cơ sở dữ liệu.
-    - **Vai trò**: Đảm bảo dữ liệu xử lý nhất quán, không phụ thuộc vào yêu cầu client.
-- **Controllers**:
-    - **Chức năng**: Xử lý yêu cầu HTTP (GET, POST, PUT, DELETE), gọi Model để thực hiện logic và trả về JSON.
-    - **Vai trò**: Trung gian giữa client và Model, định dạng phản hồi đúng cách.
-- **Routes**:
-    - **Chức năng**: Định nghĩa endpoint API (URL) và ánh xạ tới hàm trong Controllers.
-    - **Vai trò**: Tổ chức điểm truy cập API, hỗ trợ mở rộng và bảo trì.
-- **Cơ sở dữ liệu**: Microsoft SQL Server lưu trữ, quản lý và truy xuất dữ liệu hiệu quả, tích hợp tốt với MVC API.
+## 1) Overview
 
-## 3. Tính năng
+ChefMate Server provides:
+- User authentication and profile APIs
+- Recipe management (create/search/trending/tags/ingredients)
+- Social interactions (likes/comments/views)
+- Pantry management per user
+- AI Chat cooking assistant:
+  - **V1**: single active recipe per chat session
+  - **V2**: multi-recipe meal session with focus recipe switching flow
 
-| User | Recipe | Interaction |
-| --- | --- | --- |
-| Đăng nhập bằng số điện thoại hoặc email | Lấy toàn bộ công thức | Yêu thích công thức nấu ăn |
-| Đăng ký | Tìm kiếm công thức theo tên | Bình luận công thức nấu ăn |
-| Đổi mật khẩu | Tìm kiếm công thức theo tag | Tăng số lượt xem công thức |
-| Chỉnh sửa thông tin cá nhân | Tạo công thức nấu ăn mới | Lấy tất cả bình luận |
-| Lấy toàn bộ người dùng | Lấy danh sách đăng công thức nấu ăn công khai của cá nhân | Xóa bình luận |
-|  | Lấy danh sách công thức Top Trending |  |
-|  | Lấy danh sách nguyên liệu sẵn có |  |
-|  | Lấy danh sách tag sẵn có |  |
+## 2) Tech Stack
+
+- Node.js + Express
+- MySQL
+- Docker / Docker Compose
+- OpenAPI (Swagger)
+
+## 3) Main Features
 
 ### User
+- Register / Login (phone or email)
+- Update profile
+- Change/reset password
+- Get users list
 
-- [x]  Đăng nhập
-- [x]  Đăng ký
-- [x]  Đổi mật khẩu
-- [x]  Chỉnh sửa thông tin cá nhân
-- [x]  Lấy toàn bộ người dùng
+### Recipe
+- Get all recipes
+- Search by name / tags
+- Create recipe
+- Trending recipes
+- Ingredient and tag lists
 
-### b. Recipe
+### Interaction
+- Like recipe
+- Comment recipe
+- Delete comment
+- Increase recipe views
 
-- [x]  Lấy toàn bộ công thức nấu ăn
-- [x]  Tìm kiếm công thức theo tên
-- [x]  Tìm kiếm công thức theo tag
-- [x]  Tạo công thức nấu ăn mới
-- [x]  Lấy danh sách đăng công thức nấu ăn công khai của cá nhân
-- [x]  Lấy danh sách công thức Top Trending
-- [x]  Lấy danh sách nguyên liệu sẵn có
-- [x]  Lấy danh sách tag sẵn có
+### Pantry + AI Chat
+- Pantry per user (`PantryItems`)
+- Recipe recommendations from pantry
+- Chat session history (`ChatSessions`, `ChatMessages`)
+- AI Chat V1 and V2 endpoints
 
-### c. Interaction
+## 4) AI Chat V2 (Multi-Recipe)
 
-- [x]  Yêu thích công thức nấu ăn
-- [x]  Bình luận công thức nấu ăn
-- [x]  Tăng số lượt xem công thức
-- [x]  Lấy tất cả bình luận
-- [x]  Xóa bình luận
+V2 is designed for “one meal with multiple dishes”.
 
-### d. Pantry + AI Chat (New)
+Core flow:
+1. Create meal session with multiple recipes
+2. Set/clear primary (focus) recipe
+3. Update recipe status (`pending | cooking | done | skipped`)
+4. If closing current focus recipe, backend returns
+   `PENDING_PRIMARY_RECIPE_SWITCH_CONFIRMATION`
+5. Client confirms the next focus recipe
 
-- [x] Tủ lạnh theo từng user (`PantryItems`)
-- [x] Gợi ý món theo tủ lạnh: `Đủ để nấu ngay` + `Còn thiếu 1 chút`
-- [x] AI Chat theo phiên, lưu lịch sử riêng cho từng user (`ChatSessions`, `ChatMessages`)
-- [x] Cho phép gắn món đang nấu (`activeRecipeId`) để AI giữ ngữ cảnh
-- [x] Khi AI API lỗi: trả về fallback `AI_SERVER_BUSY` + message server bận
+Detailed client guide:
+- `docs/CLIENT_CHAT_V2_INTEGRATION_GUIDE.md`
+- Quick links: `docs/AI_CHAT_V2_LINKS.md`
 
-#### API mới
+## 5) API Documentation
 
-- `GET /api/pantry?userId={id}`
-- `POST /api/pantry/upsert`
-  - body: `{ userId, ingredientName, quantity, unit, expiresAt? }`
-- `DELETE /api/pantry/delete`
-  - body: `{ userId, pantryItemId }`
-- `POST /api/ai-chat/sessions`
-  - body: `{ userId, title?, activeRecipeId? }`
-- `GET /api/ai-chat/sessions/:sessionId?userId={id}`
-- `PATCH /api/ai-chat/sessions/active-recipe`
-  - body: `{ userId, chatSessionId, recipeId|null }`
-- `POST /api/ai-chat/recommendations-from-pantry`
-  - body: `{ userId, limit? }`
-- `POST /api/ai-chat/messages`
-  - body: `{ userId, chatSessionId?, message, model?, stream?, activeRecipeId? }`
+After starting server:
+- Swagger UI: `/api-docs`
+- OpenAPI JSON: `/api-docs/openapi.json`
+- OpenAPI file in repo: `docs/openapi.json`
 
-#### Biến môi trường AI
+## 6) Run with Docker (recommended)
 
-- `AI_CHAT_API_URL=https://your-ai-api-url.com`
-- `AI_CHAT_MODEL=gemma3:4b`
-- `AI_CHAT_TIMEOUT_MS=20000`
+### 6.1 Prerequisites
+- Docker
+- Docker Compose
 
-#### Security (bắt buộc trước khi chạy production)
-
-- Không commit file `.env` lên Git.
-- Dùng `.env.example` làm template và điền secret thật ở môi trường deploy.
-- Với Docker Compose, bắt buộc set các biến sau:
-  - `MYSQL_ROOT_PASSWORD`
-  - `MYSQL_PASSWORD`
-- Nên rotate ngay mọi secret đã từng hardcode hoặc đã commit trước đó (DB password, API key, token...).
-
-#### Migration DB (cho hệ thống đã chạy)
-
-Chạy thêm script:
+### 6.2 Environment
+Create `.env` from template:
 
 ```bash
-mysql -h <host> -u <user> -p <database> < scripts/migrate_ai_chat.sql
+cp .env.example .env
 ```
 
-## 4. Cơ sở dữ liệu
+Set at least these values:
+- `DB_PASSWORD`
+- `MYSQL_ROOT_PASSWORD`
+- `MYSQL_PASSWORD`
+- AI variables if needed (`AI_CHAT_API_URL`, `AI_CHAT_MODEL`, ...)
 
-<img width="852" height="540" alt="image" src="https://github.com/user-attachments/assets/3172ba07-46dc-4192-afa2-fb8d799a8ce2" />
-
-```sql
-CREATE DATABASE ChefMateDB;
-
-CREATE TABLE Users(
-  userId INT PRIMARY KEY IDENTITY(1,1),
-  fullName NVARCHAR(100) NOT NULL,
-  phone NVARCHAR(10) NOT NULL UNIQUE,
-  email NVARCHAR(50) UNIQUE,
-  passwordHash NVARCHAR(255) NOT NULL,
-  followCount INT NOT NULL DEFAULT 0,
-  recipeCount INT NOT NULL DEFAULT 0,
-  createdAt DATETIME DEFAULT GETDATE()
-);
-
-CREATE TABLE Recipes(
-  recipeId INT PRIMARY KEY IDENTITY(1,1),
-  recipeName NVARCHAR(100) NOT NULL,
-  image NVARCHAR(1000) NOT NULL,
-  likeQuantity INT DEFAULT 0,
-  cookingTime NVARCHAR(20) NOT NULL,
-  ration INT NOT NULL,
-  viewCount INT NOT NULL DEFAULT 0,
-  userId INT FOREIGN KEY REFERENCES Users(userId),
-  createdAt DATETIME DEFAULT GETDATE()
-);
-
-CREATE TABLE Tags(
-  tagId INT PRIMARY KEY IDENTITY(1,1),
-  tagName NVARCHAR(100) NOT NULL
-);
-
-CREATE TABLE RecipesTags(
-  rtId INT PRIMARY KEY IDENTITY(1,1),
-  recipeId INT FOREIGN KEY REFERENCES Recipes(recipeId),
-  tagId INT FOREIGN KEY REFERENCES Tags(tagId)
-);
-
-CREATE TABLE Ingredients(
-  ingredientId INT PRIMARY KEY IDENTITY(1,1),
-  ingredientName NVARCHAR(100) NOT NULL
-);
-
-CREATE TABLE RecipesIngredients(
-  riId INT PRIMARY KEY IDENTITY(1,1),
-  recipeId INT FOREIGN KEY REFERENCES Recipes(recipeId),
-  ingredientId INT FOREIGN KEY REFERENCES Ingredients(ingredientId),
-  weight INT NOT NULL,
-  unit NVARCHAR(20) NOT NULL
-);
-
-CREATE TABLE CookingSteps(
-  csId INT PRIMARY KEY IDENTITY(1, 1),
-  recipeId INT FOREIGN KEY REFERENCES Recipes(recipeId),
-  indexStep INT NOT NULL,
-  content NVARCHAR(4000) NOT NULL
-);
-
-CREATE TABLE UsersLike(
-  ulId INT PRIMARY KEY IDENTITY(1, 1),
-  userId INT FOREIGN KEY REFERENCES Users(userId),
-  recipeId INT FOREIGN KEY REFERENCES Recipes(recipeId)
-);
-
-CREATE TABLE UsersComment(
-  ucId INT PRIMARY KEY IDENTITY(1, 1),
-  userId INT FOREIGN KEY REFERENCES Users(userId),
-  recipeId INT FOREIGN KEY REFERENCES Recipes(recipeId),
-  content NVARCHAR(4000) NOT NULL,
-  createdAt DATE DEFAULT GETDATE()
-);
-```
-
-## 5. Cách thực hiện
-
-- Khởi động SQL server
-    - Nếu bạn sử dụng Windows:
-        - Hãy mở lên bằng cách nhấn tổ hợp phím Windows + R
-        - Sau đó nhập …
-    - Nếu bạn sử dụng Linux (Distro Ubuntu):
-        
-        ```bash
-        sudo systemctl start mssql-server
-        ```
-        
-- Khởi động ExpressJS server
+### 6.3 Start
 
 ```bash
+docker compose up -d --build
+```
+
+Default local API:
+- `http://127.0.0.1:8000`
+
+## 7) Run without Docker
+
+```bash
+npm install
 node server.js
 ```
 
-> Ở bước này nếu trong terminal hiện dòng chữ “Server đang chạy tại [http://localhost:8080](http://localhost:8080/)” và “Đã kết nối SQL Server” là server đã chạy thành công tại localhost
-> 
-- Khởi động localtunnel chạy trên port bạn chọn
+Default app port from `.env` (`PORT`, often `8080`).
+
+## 8) Database Migrations
+
+Available scripts:
+- `scripts/migrate_ai_chat.sql` (AI Chat V1)
+- `scripts/migrate_ai_chat_v2.sql` (AI Chat V2)
+
+Example:
 
 ```bash
-lt --port 8080
+mysql -h <host> -u <user> -p <database> < scripts/migrate_ai_chat_v2.sql
 ```
 
-> Sau khi chạy lệnh này và có được trả về 1 đường dẫn thì là server đã được deploy tạm thời với đường link đó.
-> 
+## 9) Security Notes (important)
 
-<aside>
-💡
+- Do **not** commit `.env`
+- Use `.env.example` as template only
+- Rotate any leaked/previously hardcoded credentials
+- Keep production secrets in deployment environment / secret manager
 
-Tips: Nếu thực hiện tải ảnh từ client nhưng không được thì các bạn hãy vào link trong terminal đó, thực hiện lấy mật khẩu và xác thực, vậy là sẽ giải quyết được vấn đề.
+---
 
-</aside>
+## 🇻🇳 Tiếng Việt
 
-# [III. Client - Admin Web](https://github.com/PhongDayNai/ChefMate_Admin_Web)
+## 1) Tổng quan
+
+ChefMate Server cung cấp:
+- API người dùng (đăng ký/đăng nhập/hồ sơ)
+- API công thức (tạo/tìm kiếm/trending)
+- API tương tác (like/comment/view)
+- Quản lý tủ lạnh theo user
+- Trợ lý AI Chat:
+  - **V1**: mỗi session tập trung 1 món (`activeRecipeId`)
+  - **V2**: 1 bữa nhiều món, có cơ chế chọn/chuyển món focus
+
+## 2) Công nghệ
+
+- Node.js + Express
+- MySQL
+- Docker / Docker Compose
+- OpenAPI (Swagger)
+
+## 3) Tính năng chính
+
+### Người dùng
+- Đăng ký / Đăng nhập (SĐT hoặc email)
+- Cập nhật hồ sơ
+- Đổi / reset mật khẩu
+- Lấy danh sách người dùng
+
+### Công thức
+- Lấy toàn bộ công thức
+- Tìm theo tên / tag
+- Tạo công thức
+- Top trending
+- Danh sách nguyên liệu / tag
+
+### Tương tác
+- Like công thức
+- Bình luận công thức
+- Xóa bình luận
+- Tăng lượt xem công thức
+
+### Tủ lạnh + AI Chat
+- Tủ lạnh theo từng user (`PantryItems`)
+- Gợi ý món theo tủ lạnh
+- Lưu lịch sử chat (`ChatSessions`, `ChatMessages`)
+- Hỗ trợ AI Chat V1 và V2
+
+## 4) AI Chat V2 (đa món)
+
+Luồng chính:
+1. Tạo meal session với nhiều món
+2. Set/clear món focus
+3. Cập nhật trạng thái từng món (`pending | cooking | done | skipped`)
+4. Khi đóng món đang focus, backend trả
+   `PENDING_PRIMARY_RECIPE_SWITCH_CONFIRMATION`
+5. Client xác nhận món focus tiếp theo
+
+Tài liệu tích hợp client:
+- `docs/CLIENT_CHAT_V2_INTEGRATION_GUIDE.md`
+- Link nhanh: `docs/AI_CHAT_V2_LINKS.md`
+
+## 5) Tài liệu API
+
+Sau khi chạy server:
+- Swagger UI: `/api-docs`
+- OpenAPI JSON: `/api-docs/openapi.json`
+- File spec trong repo: `docs/openapi.json`
+
+## 6) Chạy bằng Docker (khuyến nghị)
+
+### 6.1 Yêu cầu
+- Docker
+- Docker Compose
+
+### 6.2 Cấu hình môi trường
+Tạo `.env` từ template:
+
+```bash
+cp .env.example .env
+```
+
+Cần điền tối thiểu:
+- `DB_PASSWORD`
+- `MYSQL_ROOT_PASSWORD`
+- `MYSQL_PASSWORD`
+- Biến AI nếu cần (`AI_CHAT_API_URL`, `AI_CHAT_MODEL`, ...)
+
+### 6.3 Khởi động
+
+```bash
+docker compose up -d --build
+```
+
+API local mặc định:
+- `http://127.0.0.1:8000`
+
+## 7) Chạy không dùng Docker
+
+```bash
+npm install
+node server.js
+```
+
+Port app lấy từ `.env` (`PORT`, thường là `8080`).
+
+## 8) Migration DB
+
+Các script hiện có:
+- `scripts/migrate_ai_chat.sql` (AI Chat V1)
+- `scripts/migrate_ai_chat_v2.sql` (AI Chat V2)
+
+Ví dụ:
+
+```bash
+mysql -h <host> -u <user> -p <database> < scripts/migrate_ai_chat_v2.sql
+```
+
+## 9) Lưu ý bảo mật
+
+- **Không** commit `.env`
+- Dùng `.env.example` làm mẫu
+- Rotate các credential từng bị lộ/hardcode
+- Secret production nên lưu ở môi trường deploy/secret manager
