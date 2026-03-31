@@ -9,7 +9,7 @@ module.exports = function chatApiKeyAuth(req, res, next) {
         bearerKey = authHeader.slice(7).trim();
     }
 
-    const providedKey = headerKey || bearerKey || req.query?.authKey || req.body?.authKey;
+    const providedKey = headerKey || bearerKey;
 
     if (!providedKey || providedKey !== REQUIRED_CHAT_API_KEY) {
         return res.status(401).json({
