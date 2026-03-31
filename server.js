@@ -10,6 +10,7 @@ const pantryRoutes = require('./routes/pantryRoutes');
 const aiChatRoutes = require('./routes/aiChatRoutes');
 const aiChatV2Routes = require('./routes/aiChatV2Routes');
 const userDietRoutes = require('./routes/userDietRoutes');
+const chatApiKeyAuth = require('./middleware/chatApiKeyAuth');
 
 const app = express();
 
@@ -24,8 +25,8 @@ app.use('/api/users', userRoutes);
 app.use('/api/recipes', recipeRoutes);
 app.use('/api/interactions', interactionRoutes);
 app.use('/api/pantry', pantryRoutes);
-app.use('/api/ai-chat', aiChatRoutes);
-app.use('/api/ai-chat/v2', aiChatV2Routes);
+app.use('/api/ai-chat', chatApiKeyAuth, aiChatRoutes);
+app.use('/api/ai-chat/v2', chatApiKeyAuth, aiChatV2Routes);
 app.use('/api/user-diet-notes', userDietRoutes);
 
 app.get('/api-docs', (req, res) => {
