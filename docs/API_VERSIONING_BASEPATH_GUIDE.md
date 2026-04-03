@@ -1,52 +1,47 @@
-# API Versioning & Base Path Guide
+# API Versioning & Route Policy
 
 > Cập nhật: 2026-04-03
 
-## Tổng quan
-
-Hệ thống hiện chạy song song 2 backend:
-
-1. **Legacy server (port 8000)**
-   - Base path: `/api/...` (giữ nguyên như cũ)
-   - Auth/flow giữ tương thích cũ (đặc biệt chat dùng `x-api-key`)
-
-2. **JWT server (port 13081)**
-   - Base path: `/v2/...`
-   - Auth theo JWT + các rule mới (chat yêu cầu Bearer + `x-api-key`)
+## Kết luận ngắn
+- **Không version theo base path** kiểu `/v1/...` hay `/v2/...`.
+- Giữ route gốc dạng **`/api/...`** cho cả 2 server.
+- Version được thể hiện ở **từng API cụ thể** (ví dụ: `trending-v2`, `ai-chat/v2/...`).
 
 ---
 
-## Mapping nhanh theo cổng
+## Cách hiểu đúng về v1/v2 trong project
 
-### Port 8000 (legacy)
-- `GET http://<host>:8000/api/recipes/all`
-- `POST http://<host>:8000/api/users/login`
-- `POST http://<host>:8000/api/ai-chat/messages`
+### 1) Version theo endpoint (đúng)
+Ví dụ:
+- `GET /api/recipes/trending` (version cũ của feed)
+- `GET /api/recipes/trending-v2` (version mới của feed)
+- `POST /api/ai-chat/messages` (chat flow v1)
+- `POST /api/ai-chat/v2/messages` (chat flow v2)
 
-### Port 13081 (jwt)
-- `GET http://<host>:13081/v2/recipes/all`
-- `POST http://<host>:13081/v2/users/login`
-- `POST http://<host>:13081/v2/ai-chat/messages`
-
----
-
-## Lưu ý quan trọng cho client
-
-- Dùng đúng prefix theo môi trường:
-  - Legacy (8000): `/api`
-  - JWT (13081): `/v2`
-- Chat trên `13081` bắt buộc 2 header:
-  - `Authorization: Bearer <accessToken>`
-  - `x-api-key: __CHANGE_ME_CHAT_API_KEY__`
+### 2) Không đổi base path toàn hệ thống
+- Không dùng quy ước kiểu `/v1/users`, `/v2/users`.
+- Vẫn dùng `/api/users`, `/api/recipes`, `/api/ai-chat`...
 
 ---
 
-## Ví dụ config client
+## Chính sách theo môi trường chạy
 
-```ts
-// legacy client
-const LEGACY_BASE_URL = 'http://<host>:8000/api';
+### Port 8000 (legacy runtime)
+- Giữ nguyên route cũ: `/api/...`
 
-// jwt client
-const JWT_BASE_URL = 'http://<host>:13081/v2';
-```
+### Port 13081 (JWT runtime)
+- Cũng dùng route `/api/...`
+- Khác nhau ở auth/behavior, không khác base path.
+
+---
+
+## Ví dụ thực tế
+
+- Legacy + JWT đều gọi được:
+  - `GET /api/recipes/all`
+  - `GET /api/recipes/trending-v2`
+
+- Chat v2 endpoint:
+  - `POST /api/ai-chat/v2/messages`
+
+> Tóm lại: **v1/v2 là version nghiệp vụ của endpoint**, không phải version của toàn bộ URL prefix.
