@@ -1,7 +1,7 @@
 const pantryModel = require('../models/pantryModel');
 
 exports.getPantryByUser = async (req, res) => {
-    const userId = Number(req.query.userId || req.body?.userId);
+    const userId = Number(req.auth?.userId || req.userId || req.query.userId || req.body?.userId || 0);
 
     if (!userId || userId <= 0) {
         return res.status(400).json({
@@ -25,7 +25,8 @@ exports.getPantryByUser = async (req, res) => {
 };
 
 exports.upsertPantryItem = async (req, res) => {
-    const { userId, ingredientName, quantity, unit, expiresAt } = req.body || {};
+    const { ingredientName, quantity, unit, expiresAt } = req.body || {};
+    const userId = Number(req.auth?.userId || req.userId || req.body?.userId || 0);
 
     try {
         const result = await pantryModel.upsertPantryItem({

@@ -104,6 +104,15 @@ exports.getUserByIdentifier = async (identifier) => {
     return rows.length > 0 ? rows[0] : null;
 };
 
+exports.getUserById = async (userId) => {
+    const [rows] = await pool.query(
+        'SELECT * FROM Users WHERE userId = ? LIMIT 1',
+        [userId]
+    );
+
+    return rows.length > 0 ? rows[0] : null;
+};
+
 exports.updateUserInformation = async (userId, fullName, phone, email) => {
     const existingPhone = await this.getUserByPhone(phone);
 
