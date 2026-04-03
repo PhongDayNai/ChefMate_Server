@@ -17,7 +17,8 @@ exports.getAllRecipes = async (req, res) => {
 
 exports.createRecipe = async (req, res) => {
     console.log('req.file:', req.file);
-    const { recipeName, cookingTime, ration, ingredients, cookingSteps, userId, tags } = req.body;
+    const { recipeName, cookingTime, ration, ingredients, cookingSteps, tags } = req.body;
+    const userId = Number(req.auth?.userId || req.userId || req.body?.userId || 0);
 
     if (!recipeName || !cookingTime || !ration || !ingredients || !cookingSteps || !userId) {
         return res.status(400).json({
@@ -119,15 +120,8 @@ exports.createRecipe = async (req, res) => {
 };
 
 exports.searchRecipe = async (req, res) => {
-    if (!req.body) {
-        return res.status(400).json({
-            success: false,
-            data: null,
-            message: 'Request body is missing'
-        });
-    }
-
-    const { recipeName, userId } = req.body;
+    const recipeName = req.body?.recipeName || req.query?.q || req.query?.recipeName;
+    const userId = Number(req.auth?.userId || req.userId || req.body?.userId || req.query?.userId || 0) || null;
 
     if (!recipeName || typeof recipeName !== 'string') {
         return res.status(400).json({
@@ -173,7 +167,7 @@ exports.getAllIngredients = async (req, res) => {
 };
 
 exports.getTopTrending = async (req, res) => {
-    const { userId } = req.body;
+    const userId = Number(req.auth?.userId || req.userId || req.body?.userId || req.query?.userId || 0) || null;
 
     try {
         const result = await recipeModel.getTopTrending(userId || null);
@@ -189,7 +183,7 @@ exports.getTopTrending = async (req, res) => {
 };
 
 exports.getTrendingFeed = async (req, res) => {
-    const userId = Number(req.query.userId || req.body?.userId || 0) || null;
+    const userId = Number(req.auth?.userId || req.userId || req.query.userId || req.body?.userId || 0) || null;
     const page = Number(req.query.page || req.body?.page || 1);
     const limit = Number(req.query.limit || req.body?.limit || 20);
     const period = String(req.query.period || req.body?.period || 'all');
@@ -208,7 +202,7 @@ exports.getTrendingFeed = async (req, res) => {
 };
 
 exports.getTrendingV2 = async (req, res) => {
-    const userId = Number(req.query.userId || req.body?.userId || 0) || null;
+    const userId = Number(req.auth?.userId || req.userId || req.query.userId || req.body?.userId || 0) || null;
     const page = Number(req.query.page || req.body?.page || 1);
     const limit = Number(req.query.limit || req.body?.limit || 20);
     const period = String(req.query.period || req.body?.period || 'all');
@@ -250,15 +244,8 @@ exports.getAllTags = async (req, res) => {
 exports.searchRecipesByTag = async (req, res) => {
     console.log('req.body:', req.body);
 
-    if (!req.body) {
-        return res.status(400).json({
-            success: false,
-            data: null,
-            message: 'Request body is missing'
-        });
-    }
-
-    const { tagName, userId } = req.body;
+    const tagName = req.body?.tagName || req.query?.tagName;
+    const userId = Number(req.auth?.userId || req.userId || req.body?.userId || req.query?.userId || 0) || null;
 
     if (!tagName || typeof tagName !== 'string') {
         return res.status(400).json({
@@ -290,7 +277,7 @@ exports.searchRecipesByTag = async (req, res) => {
 };
 
 exports.getRecipesByUserId = async (req, res) => {
-    const { userId } = req.body;
+    const userId = Number(req.auth?.userId || req.userId || req.body?.userId || req.query?.userId || 0);
     const parsedUserId = parseInt(userId, 10);
 
     if (isNaN(parsedUserId) || parsedUserId <= 0) {
@@ -315,7 +302,7 @@ exports.getRecipesByUserId = async (req, res) => {
 };
 
 exports.getPendingRecipes = async (req, res) => {
-    const userId = Number(req.query.userId || req.body?.userId || 0) || null;
+    const userId = Number(req.auth?.userId || req.userId || req.query.userId || req.body?.userId || 0) || null;
 
     try {
         const result = await recipeModel.getPendingRecipes({ userId });

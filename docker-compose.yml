@@ -31,8 +31,36 @@ services:
       DB_HOST: mysql
       DB_PORT: 3306
       OPENAI_API_KEY: ${OPENAI_API_KEY}
+      PORT: 8080
+    command: ["node", "server.js"]
     ports:
       - "8000:8080"
+    volumes:
+      - ./assets:/app/assets
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  api-jwt:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: chefmate-api-jwt
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      PORT: 13081
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:-__CHANGE_ME_JWT_ACCESS_SECRET__}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-__CHANGE_ME_JWT_REFRESH_SECRET__}
+      JWT_ACCESS_EXPIRES_IN: ${JWT_ACCESS_EXPIRES_IN:-1h}
+      JWT_REFRESH_EXPIRES_IN: ${JWT_REFRESH_EXPIRES_IN:-30d}
+    command: ["node", "server.jwt.js"]
+    ports:
+      - "13081:13081"
     volumes:
       - ./assets:/app/assets
     depends_on:

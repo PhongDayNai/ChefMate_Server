@@ -2,8 +2,8 @@ const express = require('express');
 const interactionModel = require('../models/interactionModel');
 
 exports.likeRecipe = async (req, res) => {
-    const { userId, recipeId } = req.body || {};
-    const parsedUserId = Number(userId);
+    const { recipeId } = req.body || {};
+    const parsedUserId = Number(req.auth?.userId || req.userId || req.body?.userId || 0);
     const parsedRecipeId = Number(recipeId);
 
     if (!parsedUserId || parsedUserId <= 0 || !parsedRecipeId || parsedRecipeId <= 0) {
@@ -39,9 +39,10 @@ exports.addComment = async (req, res) => {
         return res.status(400).json({ error: 'Request body is missing' });
     }
 
-    const { userId, recipeId, content } = req.body;
+    const { recipeId, content } = req.body;
+    const userId = Number(req.auth?.userId || req.userId || req.body?.userId || 0);
 
-    if (!userId || typeof userId !== 'number' || userId <= 0) {
+    if (!userId || userId <= 0) {
         return res.status(400).json({ error: 'userId is required and must be a positive number' });
     }
     if (!recipeId || typeof recipeId !== 'number' || recipeId <= 0) {
@@ -94,14 +95,18 @@ exports.getAllComments = async (req, res) => {
 };
 
 exports.deleteComment = async (req, res) => {
-    const { commentId } = req.body;
+    const commentId = Number(req.body?.commentId || req.query?.commentId || 0);
+    const userId = Number(req.auth?.userId || req.userId || req.body?.userId || 0) || null;
 
     if (!commentId) {
         return res.status(400).json({ error: 'commentId is required' });
     }
 
     try {
-        const result = await interactionModel.deleteComment(commentId);
+        const result = await interactionModel.deleteComment(commentId, userId);
+        if (!result.success) {
+            return res.status(404).json(result);
+        }
         return res.status(200).json(result);
     } catch (error) {
         console.error(error);

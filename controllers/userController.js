@@ -1,5 +1,6 @@
 const userModel = require('../models/userModel');
 const bcrypt = require('bcrypt');
+const { signAccessToken, signRefreshToken, verifyRefreshToken } = require('../utils/jwtToken');
 
 exports.getAllUsers = async (req, res) => {
     try {
@@ -78,10 +79,17 @@ exports.login = async (req, res) => {
         }
 
         const { passwordHash, ...safeUser } = user;
+        const accessToken = signAccessToken(safeUser);
+        const refreshToken = signRefreshToken(safeUser);
+
         console.log(`Login successful for user: ${user.userId}`);
         res.status(200).json({
             success: true,
-            data: safeUser,
+            data: {
+                user: safeUser,
+                accessToken,
+                refreshToken
+            },
             message: 'Login successfully'
         });
     } catch (error) {
@@ -161,7 +169,8 @@ exports.changePassword = async (req, res) => {
 };
 
 exports.updateUserInformation = async (req, res) => {
-    const { userId, fullName, phone, email } = req.body;
+    const { fullName, phone, email } = req.body || {};
+    const userId = Number(req.auth?.userId || req.userId || req.body?.userId || 0);
 
     try {
         const rsUser = await userModel.updateUserInforamtion(userId, fullName, phone, email);
@@ -173,7 +182,7 @@ exports.updateUserInformation = async (req, res) => {
 };
 
 exports.getRecipesViewHistory = async (req, res) => {
-    const userId = Number(req.query.userId || req.body?.userId);
+    const userId = Number(req.auth?.userId || req.userId || req.query.userId || req.body?.userId || 0);
 
     if (!userId || userId <= 0) {
         return res.status(400).json({
@@ -192,6 +201,60 @@ exports.getRecipesViewHistory = async (req, res) => {
             success: false,
             data: null,
             message: error.message 
+        });
+    }
+};
+
+exports.refreshToken = async (req, res) => {
+    const refreshToken = String(req.body?.refreshToken || '').trim();
+
+    if (!refreshToken) {
+        return res.status(400).json({
+            success: false,
+            data: null,
+            message: 'refreshToken is required'
+        });
+    }
+
+    try {
+        const payload = verifyRefreshToken(refreshToken);
+        const userId = Number(payload?.userId || 0);
+
+        if (!userId || userId <= 0) {
+            return res.status(401).json({
+                success: false,
+                data: null,
+                message: 'Invalid refresh token payload'
+            });
+        }
+
+        const user = await userModel.getUserById(userId);
+        if (!user) {
+            return res.status(401).json({
+                success: false,
+                data: null,
+                message: 'User not found'
+            });
+        }
+
+        const { passwordHash, ...safeUser } = user;
+        const nextAccessToken = signAccessToken(safeUser);
+        const nextRefreshToken = signRefreshToken(safeUser);
+
+        return res.status(200).json({
+            success: true,
+            data: {
+                user: safeUser,
+                accessToken: nextAccessToken,
+                refreshToken: nextRefreshToken
+            },
+            message: 'Refresh token successfully'
+        });
+    } catch (error) {
+        return res.status(401).json({
+            success: false,
+            data: null,
+            message: 'Invalid or expired refresh token'
         });
     }
 };

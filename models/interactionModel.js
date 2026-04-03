@@ -237,12 +237,37 @@ exports.getAllComments = async () => {
     }
 };
 
-exports.deleteComment = async (commentId) => {
+exports.deleteComment = async (commentId, userId = null) => {
     try {
-        await pool.query(
-            'DELETE FROM UsersComment WHERE ucId = ?',
-            [commentId]
-        );
+        const parsedCommentId = Number(commentId);
+        const parsedUserId = userId === null || userId === undefined ? null : Number(userId);
+
+        if (!parsedCommentId || parsedCommentId <= 0) {
+            throw new Error('commentId is required');
+        }
+
+        let result;
+        if (parsedUserId) {
+            const [deleteResult] = await pool.query(
+                'DELETE FROM UsersComment WHERE ucId = ? AND userId = ?',
+                [parsedCommentId, parsedUserId]
+            );
+            result = deleteResult;
+        } else {
+            const [deleteResult] = await pool.query(
+                'DELETE FROM UsersComment WHERE ucId = ?',
+                [parsedCommentId]
+            );
+            result = deleteResult;
+        }
+
+        if (!Number(result.affectedRows || 0)) {
+            return {
+                success: false,
+                data: null,
+                message: 'Comment not found or not owned by user'
+            };
+        }
 
         return {
             success: true,
