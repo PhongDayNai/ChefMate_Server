@@ -11,8 +11,9 @@
 ### 1.1 Auth model mới
 - Dùng **Bearer accessToken** cho API private.
 - Dùng **refreshToken** để cấp lại accessToken.
-- **Không truyền `userId` từ client** cho các API private nữa.
+- **Không truyền `userId` từ client** cho các API private nữa (khi dùng JWT).
 - Backend tự lấy `userId` từ token.
+- Một số API public hỗ trợ **optional Bearer token** để cá nhân hoá kết quả (ví dụ `isLiked`). Không có token vẫn gọi được như public.
 
 ### 1.2 Song song 2 backend
 - Legacy: `:8000` (giữ nguyên để tương thích cũ)
@@ -102,14 +103,14 @@ Request update profile:
 
 ### Public
 - `GET /api/recipes/all`
-- `GET /api/recipes/search?q=<keyword>`
-- `POST /api/recipes/search` *(legacy-compatible)*
+- `GET /api/recipes/search?q=<keyword>` *(optional Bearer: có token thì trả `isLiked` theo user)*
+- `POST /api/recipes/search` *(legacy-compatible, optional Bearer)
 - `GET /api/recipes/ingredients`
-- `GET /api/recipes/trending?page=1&limit=20&period=all`
-- `GET /api/recipes/trending-v2?page=1&limit=20&period=all`
+- `GET /api/recipes/trending?page=1&limit=20&period=all` *(optional Bearer: có token thì `isLiked` theo user, không token thì `isLiked=false`)*
+- `GET /api/recipes/trending-v2?page=1&limit=20&period=all` *(optional Bearer tương tự)*
 - `GET /api/recipes/tags`
-- `GET /api/recipes/by-tag?tagName=<tag>`
-- `POST /api/recipes/search-by-tag` *(legacy-compatible)*
+- `GET /api/recipes/by-tag?tagName=<tag>` *(optional Bearer)*
+- `POST /api/recipes/search-by-tag` *(legacy-compatible, optional Bearer)*
 - `GET /api/recipes/growth-report`
 
 ### Private
@@ -219,8 +220,10 @@ Delete request:
 
 ## 3.6 AI Chat v1 (`/api/ai-chat`)
 
-> Tất cả endpoint dưới đây đều private và dùng Bearer token.  
-> Trên `:13081` **không dùng** `x-api-key` như legacy chat ở `:8000`.
+> Tất cả endpoint dưới đây đều private.  
+> Trên `:13081` hỗ trợ **2 cách auth cho chat**:
+> 1) `Authorization: Bearer <accessToken>` (khuyến nghị)
+> 2) `x-api-key: __CHANGE_ME_CHAT_API_KEY__` (tương thích client cũ)
 
 - `POST /sessions`
 - `GET /sessions`
@@ -282,7 +285,7 @@ Send v2 message:
 - `POST /api/recipes/user-recipes` -> `GET /api/recipes/me` (Bearer)
 - `POST /api/recipes/search-by-tag` -> `GET /api/recipes/by-tag?tagName=...`
 - `POST /api/users/update-user-information` -> `PATCH /api/users/me` (Bearer)
-- `POST /api/ai-chat/recommendations-from-pantry` -> `GET /api/ai-chat/recommendations-from-pantry` (Bearer)
+- `POST /api/ai-chat/recommendations-from-pantry` -> `GET /api/ai-chat/recommendations-from-pantry` (Bearer khuyến nghị; vẫn hỗ trợ `x-api-key` cho chat compatibility)
 
 > Legacy endpoints vẫn giữ trên `:13081` để chuyển đổi dần, nhưng client mới nên ưu tiên endpoint GET/PATCH ở trên.
 
@@ -305,7 +308,7 @@ Send v2 message:
 - [ ] Thêm flow refresh token khi gặp 401
 - [ ] Chuyển sang endpoint GET/PATCH mới theo mapping
 - [ ] Test đủ cả unauthorized (401) và authorized (200)
-- [ ] Với chat trên `:13081`, không gửi `x-api-key`
+- [ ] Với chat trên `:13081`, ưu tiên Bearer token; chỉ dùng `x-api-key` khi cần tương thích client cũ
 
 ---
 
