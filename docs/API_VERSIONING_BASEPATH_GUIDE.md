@@ -1,47 +1,41 @@
-# API Versioning & Route Policy
+# API Versioning & Migration Rule (13081)
 
 > Cập nhật: 2026-04-03
 
-## Kết luận ngắn
-- **Không version theo base path** kiểu `/v1/...` hay `/v2/...`.
-- Giữ route gốc dạng **`/api/...`** cho cả 2 server.
-- Version được thể hiện ở **từng API cụ thể** (ví dụ: `trending-v2`, `ai-chat/v2/...`).
+## Rule anh yêu cầu (đã áp dụng)
+
+### Legacy server — giữ nguyên
+- Port `8000`: tiếp tục dùng route cũ `/api/...`
+
+### JWT server — route mới
+- Port `13081`: dùng prefix version ở đầu path: `/v2/...`
+- Các endpoint có hậu tố `-v2` được chuẩn hoá theo dạng không hậu tố khi phù hợp.
+
+Ví dụ chính:
+- `13081 /api/recipes/trending-v2`  ->  `13081 /v2/recipes/trending`
 
 ---
 
-## Cách hiểu đúng về v1/v2 trong project
+## Mapping đã áp dụng trên 13081
 
-### 1) Version theo endpoint (đúng)
-Ví dụ:
-- `GET /api/recipes/trending` (version cũ của feed)
-- `GET /api/recipes/trending-v2` (version mới của feed)
-- `POST /api/ai-chat/messages` (chat flow v1)
-- `POST /api/ai-chat/v2/messages` (chat flow v2)
+### Recipes
+- `GET /v2/recipes/trending` = behavior của **trending-v2**
+- `GET /v2/recipes/trending-v1` = behavior cũ của **trending**
+- `GET /v2/recipes/trending-v2` vẫn giữ như alias tương thích tạm thời
 
-### 2) Không đổi base path toàn hệ thống
-- Không dùng quy ước kiểu `/v1/users`, `/v2/users`.
-- Vẫn dùng `/api/users`, `/api/recipes`, `/api/ai-chat`...
+### Chat
+- `POST /v2/ai-chat/...` = chat v2 meal flow (thay cho `/api/ai-chat/v2/...`)
+- `POST /v2/ai-chat-v1/...` = chat v1 flow
 
----
-
-## Chính sách theo môi trường chạy
-
-### Port 8000 (legacy runtime)
-- Giữ nguyên route cũ: `/api/...`
-
-### Port 13081 (JWT runtime)
-- Cũng dùng route `/api/...`
-- Khác nhau ở auth/behavior, không khác base path.
+### Các nhóm còn lại
+- `users` -> `/v2/users/...`
+- `interactions` -> `/v2/interactions/...`
+- `pantry` -> `/v2/pantry/...`
+- `user-diet-notes` -> `/v2/user-diet-notes/...`
 
 ---
 
-## Ví dụ thực tế
-
-- Legacy + JWT đều gọi được:
-  - `GET /api/recipes/all`
-  - `GET /api/recipes/trending-v2`
-
-- Chat v2 endpoint:
-  - `POST /api/ai-chat/v2/messages`
-
-> Tóm lại: **v1/v2 là version nghiệp vụ của endpoint**, không phải version của toàn bộ URL prefix.
+## Lưu ý auth (13081)
+- Chat (`/v2/ai-chat/*` và `/v2/ai-chat-v1/*`) bắt buộc:
+  - `Authorization: Bearer <accessToken>`
+  - `x-api-key: __CHANGE_ME_CHAT_API_KEY__`
