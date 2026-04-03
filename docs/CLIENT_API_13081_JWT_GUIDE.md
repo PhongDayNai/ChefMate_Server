@@ -104,7 +104,7 @@ Request update profile:
 ### Public
 - `GET /api/recipes/all`
 - `GET /api/recipes/search?q=<keyword>` *(optional Bearer: có token thì trả `isLiked` theo user)*
-- `POST /api/recipes/search` *(legacy-compatible, optional Bearer)
+- `POST /api/recipes/search` *(legacy-compatible, optional Bearer)*
 - `GET /api/recipes/ingredients`
 - `GET /api/recipes/trending?page=1&limit=20&period=all` *(optional Bearer: có token thì `isLiked` theo user, không token thì `isLiked=false`)*
 - `GET /api/recipes/trending-v2?page=1&limit=20&period=all` *(optional Bearer tương tự)*
@@ -252,7 +252,11 @@ Send message request:
 
 ## 3.7 AI Chat v2 (`/api/ai-chat/v2`)
 
-> Tất cả endpoint đều private.
+> Tất cả endpoint đều private.  
+> Trên `:13081`, chat v2 cũng bật chế độ bảo mật kép: **bắt buộc đồng thời**
+> 1) `Authorization: Bearer <accessToken>`
+> 2) `x-api-key: __CHANGE_ME_CHAT_API_KEY__`
+> Thiếu 1 trong 2 sẽ bị `401`.
 
 - `POST /sessions/meal`
 - `PATCH /sessions/meal/recipes`
