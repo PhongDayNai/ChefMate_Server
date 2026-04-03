@@ -613,7 +613,14 @@ async function getRecipeContexts(recipeIds = []) {
         .sort((a, b) => normalized.indexOf(a.recipeId) - normalized.indexOf(b.recipeId));
 }
 
-function buildMealPrompt({ mealItems = [], recipeContexts = [], pantryRows = [], activeDietNotes = [] }) {
+function buildMealPrompt({
+    mealItems = [],
+    recipeContexts = [],
+    pantryRows = [],
+    activeDietNotes = [],
+    activeRecipeId = null,
+    focusedRecipeContext = null
+}) {
     const recipeStatusSummary = mealItems.map(item => ({
         recipeId: item.recipeId,
         recipeName: item.recipe?.recipeName || null,
@@ -623,12 +630,24 @@ function buildMealPrompt({ mealItems = [], recipeContexts = [], pantryRows = [],
         note: item.note
     }));
 
+    const activeFocusLine = activeRecipeId
+        ? `Current focus recipeId: ${activeRecipeId}`
+        : 'Current focus recipeId: null';
+
+    const focusedRecipeLine = focusedRecipeContext
+        ? `Focused recipe detail (ưu tiên cao nhất): ${JSON.stringify(focusedRecipeContext, null, 2)}`
+        : 'Focused recipe detail (ưu tiên cao nhất): null';
+
     return [
         `Bạn là ${DEFAULT_AGENT_NAME}, trợ lý nấu ăn của ChefMate.`,
         'Luôn trả lời tiếng Việt tự nhiên, rõ ràng, thực tế và an toàn.',
         'Người dùng có thể nấu nhiều món trong một bữa, hãy tối ưu thứ tự nấu và tái sử dụng nguyên liệu/dụng cụ.',
         'Ưu tiên đưa kế hoạch theo timeline (chuẩn bị trước, món làm song song, món làm sau).',
         'Tuyệt đối tôn trọng dị ứng/hạn chế ăn uống. Nếu thiếu dữ liệu thì hỏi lại ngắn gọn.',
+        'QUY TẮC CỨNG VỀ FOCUS: nếu session có activeRecipeId và user KHÔNG nêu rõ món khác hoặc không hỏi toàn bộ bữa, phải trả lời theo món đang focus.',
+        'Chỉ trả lời theo toàn meal (nhiều món) khi user yêu cầu rõ ràng kiểu: toàn bộ bữa, thứ tự cả bữa, so sánh các món.',
+        activeFocusLine,
+        focusedRecipeLine,
         `Meal items hiện tại: ${JSON.stringify(recipeStatusSummary, null, 2)}`,
         `Chi tiết công thức các món: ${JSON.stringify(recipeContexts, null, 2)}`,
         `Pantry hiện tại: ${JSON.stringify(pantryRows, null, 2)}`,
@@ -1202,13 +1221,20 @@ exports.sendMessageV2 = async ({
         getRecentMessages(sessionId, 40)
     ]);
 
+    const activeRecipeId = session?.activeRecipeId ? Number(session.activeRecipeId) : null;
+    const focusedRecipeContext = activeRecipeId
+        ? (recipeContexts.find(item => Number(item.recipeId) === activeRecipeId) || null)
+        : null;
+
     const contextMessage = {
         role: 'system',
         content: buildMealPrompt({
             mealItems,
             recipeContexts,
             pantryRows,
-            activeDietNotes
+            activeDietNotes,
+            activeRecipeId,
+            focusedRecipeContext
         })
     };
 
