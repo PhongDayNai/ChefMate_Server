@@ -7,7 +7,7 @@
 Hệ thống hiện chạy song song 2 backend:
 
 1. **Legacy server (port 8000)**
-   - Base path: `/v1/...`
+   - Base path: `/api/...` (giữ nguyên như cũ)
    - Auth/flow giữ tương thích cũ (đặc biệt chat dùng `x-api-key`)
 
 2. **JWT server (port 13081)**
@@ -19,9 +19,9 @@ Hệ thống hiện chạy song song 2 backend:
 ## Mapping nhanh theo cổng
 
 ### Port 8000 (legacy)
-- `GET http://<host>:8000/v1/recipes/all`
-- `POST http://<host>:8000/v1/users/login`
-- `POST http://<host>:8000/v1/ai-chat/messages`
+- `GET http://<host>:8000/api/recipes/all`
+- `POST http://<host>:8000/api/users/login`
+- `POST http://<host>:8000/api/ai-chat/messages`
 
 ### Port 13081 (jwt)
 - `GET http://<host>:13081/v2/recipes/all`
@@ -32,10 +32,9 @@ Hệ thống hiện chạy song song 2 backend:
 
 ## Lưu ý quan trọng cho client
 
-- Không dùng `/api/...` nữa trên cả 2 cổng mới.
 - Dùng đúng prefix theo môi trường:
-  - Legacy: `/v1`
-  - JWT: `/v2`
+  - Legacy (8000): `/api`
+  - JWT (13081): `/v2`
 - Chat trên `13081` bắt buộc 2 header:
   - `Authorization: Bearer <accessToken>`
   - `x-api-key: __CHANGE_ME_CHAT_API_KEY__`
@@ -46,7 +45,7 @@ Hệ thống hiện chạy song song 2 backend:
 
 ```ts
 // legacy client
-const LEGACY_BASE_URL = 'http://<host>:8000/v1';
+const LEGACY_BASE_URL = 'http://<host>:8000/api';
 
 // jwt client
 const JWT_BASE_URL = 'http://<host>:13081/v2';
