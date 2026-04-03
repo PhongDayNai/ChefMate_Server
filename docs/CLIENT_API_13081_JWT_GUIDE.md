@@ -221,9 +221,10 @@ Delete request:
 ## 3.6 AI Chat v1 (`/api/ai-chat`)
 
 > Tất cả endpoint dưới đây đều private.  
-> Trên `:13081` hỗ trợ **2 cách auth cho chat**:
-> 1) `Authorization: Bearer <accessToken>` (khuyến nghị)
-> 2) `x-api-key: __CHANGE_ME_CHAT_API_KEY__` (tương thích client cũ)
+> Trên `:13081`, chat đang bật chế độ bảo mật kép: **bắt buộc đồng thời**
+> 1) `Authorization: Bearer <accessToken>`
+> 2) `x-api-key: __CHANGE_ME_CHAT_API_KEY__`
+> Thiếu 1 trong 2 sẽ bị `401`.
 
 - `POST /sessions`
 - `GET /sessions`
@@ -285,7 +286,7 @@ Send v2 message:
 - `POST /api/recipes/user-recipes` -> `GET /api/recipes/me` (Bearer)
 - `POST /api/recipes/search-by-tag` -> `GET /api/recipes/by-tag?tagName=...`
 - `POST /api/users/update-user-information` -> `PATCH /api/users/me` (Bearer)
-- `POST /api/ai-chat/recommendations-from-pantry` -> `GET /api/ai-chat/recommendations-from-pantry` (Bearer khuyến nghị; vẫn hỗ trợ `x-api-key` cho chat compatibility)
+- `POST /api/ai-chat/recommendations-from-pantry` -> `GET /api/ai-chat/recommendations-from-pantry` (chat trên `:13081` bắt buộc cả Bearer + `x-api-key`)
 
 > Legacy endpoints vẫn giữ trên `:13081` để chuyển đổi dần, nhưng client mới nên ưu tiên endpoint GET/PATCH ở trên.
 
@@ -308,7 +309,7 @@ Send v2 message:
 - [ ] Thêm flow refresh token khi gặp 401
 - [ ] Chuyển sang endpoint GET/PATCH mới theo mapping
 - [ ] Test đủ cả unauthorized (401) và authorized (200)
-- [ ] Với chat trên `:13081`, ưu tiên Bearer token; chỉ dùng `x-api-key` khi cần tương thích client cũ
+- [ ] Với chat trên `:13081`, luôn gửi đồng thời `Authorization: Bearer <accessToken>` và `x-api-key: __CHANGE_ME_CHAT_API_KEY__`
 
 ---
 
