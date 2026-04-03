@@ -1,92 +1,135 @@
-# ChefMate Client API Guide (JWT) — Port 13081
+# CLIENT API 13081 JWT GUIDE (Bản chuẩn mới)
 
 > Cập nhật: 2026-04-03  
-> Base URL mới: `http://<host>:13081`  
-> Prefix mới: `/v2/...`
+> Server: `http://<host>:13081`  
+> Base path mới: `/v2/...`
 
 ---
 
-## 1) Quy tắc route mới trên 13081
+## 1) Mục tiêu tài liệu
+Tài liệu này dành cho mobile/web client khi gọi backend JWT ở cổng `13081`.
 
-- Legacy 8000 giữ nguyên `/api/...`.
-- JWT 13081 chuyển sang `/v2/...`.
-- Endpoint version cũ có hậu tố `-v2` sẽ được chuẩn hoá dần.
-
-Ví dụ bắt buộc:
-- `GET /api/recipes/trending-v2` (cũ) -> `GET /v2/recipes/trending` (mới)
-
----
-
-## 2) Auth model
-
-### 2.1 JWT chung
-- Dùng `Authorization: Bearer <accessToken>` cho API private.
-- Dùng `POST /v2/users/refresh-token` để refresh.
-
-### 2.2 Chat bảo mật kép (13081)
-Với chat (`/v2/ai-chat/*`, `/v2/ai-chat-v1/*`) bắt buộc đồng thời:
-- `Authorization: Bearer <accessToken>`
-- `x-api-key: __CHANGE_ME_CHAT_API_KEY__`
+### Quy tắc quan trọng
+- **Port 8000 (legacy)**: vẫn giữ route cũ `/api/...`.
+- **Port 13081 (JWT)**: dùng route mới `/v2/...`.
+- `v1/v2` ở đây là version API theo endpoint/flow nghiệp vụ, không phải copy nguyên route cũ.
 
 ---
 
-## 3) Danh sách endpoint 13081
+## 2) Auth model trên 13081
+
+## 2.1 JWT chung
+Đa số API private dùng:
+```http
+Authorization: Bearer <accessToken>
+```
+
+Refresh token:
+- `POST /v2/users/refresh-token`
+
+## 2.2 Chat dùng dual-auth (bắt buộc cả 2)
+Cho toàn bộ chat endpoint:
+- `/v2/ai-chat/*` (chat v2 meal flow)
+- `/v2/ai-chat-v1/*` (chat v1 flow)
+
+Bắt buộc gửi đồng thời:
+```http
+Authorization: Bearer <accessToken>
+x-api-key: __CHANGE_ME_CHAT_API_KEY__
+```
+Thiếu 1 trong 2 -> `401`.
+
+---
+
+## 3) Danh sách endpoint đầy đủ (13081)
 
 ## 3.1 Users
-- `GET /v2/users/all`
-- `POST /v2/users/register`
-- `POST /v2/users/login`
-- `POST /v2/users/refresh-token`
-- `POST /v2/users/forgot-password`
-- `POST /v2/users/change-password`
-- `GET /v2/users/recipes-view-history` (private)
-- `POST /v2/users/update-user-information` (private)
-- `PATCH /v2/users/me` (private)
+Base: `/v2/users`
+
+### Public
+- `GET /all`
+- `POST /register`
+- `POST /login`
+- `POST /refresh-token`
+- `POST /forgot-password`
+- `POST /change-password`
+
+### Private (Bearer)
+- `GET /recipes-view-history`
+- `POST /update-user-information` (legacy-compatible)
+- `PATCH /me` (khuyến nghị)
+
+---
 
 ## 3.2 Recipes
-Public:
-- `GET /v2/recipes/all`
-- `GET /v2/recipes/search?q=...` (optional Bearer)
-- `POST /v2/recipes/search` (optional Bearer)
-- `GET /v2/recipes/ingredients`
-- `GET /v2/recipes/tags`
-- `GET /v2/recipes/by-tag?tagName=...` (optional Bearer)
-- `POST /v2/recipes/search-by-tag` (optional Bearer)
-- `GET /v2/recipes/growth-report`
+Base: `/v2/recipes`
 
-Trending mapping:
-- `GET /v2/recipes/trending` => behavior cũ của `trending-v2`
-- `GET /v2/recipes/trending-v1` => behavior cũ của `trending`
-- `GET /v2/recipes/trending-v2` => alias tương thích
+### Public
+- `GET /all`
+- `GET /search?q=...` (optional Bearer)
+- `POST /search` (optional Bearer)
+- `GET /ingredients`
+- `GET /tags`
+- `GET /by-tag?tagName=...` (optional Bearer)
+- `POST /search-by-tag` (optional Bearer)
+- `GET /growth-report`
 
-Private:
-- `POST /v2/recipes/create`
-- `GET /v2/recipes/top-trending`
-- `POST /v2/recipes/top-trending`
-- `GET /v2/recipes/me`
-- `POST /v2/recipes/user-recipes`
-- `GET /v2/recipes/admin/pending`
-- `PATCH /v2/recipes/admin/review`
+### Trending mapping mới
+- `GET /trending` -> **behavior cũ của `/api/recipes/trending-v2`**
+- `GET /trending-v1` -> behavior cũ của `/api/recipes/trending`
+- `GET /trending-v2` -> alias tương thích tạm (same behavior với `/trending`)
+
+### Private (Bearer)
+- `POST /create`
+- `GET /top-trending`
+- `POST /top-trending` (legacy-compatible)
+- `GET /me`
+- `POST /user-recipes` (legacy-compatible)
+- `GET /admin/pending`
+- `PATCH /admin/review`
+
+### Optional Bearer nghĩa là gì?
+- Không có token: vẫn trả kết quả public, `isLiked=false`.
+- Có token: cá nhân hoá `isLiked` theo user.
+
+---
 
 ## 3.3 Interactions
-- `GET /v2/interactions/comments`
-- `POST /v2/interactions/increase-view-count`
-- `POST /v2/interactions/like` (private)
-- `POST /v2/interactions/comment` (private)
-- `DELETE /v2/interactions/comment` (private)
+Base: `/v2/interactions`
+
+### Public
+- `GET /comments`
+- `POST /increase-view-count`
+
+### Private (Bearer)
+- `POST /like`
+- `POST /comment`
+- `DELETE /comment`
+
+---
 
 ## 3.4 Pantry (private)
-- `GET /v2/pantry`
-- `POST /v2/pantry/upsert`
-- `DELETE /v2/pantry/delete`
+Base: `/v2/pantry`
 
-## 3.5 User Diet (private)
-- `GET /v2/user-diet-notes`
-- `POST /v2/user-diet-notes/upsert`
-- `DELETE /v2/user-diet-notes/delete`
+- `GET /`
+- `POST /upsert`
+- `DELETE /delete`
 
-## 3.6 Chat v2 meal flow (private + dual auth)
-Base: `/v2/ai-chat`
+---
+
+## 3.5 User diet notes (private)
+Base: `/v2/user-diet-notes`
+
+- `GET /`
+- `POST /upsert`
+- `DELETE /delete`
+
+---
+
+## 3.6 Chat v2 (meal flow)
+Base: `/v2/ai-chat`  
+Auth: **Bearer + x-api-key**
+
 - `POST /sessions/meal`
 - `PATCH /sessions/meal/recipes`
 - `PATCH /sessions/meal/recipes/status`
@@ -94,8 +137,12 @@ Base: `/v2/ai-chat`
 - `PATCH /sessions/meal/complete`
 - `POST /messages`
 
-## 3.7 Chat v1 flow (private + dual auth)
-Base: `/v2/ai-chat-v1`
+---
+
+## 3.7 Chat v1 (legacy flow)
+Base: `/v2/ai-chat-v1`  
+Auth: **Bearer + x-api-key**
+
 - `POST /sessions`
 - `GET /sessions`
 - `GET /sessions/:sessionId`
@@ -110,10 +157,73 @@ Base: `/v2/ai-chat-v1`
 
 ---
 
-## 4) Quick migration examples
+## 4) Mapping nhanh từ route cũ -> route mới 13081
 
+### Recipes
 - `GET /api/recipes/trending-v2` -> `GET /v2/recipes/trending`
 - `GET /api/recipes/trending` -> `GET /v2/recipes/trending-v1`
+- `GET /api/recipes/all` -> `GET /v2/recipes/all`
+
+### Chat
 - `POST /api/ai-chat/v2/messages` -> `POST /v2/ai-chat/messages`
 - `POST /api/ai-chat/messages` -> `POST /v2/ai-chat-v1/messages`
 
+### Users
+- `POST /api/users/login` -> `POST /v2/users/login`
+- `POST /api/users/refresh-token` -> `POST /v2/users/refresh-token`
+
+---
+
+## 5) Error handling chuẩn client
+
+- `200/201`: thành công
+- `400`: payload sai
+- `401`: thiếu token / token sai / thiếu 1 trong 2 header chat
+- `404`: không tìm thấy resource
+- `503`: AI server busy
+
+### Flow xử lý 401 (không áp dụng nếu thiếu x-api-key ở chat)
+1. Gọi `POST /v2/users/refresh-token`
+2. Thành công -> retry request 1 lần
+3. Thất bại -> logout
+
+---
+
+## 6) Ví dụ request thực tế
+
+## 6.1 Login
+```bash
+curl -X POST http://localhost:13081/v2/users/login \
+  -H 'Content-Type: application/json' \
+  -d '{"identifier":"0999xxxxxx","password":"your_password"}'
+```
+
+## 6.2 Trending mới (mapping từ trending-v2 cũ)
+```bash
+curl "http://localhost:13081/v2/recipes/trending?page=1&limit=20"
+```
+
+## 6.3 Trending có personalize isLiked
+```bash
+curl "http://localhost:13081/v2/recipes/trending?page=1&limit=20" \
+  -H "Authorization: Bearer <accessToken>"
+```
+
+## 6.4 Chat v2 (dual-auth)
+```bash
+curl -X POST http://localhost:13081/v2/ai-chat/messages \
+  -H "Authorization: Bearer <accessToken>" \
+  -H "x-api-key: __CHANGE_ME_CHAT_API_KEY__" \
+  -H "Content-Type: application/json" \
+  -d '{"chatSessionId":88,"message":"món hiện tại cần làm gì đầu tiên"}'
+```
+
+---
+
+## 7) Checklist migrate cho client
+- [ ] Đổi base URL sang `:13081/v2`
+- [ ] Thay route theo mapping ở mục 4
+- [ ] API private: thêm Bearer token
+- [ ] Chat API: thêm cả Bearer + x-api-key
+- [ ] Với recipes public optional token: hỗ trợ cả mode có/không có token
+- [ ] QA đủ cả case unauthorized/authorized
