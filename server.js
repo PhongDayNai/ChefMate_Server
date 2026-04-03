@@ -21,13 +21,13 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'assets')));
 // app.use('/static', express.static(path.join(__dirname, 'assets')));
 
-app.use('/api/users', userRoutes);
-app.use('/api/recipes', recipeRoutes);
-app.use('/api/interactions', interactionRoutes);
-app.use('/api/pantry', pantryRoutes);
-app.use('/api/ai-chat', chatApiKeyAuth, aiChatRoutes);
-app.use('/api/ai-chat/v2', chatApiKeyAuth, aiChatV2Routes);
-app.use('/api/user-diet-notes', userDietRoutes);
+app.use('/v1/users', userRoutes);
+app.use('/v1/recipes', recipeRoutes);
+app.use('/v1/interactions', interactionRoutes);
+app.use('/v1/pantry', pantryRoutes);
+app.use('/v1/ai-chat', chatApiKeyAuth, aiChatRoutes);
+app.use('/v1/ai-chat/v2', chatApiKeyAuth, aiChatV2Routes);
+app.use('/v1/user-diet-notes', userDietRoutes);
 
 app.get('/api-docs', (req, res) => {
     res.sendFile(path.join(__dirname, 'docs', 'swagger-ui.html'));
