@@ -10,5 +10,6 @@ router.patch('/sessions/meal/recipes/status', requireAccessTokenOrChatApiKey, in
 router.patch('/sessions/meal/primary-recipe', requireAccessTokenOrChatApiKey, injectAuthUser, aiChatV2Controller.setMealPrimaryRecipe);
 router.patch('/sessions/meal/complete', requireAccessTokenOrChatApiKey, injectAuthUser, aiChatV2Controller.completeMealSession);
 router.post('/messages', requireAccessTokenOrChatApiKey, injectAuthUser, aiChatV2Controller.sendMessageV2);
+router.post('/sessions/meal/resolve-completion-check', requireAccessTokenOrChatApiKey, injectAuthUser, aiChatV2Controller.resolveCompletionCheckV2);
 
 module.exports = router;

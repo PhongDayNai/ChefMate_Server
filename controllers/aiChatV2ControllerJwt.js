@@ -37,3 +37,8 @@ exports.sendMessageV2 = (req, res) => {
     withAuthUser(req);
     return aiChatV2Controller.sendMessageV2(req, res);
 };
+
+exports.resolveCompletionCheckV2 = (req, res) => {
+    withAuthUser(req);
+    return aiChatV2Controller.resolveCompletionCheckV2(req, res);
+};
