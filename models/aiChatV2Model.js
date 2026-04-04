@@ -613,6 +613,20 @@ async function getRecipeContexts(recipeIds = []) {
         .sort((a, b) => normalized.indexOf(a.recipeId) - normalized.indexOf(b.recipeId));
 }
 
+function normalizeInboundUserMessage(message = '') {
+    const raw = String(message || '').trim();
+    if (!raw) return '';
+
+    const focusedMessagePattern = /^Ngữ cảnh phiên nấu hiện tại:[\s\S]*?Yêu cầu của người dùng:\s*([\s\S]+)$/u;
+    const focusedMatch = raw.match(focusedMessagePattern);
+
+    if (focusedMatch && focusedMatch[1] && focusedMatch[1].trim()) {
+        return focusedMatch[1].trim();
+    }
+
+    return raw;
+}
+
 function buildMealPrompt({
     mealItems = [],
     recipeContexts = [],
@@ -1165,6 +1179,11 @@ exports.sendMessageV2 = async ({
         throw new Error('message is required');
     }
 
+    const normalizedUserMessage = normalizeInboundUserMessage(message);
+    if (!normalizedUserMessage) {
+        throw new Error('message is required');
+    }
+
     let sessionId = chatSessionId ? Number(chatSessionId) : null;
     let session = null;
 
@@ -1201,7 +1220,7 @@ exports.sendMessageV2 = async ({
     await addChatMessage({
         chatSessionId: sessionId,
         role: 'user',
-        content: String(message).trim(),
+        content: normalizedUserMessage,
         meta: {
             flow: 'meal_v2'
         }
@@ -1297,7 +1316,7 @@ exports.sendMessageV2 = async ({
                 retryable: true,
                 retryAfterMs: Number(process.env.AI_CHAT_RETRY_AFTER_MS || 5000),
                 failedUserMessage: {
-                    content: String(message).trim()
+                    content: normalizedUserMessage
                 },
                 error: {
                     message: 'Máy chủ AI đang bận hoặc tạm thời không khả dụng, anh vui lòng thử lại sau ít phút.',
