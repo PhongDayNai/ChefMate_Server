@@ -722,6 +722,41 @@ async function getPantryRowsByUser(userId) {
     }));
 }
 
+async function getUserByIdBasic(userId) {
+    const parsedUserId = Number(userId);
+    if (!parsedUserId || parsedUserId <= 0) return null;
+
+    const [rows] = await pool.query(
+        `SELECT userId, fullName, gender
+         FROM Users
+         WHERE userId = ?
+         LIMIT 1`,
+        [parsedUserId]
+    );
+
+    if (!rows.length) return null;
+
+    return {
+        userId: Number(rows[0].userId),
+        fullName: rows[0].fullName,
+        gender: rows[0].gender || 'unknown'
+    };
+}
+
+function buildUserAddressingHintByGender(gender = 'unknown') {
+    const normalized = String(gender || 'unknown').toLowerCase();
+
+    if (normalized === 'female') {
+        return 'Xưng hô tự nhiên, lịch sự với người dùng nữ bằng "chị" khi phù hợp ngữ cảnh.';
+    }
+
+    if (normalized === 'male') {
+        return 'Xưng hô tự nhiên, lịch sự với người dùng nam bằng "anh" khi phù hợp ngữ cảnh.';
+    }
+
+    return 'Xưng hô trung tính, lịch sự bằng "bạn" nếu chưa rõ giới tính.';
+}
+
 async function getRecipeContexts(recipeIds = []) {
     const normalized = Array.from(new Set(recipeIds.map(Number).filter(id => id > 0)));
     if (normalized.length === 0) return [];
@@ -810,7 +845,8 @@ function buildMealPrompt({
     pantryRows = [],
     activeDietNotes = [],
     activeRecipeId = null,
-    focusedRecipeContext = null
+    focusedRecipeContext = null,
+    userGender = 'unknown'
 }) {
     const recipeStatusSummary = mealItems.map(item => ({
         recipeId: item.recipeId,
@@ -835,6 +871,7 @@ function buildMealPrompt({
         'Người dùng có thể nấu nhiều món trong một bữa, hãy tối ưu thứ tự nấu và tái sử dụng nguyên liệu/dụng cụ.',
         'Ưu tiên đưa kế hoạch theo timeline (chuẩn bị trước, món làm song song, món làm sau).',
         'Tuyệt đối tôn trọng dị ứng/hạn chế ăn uống. Nếu thiếu dữ liệu thì hỏi lại ngắn gọn.',
+        buildUserAddressingHintByGender(userGender),
         'QUY TẮC CỨNG VỀ FOCUS: nếu session có activeRecipeId và user KHÔNG nêu rõ món khác hoặc không hỏi toàn bộ bữa, phải trả lời theo món đang focus.',
         'Chỉ trả lời theo toàn meal (nhiều món) khi user yêu cầu rõ ràng kiểu: toàn bộ bữa, thứ tự cả bữa, so sánh các món.',
         activeFocusLine,
@@ -1404,18 +1441,46 @@ exports.resolveCompletionCheckV2 = async ({
             return updateResult;
         }
 
+        const afterActionItems = updateResult?.data?.meal?.items || [];
+        const remainingItems = afterActionItems.filter(item => item.status === 'pending' || item.status === 'cooking');
+        const nextActiveRecipeId = updateResult?.data?.session?.activeRecipeId || null;
+        const nextActiveItem = nextActiveRecipeId
+            ? afterActionItems.find(item => Number(item.recipeId) === Number(nextActiveRecipeId))
+            : (remainingItems[0] || null);
+
+        if (remainingItems.length === 0) {
+            return {
+                success: true,
+                code: 'MEAL_SESSION_READY_TO_COMPLETE',
+                data: {
+                    ...updateResult.data,
+                    completionCheckAction: normalizedAction,
+                    assistantMessage: 'Em đã cập nhật trạng thái món hiện tại. Các món trong phiên nấu này đã xử lý xong hết rồi ạ. Anh muốn kết thúc phiên nấu luôn không?',
+                    nextActions: [
+                        { id: 'complete_session', label: 'Kết thúc phiên nấu' },
+                        { id: 'keep_session_open', label: 'Giữ phiên để chat tiếp' }
+                    ]
+                },
+                message: 'Meal session is ready to complete'
+            };
+        }
+
+        const actionLabel = normalizedAction === 'mark_done' ? 'đã xong' : 'đã bỏ qua';
+        const nextRecipeName = nextActiveItem?.recipe?.recipeName || `món #${nextActiveRecipeId}`;
+
         if (!normalizedPendingUserMessage) {
             return {
                 success: true,
                 data: {
                     ...updateResult.data,
-                    completionCheckAction: normalizedAction
+                    completionCheckAction: normalizedAction,
+                    assistantMessage: `Em đã cập nhật món hiện tại là ${actionLabel}. Bây giờ mình tiếp tục với ${nextRecipeName} nhé anh.`
                 },
                 message: 'Completion check action handled successfully'
             };
         }
 
-        return exports.sendMessageV2({
+        const continuation = await exports.sendMessageV2({
             userId: parsedUserId,
             chatSessionId: parsedSessionId,
             message: normalizedPendingUserMessage,
@@ -1424,9 +1489,18 @@ exports.resolveCompletionCheckV2 = async ({
             useUnifiedSession: false,
             skipCompletionCheck: true
         });
+
+        if (continuation?.success) {
+            const oldMsg = continuation?.data?.assistantMessage ? String(continuation.data.assistantMessage).trim() : '';
+            continuation.data.assistantMessage = `Em đã cập nhật món hiện tại là ${actionLabel}. Bây giờ mình tiếp tục với ${nextRecipeName} nhé anh.${oldMsg ? `\n\n${oldMsg}` : ''}`;
+        }
+
+        return continuation;
     }
 
     if (normalizedAction === 'continue_current') {
+        const activeRecipeName = targetMealItem?.recipe?.recipeName || (session.activeRecipeId ? `món #${session.activeRecipeId}` : 'món hiện tại');
+
         if (!normalizedPendingUserMessage) {
             return {
                 success: true,
@@ -1436,13 +1510,14 @@ exports.resolveCompletionCheckV2 = async ({
                         totalRecipes: mealItems.length,
                         items: mealItems
                     },
-                    completionCheckAction: normalizedAction
+                    completionCheckAction: normalizedAction,
+                    assistantMessage: `Ok anh, mình tiếp tục nấu ${activeRecipeName}. Anh cần em hỗ trợ bước nào tiếp theo?`
                 },
                 message: 'Completion check action handled successfully'
             };
         }
 
-        return exports.sendMessageV2({
+        const continuation = await exports.sendMessageV2({
             userId: parsedUserId,
             chatSessionId: parsedSessionId,
             message: normalizedPendingUserMessage,
@@ -1451,9 +1526,42 @@ exports.resolveCompletionCheckV2 = async ({
             useUnifiedSession: false,
             skipCompletionCheck: true
         });
+
+        if (continuation?.success) {
+            const oldMsg = continuation?.data?.assistantMessage ? String(continuation.data.assistantMessage).trim() : '';
+            continuation.data.assistantMessage = `Ok anh, mình tiếp tục nấu ${activeRecipeName} nhé.${oldMsg ? `\n\n${oldMsg}` : ''}`;
+        }
+
+        return continuation;
     }
 
-    throw new Error('action must be one of: mark_done, mark_skipped, continue_current');
+    if (normalizedAction === 'complete_session' || normalizedAction === 'keep_session_open') {
+        if (normalizedAction === 'complete_session') {
+            return exports.completeMealSession({
+                userId: parsedUserId,
+                chatSessionId: parsedSessionId,
+                completionType: 'completed',
+                note: null,
+                markRemainingStatus: 'done'
+            });
+        }
+
+        return {
+            success: true,
+            data: {
+                session,
+                meal: {
+                    totalRecipes: mealItems.length,
+                    items: mealItems
+                },
+                completionCheckAction: normalizedAction,
+                assistantMessage: 'Dạ vâng anh, em giữ nguyên phiên nấu để mình tiếp tục trao đổi khi cần.'
+            },
+            message: 'Keep meal session open successfully'
+        };
+    }
+
+    throw new Error('action must be one of: mark_done, mark_skipped, continue_current, complete_session, keep_session_open');
 };
 
 exports.sendMessageV2 = async ({
@@ -1552,11 +1660,12 @@ exports.sendMessageV2 = async ({
         recipeIds.push(session.activeRecipeId);
     }
 
-    const [recipeContexts, pantryRows, activeDietNotes, recentMessages] = await Promise.all([
+    const [recipeContexts, pantryRows, activeDietNotes, recentMessages, userProfile] = await Promise.all([
         getRecipeContexts(recipeIds),
         getPantryRowsByUser(parsedUserId),
         userDietModel.getActiveDietNotes(parsedUserId),
-        getRecentMessages(sessionId, 40)
+        getRecentMessages(sessionId, 40),
+        getUserByIdBasic(parsedUserId)
     ]);
 
     const activeRecipeId = session?.activeRecipeId ? Number(session.activeRecipeId) : null;
@@ -1572,7 +1681,8 @@ exports.sendMessageV2 = async ({
             pantryRows,
             activeDietNotes,
             activeRecipeId,
-            focusedRecipeContext
+            focusedRecipeContext,
+            userGender: userProfile?.gender || 'unknown'
         })
     };
 

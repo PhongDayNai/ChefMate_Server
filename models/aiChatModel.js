@@ -503,6 +503,41 @@ async function getUserMessageCountBySession(chatSessionId) {
     return Number(rows?.[0]?.total || 0);
 }
 
+async function getUserByIdBasic(userId) {
+    const parsedUserId = Number(userId);
+    if (!parsedUserId || parsedUserId <= 0) return null;
+
+    const [rows] = await pool.query(
+        `SELECT userId, fullName, gender
+         FROM Users
+         WHERE userId = ?
+         LIMIT 1`,
+        [parsedUserId]
+    );
+
+    if (!rows.length) return null;
+
+    return {
+        userId: Number(rows[0].userId),
+        fullName: rows[0].fullName,
+        gender: rows[0].gender || 'unknown'
+    };
+}
+
+function buildUserAddressingHintByGender(gender = 'unknown') {
+    const normalized = String(gender || 'unknown').toLowerCase();
+
+    if (normalized === 'female') {
+        return 'Xưng hô tự nhiên, lịch sự với người dùng nữ bằng "chị" khi phù hợp ngữ cảnh.';
+    }
+
+    if (normalized === 'male') {
+        return 'Xưng hô tự nhiên, lịch sự với người dùng nam bằng "anh" khi phù hợp ngữ cảnh.';
+    }
+
+    return 'Xưng hô trung tính, lịch sự bằng "bạn" nếu chưa rõ giới tính.';
+}
+
 function getMinutesSince(dateInput) {
     if (!dateInput) return null;
     const ts = new Date(dateInput).getTime();
@@ -1677,8 +1712,12 @@ exports.sendMessage = async ({
     });
 
     const recentMessages = await getRecentMessages(sessionId, 30);
-    const { rows: pantryRows } = await getPantryMapByUser(parsedUserId);
-    const activeDietNotes = await userDietModel.getActiveDietNotes(parsedUserId);
+    const [pantryMapData, activeDietNotes, userProfile] = await Promise.all([
+        getPantryMapByUser(parsedUserId),
+        userDietModel.getActiveDietNotes(parsedUserId),
+        getUserByIdBasic(parsedUserId)
+    ]);
+    const pantryRows = pantryMapData.rows;
 
     const recipeContext = session.activeRecipeId
         ? await getRecipeContext(session.activeRecipeId)
@@ -1691,6 +1730,7 @@ exports.sendMessage = async ({
         content: [
             DEFAULT_AGENTIC_SYSTEM_PROMPT,
             extraSystemPrompt,
+            buildUserAddressingHintByGender(userProfile?.gender || 'unknown'),
             `Tủ lạnh hiện tại của user: ${JSON.stringify(pantryRows, null, 2)}`,
             `Ghi chú ăn uống (dị ứng/hạn chế/sở thích) đang hiệu lực: ${JSON.stringify(activeDietNotes, null, 2)}`,
             recipeContext
