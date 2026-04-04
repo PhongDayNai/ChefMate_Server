@@ -14,7 +14,7 @@ exports.getAllUsers = async (req, res) => {
 };
 
 exports.createUser = async (req, res) => {
-    const { phone, email, password, fullName } = req.body;
+    const { phone, email, password, fullName, gender } = req.body;
 
     try {
         const existingUser = await userModel.getUserByPhone(phone);
@@ -26,7 +26,7 @@ exports.createUser = async (req, res) => {
 
         const passwordHash = await bcrypt.hash(password, 10);
 
-        const newUser = await userModel.createUser(fullName, phone, email, passwordHash);
+        const newUser = await userModel.createUser(fullName, phone, email, passwordHash, gender);
         console.log('New User:', newUser);
 
         const user = await userModel.getUserByPhone(phone);
@@ -169,11 +169,11 @@ exports.changePassword = async (req, res) => {
 };
 
 exports.updateUserInformation = async (req, res) => {
-    const { fullName, phone, email } = req.body || {};
+    const { fullName, phone, email, gender } = req.body || {};
     const userId = Number(req.auth?.userId || req.userId || req.body?.userId || 0);
 
     try {
-        const rsUser = await userModel.updateUserInforamtion(userId, fullName, phone, email);
+        const rsUser = await userModel.updateUserInforamtion(userId, fullName, phone, email, gender);
         return res.status(200).json(rsUser);
     } catch (error) {
         console.log("error: ", error);

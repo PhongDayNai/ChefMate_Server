@@ -7,6 +7,7 @@ USE chefmate_db;
 CREATE TABLE IF NOT EXISTS Users (
   userId INT PRIMARY KEY AUTO_INCREMENT,
   fullName VARCHAR(100) NOT NULL,
+  gender ENUM('male', 'female', 'other', 'unknown') NOT NULL DEFAULT 'unknown',
   phone VARCHAR(15) NOT NULL UNIQUE,
   email VARCHAR(100) UNIQUE,
   passwordHash VARCHAR(255) NOT NULL,
