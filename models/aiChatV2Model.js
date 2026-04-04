@@ -8,6 +8,11 @@ const DEFAULT_SESSION_INTRO_MESSAGE = `Xin chào anh, em là ${DEFAULT_AGENT_NAM
 
 const ALLOWED_MEAL_RECIPE_STATUS = new Set(['pending', 'cooking', 'done', 'skipped']);
 
+const MEAL_V2_COMPLETION_REMINDER_MINUTES = Number(process.env.MEAL_V2_COMPLETION_REMINDER_MINUTES || 60);
+const MEAL_V2_COMPLETION_REMINDER_STRONG_MINUTES = Number(process.env.MEAL_V2_COMPLETION_REMINDER_STRONG_MINUTES || 180);
+const MEAL_V2_COMPLETION_REMINDER_COOLDOWN_MINUTES = Number(process.env.MEAL_V2_COMPLETION_REMINDER_COOLDOWN_MINUTES || 30);
+const MEAL_V2_COMPLETION_REMINDER_MAX_PER_DAY = Number(process.env.MEAL_V2_COMPLETION_REMINDER_MAX_PER_DAY || 3);
+
 function safeParseJson(value) {
     if (!value) return null;
     if (typeof value === 'object') return value;
@@ -527,6 +532,178 @@ async function getRecentMessages(chatSessionId, limit = 30) {
         meta: safeParseJson(row.metaJson),
         createdAt: row.createdAt
     }));
+}
+
+async function getLatestMessageBySession(chatSessionId) {
+    const [rows] = await pool.query(
+        `SELECT chatMessageId, role, content, metaJson, createdAt
+         FROM ChatMessages
+         WHERE chatSessionId = ?
+         ORDER BY chatMessageId DESC
+         LIMIT 1`,
+        [chatSessionId]
+    );
+
+    if (!rows.length) return null;
+
+    return {
+        chatMessageId: Number(rows[0].chatMessageId),
+        role: rows[0].role,
+        content: rows[0].content,
+        meta: safeParseJson(rows[0].metaJson),
+        createdAt: rows[0].createdAt
+    };
+}
+
+function getMinutesSince(dateInput) {
+    if (!dateInput) return null;
+    const ts = new Date(dateInput).getTime();
+    if (!Number.isFinite(ts)) return null;
+    const diffMs = Date.now() - ts;
+    return Math.floor(diffMs / (1000 * 60));
+}
+
+function containsBroadMealIntent(message = '') {
+    const normalized = String(message || '').toLowerCase();
+    if (!normalized) return false;
+
+    const broadKeywords = [
+        'toàn bộ bữa',
+        'toan bo bua',
+        'cả bữa',
+        'ca bua',
+        'tat ca mon',
+        'tất cả món',
+        'so sánh',
+        'so sanh',
+        'các món',
+        'cac mon',
+        'thứ tự nấu',
+        'thu tu nau',
+        'kế hoạch bữa',
+        'ke hoach bua'
+    ];
+
+    return broadKeywords.some(keyword => normalized.includes(keyword));
+}
+
+function getLastMealV2CompletionReminderMeta(messages = []) {
+    for (let i = messages.length - 1; i >= 0; i -= 1) {
+        const message = messages[i];
+        if (message.role !== 'assistant') continue;
+        const meta = message.meta || {};
+        if (meta.flow === 'meal_v2' && meta.completionReminderV2) {
+            return {
+                message,
+                meta: meta.completionReminderV2
+            };
+        }
+    }
+
+    return null;
+}
+
+function getDayKey(dateInput = new Date()) {
+    const date = new Date(dateInput);
+    const year = date.getUTCFullYear();
+    const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+    const day = String(date.getUTCDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
+function getMealV2CompletionReminderPayload({
+    session,
+    mealItems = [],
+    minutesSinceLastMessage,
+    pendingUserMessage = '',
+    recentMessages = []
+}) {
+    const minMinutes = MEAL_V2_COMPLETION_REMINDER_MINUTES;
+    if (!Number.isFinite(minMinutes) || minutesSinceLastMessage === null || minutesSinceLastMessage < minMinutes) {
+        return null;
+    }
+
+    const hasUnfinished = mealItems.some(item => item.status === 'pending' || item.status === 'cooking');
+    if (!hasUnfinished) return null;
+
+    if (containsBroadMealIntent(pendingUserMessage)) return null;
+
+    const activeRecipeId = session?.activeRecipeId ? Number(session.activeRecipeId) : null;
+    if (!activeRecipeId) return null;
+
+    const activeMealItem = mealItems.find(item => Number(item.recipeId) === activeRecipeId);
+    if (!activeMealItem || (activeMealItem.status !== 'pending' && activeMealItem.status !== 'cooking')) {
+        return null;
+    }
+
+    const lastReminder = getLastMealV2CompletionReminderMeta(recentMessages);
+    if (lastReminder) {
+        const minutesSinceReminder = getMinutesSince(lastReminder.message?.createdAt);
+        if (
+            Number.isFinite(MEAL_V2_COMPLETION_REMINDER_COOLDOWN_MINUTES) &&
+            minutesSinceReminder !== null &&
+            minutesSinceReminder < MEAL_V2_COMPLETION_REMINDER_COOLDOWN_MINUTES
+        ) {
+            return null;
+        }
+
+        const todayKey = getDayKey();
+        const reminderDayKey = String(lastReminder.meta?.dayKey || '');
+        const reminderCount = Number(lastReminder.meta?.countToday || 0);
+
+        if (
+            Number.isFinite(MEAL_V2_COMPLETION_REMINDER_MAX_PER_DAY) &&
+            reminderDayKey === todayKey &&
+            reminderCount >= MEAL_V2_COMPLETION_REMINDER_MAX_PER_DAY
+        ) {
+            return null;
+        }
+    }
+
+    const isStrongReminder = Number.isFinite(MEAL_V2_COMPLETION_REMINDER_STRONG_MINUTES)
+        ? minutesSinceLastMessage >= MEAL_V2_COMPLETION_REMINDER_STRONG_MINUTES
+        : false;
+
+    const recipeName = activeMealItem?.recipe?.recipeName || `món #${activeRecipeId}`;
+
+    const reminderMessage = isStrongReminder
+        ? `Anh đang để dở món "${recipeName}" khoảng ${minutesSinceLastMessage} phút rồi. Anh đã nấu xong món này chưa để em cập nhật tiếp cho đúng tiến độ bữa?`
+        : `Anh đang nấu món "${recipeName}". Trước khi tiếp tục, anh xác nhận giúp em là món này đã xong chưa nhé?`;
+
+    const todayKey = getDayKey();
+    const previousCount = Number(lastReminder?.meta?.countToday || 0);
+    const nextCount = String(lastReminder?.meta?.dayKey || '') === todayKey ? previousCount + 1 : 1;
+
+    return {
+        success: true,
+        code: 'PENDING_MEAL_V2_COMPLETION_CHECK',
+        data: {
+            session,
+            meal: {
+                totalRecipes: mealItems.length,
+                items: mealItems
+            },
+            completionCheck: {
+                recipeId: activeRecipeId,
+                recipeName,
+                minutesSinceLastMessage,
+                isStrongReminder,
+                reminderMessage,
+                pendingUserMessage: String(pendingUserMessage || ''),
+                actions: [
+                    { id: 'mark_done', label: 'Đã xong món này' },
+                    { id: 'mark_skipped', label: 'Bỏ qua món này' },
+                    { id: 'continue_current', label: 'Chưa xong, tiếp tục món này' }
+                ],
+                countToday: nextCount,
+                dayKey: todayKey,
+                cooldownMinutes: MEAL_V2_COMPLETION_REMINDER_COOLDOWN_MINUTES
+            }
+        },
+        message: isStrongReminder
+            ? 'Meal v2 completion check (strong reminder)'
+            : 'Meal v2 completion check'
+    };
 }
 
 async function getPantryRowsByUser(userId) {
@@ -1162,13 +1339,131 @@ exports.completeMealSession = async ({
     }
 };
 
+exports.resolveCompletionCheckV2 = async ({
+    userId,
+    chatSessionId,
+    action,
+    pendingUserMessage = '',
+    nextPrimaryRecipeId = null,
+    model = DEFAULT_MODEL
+}) => {
+    const parsedUserId = Number(userId);
+    const parsedSessionId = Number(chatSessionId);
+    const normalizedAction = String(action || '').trim().toLowerCase();
+    const normalizedPendingUserMessage = String(pendingUserMessage || '').trim();
+
+    if (!parsedUserId || parsedUserId <= 0) {
+        throw new Error('userId must be a positive number');
+    }
+
+    if (!parsedSessionId || parsedSessionId <= 0) {
+        throw new Error('chatSessionId must be a positive number');
+    }
+
+    if (!normalizedAction) {
+        throw new Error('action is required');
+    }
+
+    const session = await getChatSessionById(parsedSessionId, parsedUserId);
+    if (!session) {
+        return {
+            success: false,
+            data: null,
+            message: 'Chat session not found'
+        };
+    }
+
+    const mealItems = await getMealRecipesBySession(parsedSessionId);
+
+    const activeRecipeId = session?.activeRecipeId ? Number(session.activeRecipeId) : null;
+    const targetMealItem = activeRecipeId
+        ? mealItems.find(item => Number(item.recipeId) === activeRecipeId)
+        : mealItems.find(item => item.status === 'pending' || item.status === 'cooking') || null;
+
+    if (normalizedAction === 'mark_done' || normalizedAction === 'mark_skipped') {
+        if (!targetMealItem?.recipeId) {
+            return {
+                success: false,
+                data: null,
+                message: 'No active recipe to update'
+            };
+        }
+
+        const updateResult = await exports.updateMealRecipeStatus({
+            userId: parsedUserId,
+            chatSessionId: parsedSessionId,
+            recipeId: Number(targetMealItem.recipeId),
+            status: normalizedAction === 'mark_done' ? 'done' : 'skipped',
+            confirmSwitchPrimary: true,
+            nextPrimaryRecipeId: nextPrimaryRecipeId === null || nextPrimaryRecipeId === undefined
+                ? null
+                : Number(nextPrimaryRecipeId)
+        });
+
+        if (!updateResult.success) {
+            return updateResult;
+        }
+
+        if (!normalizedPendingUserMessage) {
+            return {
+                success: true,
+                data: {
+                    ...updateResult.data,
+                    completionCheckAction: normalizedAction
+                },
+                message: 'Completion check action handled successfully'
+            };
+        }
+
+        return exports.sendMessageV2({
+            userId: parsedUserId,
+            chatSessionId: parsedSessionId,
+            message: normalizedPendingUserMessage,
+            model,
+            stream: false,
+            useUnifiedSession: false,
+            skipCompletionCheck: true
+        });
+    }
+
+    if (normalizedAction === 'continue_current') {
+        if (!normalizedPendingUserMessage) {
+            return {
+                success: true,
+                data: {
+                    session,
+                    meal: {
+                        totalRecipes: mealItems.length,
+                        items: mealItems
+                    },
+                    completionCheckAction: normalizedAction
+                },
+                message: 'Completion check action handled successfully'
+            };
+        }
+
+        return exports.sendMessageV2({
+            userId: parsedUserId,
+            chatSessionId: parsedSessionId,
+            message: normalizedPendingUserMessage,
+            model,
+            stream: false,
+            useUnifiedSession: false,
+            skipCompletionCheck: true
+        });
+    }
+
+    throw new Error('action must be one of: mark_done, mark_skipped, continue_current');
+};
+
 exports.sendMessageV2 = async ({
     userId,
     chatSessionId = null,
     message,
     model = DEFAULT_MODEL,
     stream = false,
-    useUnifiedSession = true
+    useUnifiedSession = true,
+    skipCompletionCheck = false
 }) => {
     const parsedUserId = Number(userId);
     if (!parsedUserId || parsedUserId <= 0) {
@@ -1217,6 +1512,30 @@ exports.sendMessageV2 = async ({
         sessionId = session.chatSessionId;
     }
 
+    const [mealItemsBeforeCheck, recentMessagesBeforeCheck] = await Promise.all([
+        getMealRecipesBySession(sessionId),
+        getRecentMessages(sessionId, 40)
+    ]);
+
+    if (!skipCompletionCheck) {
+        const latestMessage = recentMessagesBeforeCheck.length > 0
+            ? recentMessagesBeforeCheck[recentMessagesBeforeCheck.length - 1]
+            : await getLatestMessageBySession(sessionId);
+
+        const minutesSinceLastMessage = getMinutesSince(latestMessage?.createdAt);
+        const reminderPayload = getMealV2CompletionReminderPayload({
+            session,
+            mealItems: mealItemsBeforeCheck,
+            minutesSinceLastMessage,
+            pendingUserMessage: normalizedUserMessage,
+            recentMessages: recentMessagesBeforeCheck
+        });
+
+        if (reminderPayload) {
+            return reminderPayload;
+        }
+    }
+
     await addChatMessage({
         chatSessionId: sessionId,
         role: 'user',
@@ -1226,7 +1545,7 @@ exports.sendMessageV2 = async ({
         }
     });
 
-    const mealItems = await getMealRecipesBySession(sessionId);
+    const mealItems = mealItemsBeforeCheck;
     const recipeIds = mealItems.map(item => item.recipeId);
 
     if (recipeIds.length === 0 && session.activeRecipeId) {

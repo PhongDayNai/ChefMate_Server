@@ -233,6 +233,66 @@ exports.completeMealSession = async (req, res) => {
     }
 };
 
+exports.resolveCompletionCheckV2 = async (req, res) => {
+    const { userId, chatSessionId, action, pendingUserMessage, nextPrimaryRecipeId, model } = req.body || {};
+
+    if (!userId || Number(userId) <= 0) {
+        return res.status(400).json({
+            success: false,
+            data: null,
+            message: 'userId is required and must be a positive number'
+        });
+    }
+
+    if (!chatSessionId || Number(chatSessionId) <= 0) {
+        return res.status(400).json({
+            success: false,
+            data: null,
+            message: 'chatSessionId is required and must be a positive number'
+        });
+    }
+
+    if (!action || typeof action !== 'string') {
+        return res.status(400).json({
+            success: false,
+            data: null,
+            message: 'action is required'
+        });
+    }
+
+    try {
+        const result = await aiChatV2Model.resolveCompletionCheckV2({
+            userId: Number(userId),
+            chatSessionId: Number(chatSessionId),
+            action,
+            pendingUserMessage: pendingUserMessage === undefined || pendingUserMessage === null
+                ? ''
+                : String(pendingUserMessage),
+            nextPrimaryRecipeId: nextPrimaryRecipeId === null || nextPrimaryRecipeId === undefined
+                ? null
+                : Number(nextPrimaryRecipeId),
+            model
+        });
+
+        if (!result.success && result.code === 'AI_SERVER_BUSY') {
+            return res.status(503).json(result);
+        }
+
+        if (!result.success) {
+            return res.status(404).json(result);
+        }
+
+        return res.status(200).json(result);
+    } catch (error) {
+        console.error('Error in resolveCompletionCheckV2:', error);
+        return res.status(isBadRequestError(error) ? 400 : 500).json({
+            success: false,
+            data: null,
+            message: `Failed to resolve completion check v2: ${error.message}`
+        });
+    }
+};
+
 exports.sendMessageV2 = async (req, res) => {
     const { userId, chatSessionId, message, model, stream, useUnifiedSession } = req.body || {};
 
