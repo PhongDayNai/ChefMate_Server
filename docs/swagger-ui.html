@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5/swagger-ui.css" />
   <style>
     body { margin:0; background:#fafafa; }
+    .topbar { display:none; }
   </style>
 </head>
 <body>
@@ -15,7 +16,6 @@
   <script>
     window.ui = SwaggerUIBundle({
       url: '/api-docs/openapi.json',
-      explorer: true,
       dom_id: '#swagger-ui',
       deepLinking: true,
       presets: [SwaggerUIBundle.presets.apis],
