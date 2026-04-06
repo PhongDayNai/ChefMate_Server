@@ -1072,7 +1072,14 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK (session + messages + meal items + focus)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChatSessionHistoryResponse"
+                }
+              }
+            }
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
@@ -2310,6 +2317,118 @@
                     "label": {
                       "type": "string"
                     }
+                  }
+                }
+              }
+            }
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "ChatSessionRecipeItem": {
+        "type": "object",
+        "properties": {
+          "chatSessionRecipeId": {
+            "type": "integer"
+          },
+          "chatSessionId": {
+            "type": "integer"
+          },
+          "recipeId": {
+            "type": "integer"
+          },
+          "sortOrder": {
+            "type": "integer"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "cooking",
+              "done",
+              "skipped"
+            ]
+          },
+          "servingsOverride": {
+            "type": "number",
+            "nullable": true
+          },
+          "note": {
+            "type": "string",
+            "nullable": true
+          },
+          "selectedAt": {
+            "type": "string"
+          },
+          "resolvedAt": {
+            "type": "string",
+            "nullable": true
+          },
+          "recipe": {
+            "type": "object",
+            "properties": {
+              "recipeId": {
+                "type": "integer"
+              },
+              "recipeName": {
+                "type": "string"
+              },
+              "image": {
+                "type": "string"
+              },
+              "cookingTime": {
+                "type": "string"
+              },
+              "ration": {
+                "type": "integer"
+              }
+            }
+          }
+        }
+      },
+      "ChatSessionHistoryResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "session": {
+                "type": "object"
+              },
+              "messages": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              },
+              "meal": {
+                "type": "object",
+                "properties": {
+                  "totalRecipes": {
+                    "type": "integer"
+                  },
+                  "items": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/ChatSessionRecipeItem"
+                    }
+                  }
+                }
+              },
+              "focus": {
+                "type": "object",
+                "properties": {
+                  "activeRecipeId": {
+                    "type": "integer",
+                    "nullable": true
+                  },
+                  "needsSelection": {
+                    "type": "boolean"
                   }
                 }
               }
