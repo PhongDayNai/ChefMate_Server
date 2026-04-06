@@ -28,6 +28,36 @@ Thiếu 1 trong 2 -> `401 Unauthorized`.
 - Dùng **Chat v1** khi cần flow chat theo session cơ bản (single recipe/session).
 - Dùng **Chat v2** khi cần điều phối **nhiều món trong một bữa** (meal planning, focus recipe, trạng thái từng món).
 
+## 2.1 Bản mới nhất: endpoint nào nên gọi / không nên gọi
+
+### ✅ Nên dùng ở bản mới nhất
+
+#### Meal chat (khuyến nghị chính)
+- `POST /v2/ai-chat/sessions/meal`
+- `PATCH /v2/ai-chat/sessions/meal/primary-recipe`
+- `PATCH /v2/ai-chat/sessions/meal/recipes/status`
+- `POST /v2/ai-chat/messages`
+- `POST /v2/ai-chat/sessions/meal/resolve-completion-check`
+- `PATCH /v2/ai-chat/sessions/meal/complete`
+
+#### Khi cần gợi ý từ pantry
+- **Ưu tiên** `POST /v2/ai-chat-v1/recommendations-from-pantry` (payload rõ ràng, dễ mở rộng)
+
+### ⚠️ Chỉ dùng để tương thích hoặc trường hợp đặc biệt
+
+- Toàn bộ nhóm ` /v2/ai-chat-v1/* `: vẫn hoạt động, dùng cho client cũ/single-session.
+- `GET /v2/ai-chat-v1/recommendations-from-pantry`: chỉ nên giữ cho backward compatibility.
+- `GET /v2/ai-chat-v1/messages`: dùng khi màn hình cần unified timeline của v1.
+
+### ❌ Không khuyến nghị cho client mới
+
+- Không bắt đầu flow mới bằng ` /v2/ai-chat-v1/messages ` nếu app đã theo meal flow.
+- Không phụ thuộc route legacy `/api/ai-chat...` trên server cũ cho tính năng mới.
+- Không bỏ qua endpoint resolve khi server trả business code cần xác nhận:
+  - `PENDING_MEAL_V2_COMPLETION_CHECK` -> phải gọi `POST /v2/ai-chat/sessions/meal/resolve-completion-check`
+  - `PENDING_PRIMARY_RECIPE_SWITCH_CONFIRMATION` -> phải gọi lại `PATCH /v2/ai-chat/sessions/meal/recipes/status` với `confirmSwitchPrimary=true`
+  - `PENDING_PREVIOUS_RECIPE_COMPLETION` (v1) -> phải gọi `POST /v2/ai-chat-v1/sessions/resolve-previous`
+
 ---
 
 ## 3) Chat v1 API (`/v2/ai-chat-v1`)
