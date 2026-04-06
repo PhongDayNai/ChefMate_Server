@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5/swagger-ui.css" />
   <style>
     body { margin:0; background:#fafafa; }
+    .topbar { display:none; }
   </style>
 </head>
 <body>
@@ -14,10 +15,7 @@
   <script src="https://unpkg.com/swagger-ui-dist@5/swagger-ui-bundle.js"></script>
   <script>
     window.ui = SwaggerUIBundle({
-      // Spec mặc định luôn load được
       url: '/api-docs/openapi.json',
-      // Hiện ô Explore để có thể dán URL spec khác nếu cần
-      explorer: true,
       dom_id: '#swagger-ui',
       deepLinking: true,
       presets: [SwaggerUIBundle.presets.apis],
