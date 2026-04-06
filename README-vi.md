@@ -1,225 +1,217 @@
-# Hệ thống ứng dụng công thức nấu ăn - ChefMate
+# ChefMate Server 🍳
 
-# [I. Client - Ứng dụng di động](https://github.com/PhongDayNai/ChefMate_Client)
+Backend API cho **ChefMate** — nền tảng công thức nấu ăn, quản lý pantry và trợ lý AI khi nấu.
 
-# II. Server - Máy chủ
+Repository này chứa server được xây dựng bằng **Node.js + Express + MySQL**, hỗ trợ đồng thời:
+- **Legacy API** (`/api/...`)
+- **JWT API** (`/v2/...`, khuyến nghị cho client mới)
 
-## 1. Công nghệ
+## 🔗 Repository liên quan
 
-- **ExpressJS**: Framework xây dựng RESTful API.
-- **SQL Server**: Quản trị cơ sở dữ liệu quan hệ.
+- Mobile App: [ChefMate_Client](https://github.com/PhongDayNai/ChefMate_Client)
+- Admin Web: [ChefMate_Admin_Web](https://github.com/PhongDayNai/ChefMate_Admin_Web)
 
-## 2. Kiến trúc: Mô hình MVC API
+---
 
-- **Models**:
-    - **Chức năng**: Định nghĩa cấu trúc dữ liệu và tương tác với cơ sở dữ liệu.
-    - **Vai trò**: Đảm bảo dữ liệu xử lý nhất quán, không phụ thuộc vào yêu cầu client.
-- **Controllers**:
-    - **Chức năng**: Xử lý yêu cầu HTTP (GET, POST, PUT, DELETE), gọi Model để thực hiện logic và trả về JSON.
-    - **Vai trò**: Trung gian giữa client và Model, định dạng phản hồi đúng cách.
-- **Routes**:
-    - **Chức năng**: Định nghĩa endpoint API (URL) và ánh xạ tới hàm trong Controllers.
-    - **Vai trò**: Tổ chức điểm truy cập API, hỗ trợ mở rộng và bảo trì.
-- **Cơ sở dữ liệu**: Microsoft SQL Server lưu trữ, quản lý và truy xuất dữ liệu hiệu quả, tích hợp tốt với MVC API.
+## ✨ Tính năng chính
 
-## 3. Tính năng
+- Quản lý tài khoản (đăng ký/đăng nhập/cập nhật profile/mật khẩu)
+- Quản lý công thức (tạo, tìm kiếm, tag, trending, công thức theo user)
+- Tương tác xã hội (like/comment/view)
+- Quản lý pantry theo từng user
+- Ghi chú ăn uống (dị ứng/hạn chế/sở thích/ghi chú sức khỏe)
+- AI Chat v1 theo session
+- AI Chat v2 theo meal flow nhiều món
+- JWT auth + refresh token
+- Bảo vệ chat endpoint bằng dual-auth (Bearer + API key)
 
-| User | Recipe | Interaction |
-| --- | --- | --- |
-| Đăng nhập bằng số điện thoại hoặc email | Lấy toàn bộ công thức | Yêu thích công thức nấu ăn |
-| Đăng ký | Tìm kiếm công thức theo tên | Bình luận công thức nấu ăn |
-| Đổi mật khẩu | Tìm kiếm công thức theo tag | Tăng số lượt xem công thức |
-| Chỉnh sửa thông tin cá nhân | Tạo công thức nấu ăn mới | Lấy tất cả bình luận |
-| Lấy toàn bộ người dùng | Lấy danh sách đăng công thức nấu ăn công khai của cá nhân | Xóa bình luận |
-|  | Lấy danh sách công thức Top Trending |  |
-|  | Lấy danh sách nguyên liệu sẵn có |  |
-|  | Lấy danh sách tag sẵn có |  |
+---
 
-### User
+## 🧱 Công nghệ sử dụng
 
-- [x]  Đăng nhập
-- [x]  Đăng ký
-- [x]  Đổi mật khẩu
-- [x]  Chỉnh sửa thông tin cá nhân
-- [x]  Lấy toàn bộ người dùng
+- **Runtime**: Node.js
+- **Framework**: Express.js
+- **Database**: MySQL 8
+- **Auth**: JWT (Access Token + Refresh Token)
+- **Container**: Docker + Docker Compose
+- **AI integration**: provider chính + fallback cấu hình qua env
 
-### b. Recipe
+---
 
-- [x]  Lấy toàn bộ công thức nấu ăn
-- [x]  Tìm kiếm công thức theo tên
-- [x]  Tìm kiếm công thức theo tag
-- [x]  Tạo công thức nấu ăn mới
-- [x]  Lấy danh sách đăng công thức nấu ăn công khai của cá nhân
-- [x]  Lấy danh sách công thức Top Trending
-- [x]  Lấy danh sách nguyên liệu sẵn có
-- [x]  Lấy danh sách tag sẵn có
+## 📂 Cấu trúc thư mục
 
-### c. Interaction
+```text
+chefmate-server/
+├─ controllers/
+├─ models/
+├─ routes/            # Route JWT (/v2/...)
+├─ routes-legacy/     # Route legacy (/api/...)
+├─ middleware/
+├─ config/
+├─ docs/
+├─ scripts/
+├─ assets/
+├─ server.js          # Legacy server (port nội bộ mặc định 8080)
+├─ server.jwt.js      # JWT server (mặc định 13081)
+├─ docker-compose.yml
+└─ .env.example
+```
 
-- [x]  Yêu thích công thức nấu ăn
-- [x]  Bình luận công thức nấu ăn
-- [x]  Tăng số lượt xem công thức
-- [x]  Lấy tất cả bình luận
-- [x]  Xóa bình luận
+---
 
-### d. Pantry + AI Chat (New)
+## 🚀 Chạy nhanh (khuyến nghị Docker)
 
-- [x] Tủ lạnh theo từng user (`PantryItems`)
-- [x] Gợi ý món theo tủ lạnh: `Đủ để nấu ngay` + `Còn thiếu 1 chút`
-- [x] AI Chat theo phiên, lưu lịch sử riêng cho từng user (`ChatSessions`, `ChatMessages`)
-- [x] Cho phép gắn món đang nấu (`activeRecipeId`) để AI giữ ngữ cảnh
-- [x] Khi AI API lỗi: trả về fallback `AI_SERVER_BUSY` + message server bận
-
-#### API mới
-
-- `GET /api/pantry?userId={id}`
-- `POST /api/pantry/upsert`
-  - body: `{ userId, ingredientName, quantity, unit, expiresAt? }`
-- `DELETE /api/pantry/delete`
-  - body: `{ userId, pantryItemId }`
-- `POST /api/ai-chat/sessions`
-  - body: `{ userId, title?, activeRecipeId? }`
-- `GET /api/ai-chat/sessions/:sessionId?userId={id}`
-- `PATCH /api/ai-chat/sessions/active-recipe`
-  - body: `{ userId, chatSessionId, recipeId|null }`
-- `POST /api/ai-chat/recommendations-from-pantry`
-  - body: `{ userId, limit? }`
-- `POST /api/ai-chat/messages`
-  - body: `{ userId, chatSessionId?, message, model?, stream?, activeRecipeId? }`
-
-#### Biến môi trường AI
-
-- `AI_CHAT_API_URL=https://your-ai-api-url.com`
-- `AI_CHAT_MODEL=gemma3:4b`
-- `AI_CHAT_TIMEOUT_MS=20000`
-
-#### Security (bắt buộc trước khi chạy production)
-
-- Không commit file `.env` lên Git.
-- Dùng `.env.example` làm template và điền secret thật ở môi trường deploy.
-- Với Docker Compose, bắt buộc set các biến sau:
-  - `MYSQL_ROOT_PASSWORD`
-  - `MYSQL_PASSWORD`
-- Nên rotate ngay mọi secret đã từng hardcode hoặc đã commit trước đó (DB password, API key, token...).
-
-#### Migration DB (cho hệ thống đã chạy)
-
-Chạy thêm script:
+### 1) Clone và cấu hình
 
 ```bash
-mysql -h <host> -u <user> -p <database> < scripts/migrate_ai_chat.sql
+git clone <your-repo-url>
+cd chefmate-server
+cp .env.example .env
 ```
 
-## 4. Cơ sở dữ liệu
+Cập nhật giá trị trong `.env` trước khi chạy (DB, JWT secrets, chat key, AI keys).
 
-<img width="852" height="540" alt="image" src="https://github.com/user-attachments/assets/3172ba07-46dc-4192-afa2-fb8d799a8ce2" />
-
-```sql
-CREATE DATABASE ChefMateDB;
-
-CREATE TABLE Users(
-  userId INT PRIMARY KEY IDENTITY(1,1),
-  fullName NVARCHAR(100) NOT NULL,
-  phone NVARCHAR(10) NOT NULL UNIQUE,
-  email NVARCHAR(50) UNIQUE,
-  passwordHash NVARCHAR(255) NOT NULL,
-  followCount INT NOT NULL DEFAULT 0,
-  recipeCount INT NOT NULL DEFAULT 0,
-  createdAt DATETIME DEFAULT GETDATE()
-);
-
-CREATE TABLE Recipes(
-  recipeId INT PRIMARY KEY IDENTITY(1,1),
-  recipeName NVARCHAR(100) NOT NULL,
-  image NVARCHAR(1000) NOT NULL,
-  likeQuantity INT DEFAULT 0,
-  cookingTime NVARCHAR(20) NOT NULL,
-  ration INT NOT NULL,
-  viewCount INT NOT NULL DEFAULT 0,
-  userId INT FOREIGN KEY REFERENCES Users(userId),
-  createdAt DATETIME DEFAULT GETDATE()
-);
-
-CREATE TABLE Tags(
-  tagId INT PRIMARY KEY IDENTITY(1,1),
-  tagName NVARCHAR(100) NOT NULL
-);
-
-CREATE TABLE RecipesTags(
-  rtId INT PRIMARY KEY IDENTITY(1,1),
-  recipeId INT FOREIGN KEY REFERENCES Recipes(recipeId),
-  tagId INT FOREIGN KEY REFERENCES Tags(tagId)
-);
-
-CREATE TABLE Ingredients(
-  ingredientId INT PRIMARY KEY IDENTITY(1,1),
-  ingredientName NVARCHAR(100) NOT NULL
-);
-
-CREATE TABLE RecipesIngredients(
-  riId INT PRIMARY KEY IDENTITY(1,1),
-  recipeId INT FOREIGN KEY REFERENCES Recipes(recipeId),
-  ingredientId INT FOREIGN KEY REFERENCES Ingredients(ingredientId),
-  weight INT NOT NULL,
-  unit NVARCHAR(20) NOT NULL
-);
-
-CREATE TABLE CookingSteps(
-  csId INT PRIMARY KEY IDENTITY(1, 1),
-  recipeId INT FOREIGN KEY REFERENCES Recipes(recipeId),
-  indexStep INT NOT NULL,
-  content NVARCHAR(4000) NOT NULL
-);
-
-CREATE TABLE UsersLike(
-  ulId INT PRIMARY KEY IDENTITY(1, 1),
-  userId INT FOREIGN KEY REFERENCES Users(userId),
-  recipeId INT FOREIGN KEY REFERENCES Recipes(recipeId)
-);
-
-CREATE TABLE UsersComment(
-  ucId INT PRIMARY KEY IDENTITY(1, 1),
-  userId INT FOREIGN KEY REFERENCES Users(userId),
-  recipeId INT FOREIGN KEY REFERENCES Recipes(recipeId),
-  content NVARCHAR(4000) NOT NULL,
-  createdAt DATE DEFAULT GETDATE()
-);
-```
-
-## 5. Cách thực hiện
-
-- Khởi động SQL server
-    - Nếu bạn sử dụng Windows:
-        - Hãy mở lên bằng cách nhấn tổ hợp phím Windows + R
-        - Sau đó nhập …
-    - Nếu bạn sử dụng Linux (Distro Ubuntu):
-        
-        ```bash
-        sudo systemctl start mssql-server
-        ```
-        
-- Khởi động ExpressJS server
+### 2) Khởi động dịch vụ
 
 ```bash
-node server.js
+docker compose up --build -d
 ```
 
-> Ở bước này nếu trong terminal hiện dòng chữ “Server đang chạy tại [http://localhost:8080](http://localhost:8080/)” và “Đã kết nối SQL Server” là server đã chạy thành công tại localhost
-> 
-- Khởi động localtunnel chạy trên port bạn chọn
+### 3) URL dịch vụ
+
+- Legacy API: `http://localhost:8000`
+- JWT API: `http://localhost:13081`
+- Swagger UI:
+  - `http://localhost:8000/api-docs`
+  - `http://localhost:13081/api-docs`
+
+---
+
+## 🧪 Chạy local (không dùng Docker)
+
+> Cần có MySQL đang chạy và file `.env` hợp lệ.
 
 ```bash
-lt --port 8080
+npm install
+npm run start       # chạy legacy server
+# hoặc
+npm run start:jwt   # chạy JWT server
 ```
 
-> Sau khi chạy lệnh này và có được trả về 1 đường dẫn thì là server đã được deploy tạm thời với đường link đó.
-> 
+---
 
-<aside>
-💡
+## 🔐 Xác thực (Authentication)
 
-Tips: Nếu thực hiện tải ảnh từ client nhưng không được thì các bạn hãy vào link trong terminal đó, thực hiện lấy mật khẩu và xác thực, vậy là sẽ giải quyết được vấn đề.
+### API private thông thường
+Dùng Bearer token:
 
-</aside>
+```http
+Authorization: Bearer <accessToken>
+```
 
-# [III. Client - Admin Web](https://github.com/PhongDayNai/ChefMate_Admin_Web)
+### Chat API bắt buộc dual-auth
+Áp dụng cho tất cả endpoint:
+- `/v2/ai-chat/*`
+- `/v2/ai-chat-v1/*`
+
+Phải gửi đồng thời:
+
+```http
+Authorization: Bearer <accessToken>
+x-api-key: <CHAT_API_KEY>
+```
+
+Thiếu 1 trong 2 header sẽ trả `401 Unauthorized`.
+
+---
+
+## 🛣️ Bề mặt API
+
+### Legacy API
+- Prefix: `/api/...`
+- Server: `server.js`
+- Giữ tương thích cho client cũ
+
+### JWT API (khuyến nghị)
+- Prefix: `/v2/...`
+- Server: `server.jwt.js`
+- Dành cho client hiện tại/mới
+
+### Tài liệu tích hợp JWT đầy đủ
+- [`docs/API_JWT_13081_COMPLETE.md`](./docs/API_JWT_13081_COMPLETE.md)
+
+---
+
+## 📘 Nhóm API chính (JWT)
+
+- Users: `/v2/users`
+- Recipes: `/v2/recipes`
+- Interactions: `/v2/interactions`
+- Pantry: `/v2/pantry`
+- User Diet Notes: `/v2/user-diet-notes`
+- AI Chat v1: `/v2/ai-chat-v1`
+- AI Chat v2 meal flow: `/v2/ai-chat`
+
+---
+
+## ⚙️ Biến môi trường
+
+Xem đầy đủ trong `.env.example`.
+
+Các biến thường dùng:
+
+- `PORT`
+- `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`
+- `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET`
+- `JWT_ACCESS_EXPIRES_IN`, `JWT_REFRESH_EXPIRES_IN`
+- `CHAT_API_KEY`
+- `AI_CHAT_API_URL`, `AI_CHAT_MODEL`, `AI_CHAT_TIMEOUT_MS`
+- `AI_CHAT_FALLBACK_API_URL`, `AI_CHAT_FALLBACK_API_KEY`, `AI_CHAT_FALLBACK_MODEL`
+
+---
+
+## 🧰 Scripts
+
+```bash
+npm run start
+npm run start:jwt
+```
+
+Các script migrate/test/import khác nằm trong [`scripts/`](./scripts).
+
+---
+
+## 🛡️ Lưu ý bảo mật
+
+- Không commit `.env` hoặc secret thật lên Git.
+- Nếu nghi ngờ lộ thông tin, xoay vòng credential ngay.
+- Dùng JWT secret mạnh ở production.
+- Tách khóa AI/chat theo từng môi trường.
+- Khi deploy production nên đặt sau HTTPS/reverse proxy.
+
+---
+
+## 🤝 Đóng góp
+
+Mọi đóng góp đều được hoan nghênh.
+
+Quy trình đề xuất:
+
+1. Fork repository
+2. Tạo feature branch
+3. Commit theo **Conventional Commits**
+4. Mở PR kèm mô tả rõ ràng + ghi chú kiểm thử
+
+---
+
+## 📄 License
+
+Repository hiện chưa khai báo license file.
+
+Nếu public rộng rãi, nên thêm `LICENSE` (ví dụ MIT).
+
+---
+
+## 🌍 English README
+
+English version: [README.md](./README.md)
