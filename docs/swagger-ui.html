@@ -7,7 +7,6 @@
   <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5/swagger-ui.css" />
   <style>
     body { margin:0; background:#fafafa; }
-    .topbar { display:none; }
   </style>
 </head>
 <body>
@@ -15,7 +14,12 @@
   <script src="https://unpkg.com/swagger-ui-dist@5/swagger-ui-bundle.js"></script>
   <script>
     window.ui = SwaggerUIBundle({
-      url: '/api-docs/openapi.json',
+      urls: [
+        { url: '/api-docs/openapi.json', name: 'ChefMate API (Current Host)' },
+        { url: 'https://chefmate-api.phongdaynai.id.vn/api-docs/openapi.json', name: 'ChefMate API (Production)' },
+        { url: 'http://127.0.0.1:13081/api-docs/openapi.json', name: 'ChefMate API (Local JWT 13081)' },
+        { url: 'http://127.0.0.1:8000/api-docs/openapi.json', name: 'ChefMate API (Local Legacy 8000)' }
+      ],
       dom_id: '#swagger-ui',
       deepLinking: true,
       presets: [SwaggerUIBundle.presets.apis],
