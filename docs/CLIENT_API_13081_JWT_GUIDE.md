@@ -1,6 +1,6 @@
 # CLIENT API 13081 JWT GUIDE (Bản chuẩn mới)
 
-> Cập nhật: 2026-04-03  
+> Cập nhật: 2026-04-06  
 > Server: `http://<host>:13081`  
 > Base path mới: `/v2/...`
 
@@ -135,6 +135,7 @@ Auth: **Bearer + x-api-key**
 - `PATCH /sessions/meal/recipes/status`
 - `PATCH /sessions/meal/primary-recipe`
 - `PATCH /sessions/meal/complete`
+- `POST /sessions/meal/resolve-completion-check`
 - `POST /messages`
 
 ---
