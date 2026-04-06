@@ -1597,6 +1597,194 @@
         },
         "operationId": "sendChatMessageV2"
       }
+    },
+    "/api/recipes/trending": {
+      "get": {
+        "tags": [
+          "Recipes"
+        ],
+        "summary": "Trending v1 (legacy pagination feed)",
+        "description": "Feed thịnh hành phiên bản cũ. Hỗ trợ phân trang và period tương tự trending-v2 nhưng không bọc thêm apiVersion=v2.",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Optional. Nếu có, trả thêm trạng thái isLiked"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 1,
+              "minimum": 1
+            },
+            "description": "Trang hiện tại"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 20,
+              "minimum": 1,
+              "maximum": 50
+            },
+            "description": "Số item mỗi trang"
+          },
+          {
+            "name": "period",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "all",
+                "7d",
+                "30d",
+                "90d"
+              ],
+              "default": "all"
+            },
+            "description": "Khoảng thời gian tính trend"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/recipes/admin/pending": {
+      "get": {
+        "tags": [
+          "Recipes"
+        ],
+        "summary": "Get pending recipes for admin review",
+        "description": "Lấy danh sách công thức trạng thái pending để duyệt.",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Optional user context"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/recipes/admin/review": {
+      "patch": {
+        "tags": [
+          "Recipes"
+        ],
+        "summary": "Review recipe (approve/reject)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "recipeId",
+                  "status"
+                ],
+                "properties": {
+                  "recipeId": {
+                    "type": "integer"
+                  },
+                  "status": {
+                    "type": "string",
+                    "description": "Giá trị hợp lệ theo server/model (ví dụ: approved/rejected/pending)"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Review thành công"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/api/ai-chat/v2/sessions/meal/complete": {
+      "patch": {
+        "tags": [
+          "AIChatV2"
+        ],
+        "summary": "Complete/close meal session",
+        "description": "Đóng meal session và cập nhật trạng thái các món còn lại theo lựa chọn completionType.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "userId",
+                  "chatSessionId"
+                ],
+                "properties": {
+                  "userId": {
+                    "type": "integer"
+                  },
+                  "chatSessionId": {
+                    "type": "integer"
+                  },
+                  "completionType": {
+                    "type": "string",
+                    "nullable": true,
+                    "description": "Mặc định completed nếu không truyền"
+                  },
+                  "note": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "markRemainingStatus": {
+                    "type": "string",
+                    "nullable": true,
+                    "description": "Trạng thái áp cho món còn lại khi đóng session"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "operationId": "completeMealSessionV2"
+      }
     }
   },
   "components": {
