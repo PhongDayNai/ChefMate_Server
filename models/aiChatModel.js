@@ -630,6 +630,38 @@ async function getPantryMapByUser(userId) {
     };
 }
 
+async function getMealRecipesBySession(chatSessionId) {
+    const [rows] = await pool.query(
+        `SELECT csr.chatSessionRecipeId, csr.chatSessionId, csr.recipeId, csr.sortOrder, csr.status,
+                csr.servingsOverride, csr.note, csr.selectedAt, csr.resolvedAt,
+                r.recipeName, r.image, r.cookingTime, r.ration
+         FROM ChatSessionRecipes csr
+         JOIN Recipes r ON r.recipeId = csr.recipeId
+         WHERE csr.chatSessionId = ?
+         ORDER BY csr.sortOrder ASC, csr.chatSessionRecipeId ASC`,
+        [chatSessionId]
+    );
+
+    return rows.map(row => ({
+        chatSessionRecipeId: Number(row.chatSessionRecipeId),
+        chatSessionId: Number(row.chatSessionId),
+        recipeId: Number(row.recipeId),
+        sortOrder: Number(row.sortOrder),
+        status: row.status,
+        servingsOverride: row.servingsOverride === null ? null : Number(row.servingsOverride),
+        note: row.note,
+        selectedAt: row.selectedAt,
+        resolvedAt: row.resolvedAt,
+        recipe: {
+            recipeId: Number(row.recipeId),
+            recipeName: row.recipeName,
+            image: row.image,
+            cookingTime: row.cookingTime,
+            ration: Number(row.ration)
+        }
+    }));
+}
+
 async function getRecentMessages(chatSessionId, limit = 20) {
     const parsedLimit = Number(limit) > 0 ? Number(limit) : 20;
 
@@ -1410,13 +1442,24 @@ exports.getSessionHistory = async ({ userId, chatSessionId }) => {
         };
     }
 
-    const messages = await getRecentMessages(chatSessionId, 200);
+    const [messages, mealItems] = await Promise.all([
+        getRecentMessages(chatSessionId, 200),
+        getMealRecipesBySession(chatSessionId)
+    ]);
 
     return {
         success: true,
         data: {
             session,
-            messages
+            messages,
+            meal: {
+                totalRecipes: mealItems.length,
+                items: mealItems
+            },
+            focus: {
+                activeRecipeId: session?.activeRecipeId || null,
+                needsSelection: mealItems.length > 1 && !session?.activeRecipeId
+            }
         },
         message: 'Get chat history successfully'
     };
