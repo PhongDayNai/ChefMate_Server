@@ -6,9 +6,10 @@ Repository này chứa server được xây dựng bằng **Node.js + Express + 
 - **Legacy API** (`/api/...`)
 - **JWT API** (`/v2/...`, khuyến nghị cho client mới)
 
-## 🔗 Repository liên quan
+## 🌐 Ecosystem
 
-- Mobile App: [ChefMate_Client](https://github.com/PhongDayNai/ChefMate_Client)
+- Android Client: [ChefMate_Client](https://github.com/PhongDayNai/ChefMate_Client)
+- Web Client: [Chefmate_Web_Client](https://github.com/PhongDayNai/Chefmate_Web_Client)
 - Admin Web: [ChefMate_Admin_Web](https://github.com/PhongDayNai/ChefMate_Admin_Web)
 
 ---
