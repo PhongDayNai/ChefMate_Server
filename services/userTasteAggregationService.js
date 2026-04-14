@@ -156,9 +156,25 @@ async function recomputeUserTasteProfile(userId) {
     });
 }
 
+async function getLatestSignalAt(userId) {
+    const [rows] = await pool.query(
+        `SELECT MAX(createdAt) AS latestSignalAt
+         FROM UserEatingSignals
+         WHERE userId = ?`,
+        [Number(userId)]
+    );
+
+    return rows[0]?.latestSignalAt || null;
+}
+
 async function getOrRefreshUserTasteProfile(userId, { maxAgeHours = 12 } = {}) {
     const existing = await userTasteProfileModel.getByUserId(userId);
     if (!existing?.computedAt) {
+        return recomputeUserTasteProfile(userId);
+    }
+
+    const latestSignalAt = await getLatestSignalAt(userId);
+    if (latestSignalAt && new Date(latestSignalAt).getTime() > new Date(existing.computedAt).getTime()) {
         return recomputeUserTasteProfile(userId);
     }
 
