@@ -1,11 +1,20 @@
+const { enrichExplanationText, isAiEnrichmentEnabled } = require('./aiRecommendationEnrichmentService');
+
 function normalizeReason(text) {
     return String(text || '').trim();
 }
 
-function buildExplanationPayload({ recipe, recommendation, userProfile, profile, context = 'normal' }) {
+async function buildExplanationPayload({ recipe, recommendation, userProfile, profile, context = 'normal' }) {
     const reasons = Array.isArray(recommendation?.reasons)
         ? recommendation.reasons.map(normalizeReason).filter(Boolean)
         : [];
+
+    const aiSummary = await enrichExplanationText({
+        recipe,
+        recommendation,
+        userProfile,
+        context
+    });
 
     return {
         recipeId: Number(recipe?.recipeId || recommendation?.recipeId || 0),
@@ -13,6 +22,9 @@ function buildExplanationPayload({ recipe, recommendation, userProfile, profile,
         context,
         recommendationType: recommendation?.recommendationType || null,
         reasons,
+        summary: aiSummary || null,
+        explanationSource: aiSummary ? 'hybrid' : 'rule',
+        aiEnrichmentEnabled: isAiEnrichmentEnabled(),
         score: Number(recommendation?.score || 0),
         scoreBreakdown: recommendation?.scoreBreakdown || {},
         fitDimensions: {

@@ -1,4 +1,5 @@
 const userEatingInsightModel = require('../models/userEatingInsightModel');
+const { enrichInsightMessages } = require('./aiRecommendationEnrichmentService');
 
 function generateInsightsFromProfile(profile) {
     const recent = profile?.recentTasteVector || {};
@@ -60,7 +61,8 @@ function generateInsightsFromProfile(profile) {
 
 async function refreshInsightsForUser(userId, profile) {
     const insights = generateInsightsFromProfile(profile);
-    return userEatingInsightModel.replaceInsightsForUser(userId, insights);
+    const enrichedInsights = await enrichInsightMessages(insights, profile);
+    return userEatingInsightModel.replaceInsightsForUser(userId, enrichedInsights);
 }
 
 module.exports = {

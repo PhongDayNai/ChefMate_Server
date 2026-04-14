@@ -1,5 +1,6 @@
 const recipeProfileModel = require('../models/recipeProfileModel');
 const { PROFILE_DIMENSIONS } = require('./recommendationConstants');
+const { enrichRecipeProfileWithAI } = require('./aiRecommendationEnrichmentService');
 
 const KEYWORDS = {
     spicy: ['ớt', 'sa tế', 'cay', 'tiêu xanh', 'tiêu đen', 'kim chi'],
@@ -146,7 +147,8 @@ function buildProfileFromRecipe(recipe) {
 }
 
 async function profileRecipe(recipe) {
-    const profile = buildProfileFromRecipe(recipe);
+    const baseProfile = buildProfileFromRecipe(recipe);
+    const profile = await enrichRecipeProfileWithAI({ recipe, baseProfile });
     return recipeProfileModel.upsert({
         recipeId: recipe.recipeId,
         ...profile
