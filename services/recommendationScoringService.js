@@ -123,7 +123,7 @@ function hasDietConflict(recipe, activeDietNotes) {
     return false;
 }
 
-function buildReasons({ recipeDimensions, pantryScore, balanceSignals, activeDietNotes, context, fatiguePenalty }) {
+function buildReasons({ recipeDimensions, pantryScore, balanceSignals, activeDietNotes, context, fatiguePenalty, adaptiveAdjustment }) {
     const reasons = [];
     if (Number(recipeDimensions.seafood || 0) >= 0.45) reasons.push('matches your stronger seafood preference');
     if (Number(recipeDimensions.soup || 0) >= 0.45 || Number(recipeDimensions.light || 0) >= 0.5) reasons.push('lighter than your recent meal pattern');
@@ -134,6 +134,8 @@ function buildReasons({ recipeDimensions, pantryScore, balanceSignals, activeDie
     if (context === 'quick_meal' && Number(recipeDimensions.quick_meal || 0) >= 0.45) reasons.push('fits a quicker meal context');
     if (context === 'pantry_first' && pantryScore.coverage >= 0.4) reasons.push('covers a useful portion of your pantry ingredients');
     if (fatiguePenalty > 0.2) reasons.push('rank adjusted to avoid repetition from very recent meals');
+    if (adaptiveAdjustment >= 0.4) reasons.push('similar patterns have received positive feedback recently');
+    if (adaptiveAdjustment <= -0.4) reasons.push('similar patterns have received weaker feedback recently');
     return Array.from(new Set(reasons)).slice(0, 4);
 }
 
@@ -163,6 +165,7 @@ function buildRecentRecipePenaltyMap(signals = []) {
         if (signalType === 'cook_completed') delta = 0.8;
         else if (signalType === 'cook_started') delta = 0.45;
         else if (signalType === 'recommendation_accept') delta = 0.35;
+        else if (signalType === 'recommendation_ignore') delta = 0.2;
         else if (signalType === 'recipe_view') delta = 0.1;
         penaltyMap.set(recipeId, clamp(current + delta, 0, 1.5));
     }
@@ -191,13 +194,75 @@ function scoreDiversity(recipeDimensions, recentExposure = {}) {
     return clamp(score, 0, 1.5);
 }
 
+function buildAdaptiveFeedbackProfile(signals = [], profileMap = new Map()) {
+    const profile = {
+        positiveDimensions: {},
+        negativeDimensions: {},
+        recipeAdjustments: new Map()
+    };
+
+    for (const signal of signals) {
+        const recipeId = Number(signal.recipeId || 0);
+        const signalType = String(signal.signalType || '');
+        const recipeProfile = profileMap.get(recipeId);
+        const dimensions = recipeProfile ? mergeDimensions(recipeProfile) : {};
+        let recipeDelta = 0;
+        let targetBucket = null;
+
+        if (signalType === 'feedback_positive' || signalType === 'recommendation_accept' || signalType === 'cook_completed') {
+            recipeDelta = signalType === 'cook_completed' ? 0.35 : 0.5;
+            targetBucket = 'positiveDimensions';
+        } else if (signalType === 'feedback_negative' || signalType === 'recommendation_ignore') {
+            recipeDelta = -0.45;
+            targetBucket = 'negativeDimensions';
+        } else if (signalType === 'feedback_too_spicy') {
+            profile.negativeDimensions.spicy = Number(profile.negativeDimensions.spicy || 0) + 0.8;
+            recipeDelta = -0.5;
+        } else if (signalType === 'feedback_too_oily') {
+            profile.negativeDimensions.oiliness = Number(profile.negativeDimensions.oiliness || 0) + 0.8;
+            recipeDelta = -0.5;
+        } else if (signalType === 'feedback_too_heavy') {
+            profile.negativeDimensions.heavy = Number(profile.negativeDimensions.heavy || 0) + 0.8;
+            recipeDelta = -0.5;
+        } else if (signalType === 'feedback_light_preferred') {
+            profile.positiveDimensions.light = Number(profile.positiveDimensions.light || 0) + 0.7;
+            recipeDelta = 0.25;
+        }
+
+        if (targetBucket) {
+            for (const [key, value] of Object.entries(dimensions)) {
+                profile[targetBucket][key] = Number(profile[targetBucket][key] || 0) + Number(value || 0);
+            }
+        }
+
+        if (recipeId > 0 && recipeDelta !== 0) {
+            const current = Number(profile.recipeAdjustments.get(recipeId) || 0);
+            profile.recipeAdjustments.set(recipeId, clamp(current + recipeDelta, -1.5, 1.5));
+        }
+    }
+
+    return profile;
+}
+
+function scoreAdaptiveAdjustment(recipeId, recipeDimensions, adaptiveFeedbackProfile) {
+    const recipeAdjustment = Number(adaptiveFeedbackProfile.recipeAdjustments.get(Number(recipeId)) || 0);
+    let dimensionAdjustment = 0;
+
+    for (const [key, value] of Object.entries(recipeDimensions || {})) {
+        dimensionAdjustment += Number(adaptiveFeedbackProfile.positiveDimensions[key] || 0) * Number(value || 0) * 0.08;
+        dimensionAdjustment -= Number(adaptiveFeedbackProfile.negativeDimensions[key] || 0) * Number(value || 0) * 0.1;
+    }
+
+    return clamp(recipeAdjustment + dimensionAdjustment, -2, 2);
+}
+
 async function buildRecommendationContext(parsedUserId) {
     const [recipesResult, activeDietNotes, pantryResult, userProfile, recentSignals] = await Promise.all([
         recipeModel.getAllRecipes(),
         userDietModel.getActiveDietNotes(parsedUserId),
         pantryModel.listPantryByUser(parsedUserId).catch(() => ({ success: true, data: [] })),
         getOrRefreshUserTasteProfile(parsedUserId),
-        userEatingSignalModel.listSignalsByUser(parsedUserId, { limit: 50 })
+        userEatingSignalModel.listSignalsByUser(parsedUserId, { limit: 100 })
     ]);
 
     const recipes = recipesResult?.data || [];
@@ -207,6 +272,7 @@ async function buildRecommendationContext(parsedUserId) {
     const profileMap = new Map(profiles.map(profile => [Number(profile.recipeId), profile]));
     const recentRecipePenaltyMap = buildRecentRecipePenaltyMap(recentSignals);
     const recentDimensionExposure = buildDimensionExposure(recentSignals, profileMap);
+    const adaptiveFeedbackProfile = buildAdaptiveFeedbackProfile(recentSignals, profileMap);
     const insights = await refreshInsightsForUser(parsedUserId, userProfile);
 
     return {
@@ -218,6 +284,7 @@ async function buildRecommendationContext(parsedUserId) {
         recentSignals,
         recentRecipePenaltyMap,
         recentDimensionExposure,
+        adaptiveFeedbackProfile,
         insights
     };
 }
@@ -234,6 +301,7 @@ async function getPersonalizedRecommendations({ userId, context = 'normal', limi
         profileMap,
         recentRecipePenaltyMap,
         recentDimensionExposure,
+        adaptiveFeedbackProfile,
         insights
     } = recommendationContext;
 
@@ -249,9 +317,10 @@ async function getPersonalizedRecommendations({ userId, context = 'normal', limi
         const pantryScore = scorePantry(recipe, pantryItems);
         const contextScore = scoreContext(recipeDimensions, pantryScore, context);
         const diversity = scoreDiversity(recipeDimensions, recentDimensionExposure);
+        const adaptiveAdjustment = scoreAdaptiveAdjustment(Number(recipe.recipeId), recipeDimensions, adaptiveFeedbackProfile);
         const heavyPenalty = Math.max(0, Number(recipeDimensions.heavy || 0) * (userProfile.balanceSignals?.heavyWeekDetected ? 0.9 : 0));
         const fatiguePenalty = Number(recentRecipePenaltyMap.get(Number(recipe.recipeId)) || 0);
-        const finalScore = Number((preference + balance + pantryScore.score + contextScore + diversity - heavyPenalty - fatiguePenalty).toFixed(2));
+        const finalScore = Number((preference + balance + pantryScore.score + contextScore + diversity + adaptiveAdjustment - heavyPenalty - fatiguePenalty).toFixed(2));
         const recommendationType = balance >= preference && balance > pantryScore.score
             ? 'balance_recovery'
             : pantryScore.score > preference
@@ -270,7 +339,8 @@ async function getPersonalizedRecommendations({ userId, context = 'normal', limi
                 balanceSignals: userProfile.balanceSignals || {},
                 activeDietNotes,
                 context,
-                fatiguePenalty
+                fatiguePenalty,
+                adaptiveAdjustment
             }) : [],
             scoreBreakdown: {
                 preference: Number(preference.toFixed(2)),
@@ -278,12 +348,8 @@ async function getPersonalizedRecommendations({ userId, context = 'normal', limi
                 pantry: Number(pantryScore.score.toFixed(2)),
                 context: Number(contextScore.toFixed(2)),
                 diversity: Number(diversity.toFixed(2)),
+                adaptive: Number(adaptiveAdjustment.toFixed(2)),
                 penalty: Number((heavyPenalty + fatiguePenalty).toFixed(2))
-            },
-            _debug: {
-                pantryScore,
-                recipeDimensions,
-                fatiguePenalty
             }
         });
     }
@@ -345,7 +411,8 @@ async function explainPersonalizedRecommendation({ userId, recipeId, context = '
         userProfile,
         profileMap,
         recentRecipePenaltyMap,
-        recentDimensionExposure
+        recentDimensionExposure,
+        adaptiveFeedbackProfile
     } = recommendationContext;
 
     const recipe = recipes.find(item => Number(item.recipeId) === targetRecipeId) || null;
@@ -364,6 +431,7 @@ async function explainPersonalizedRecommendation({ userId, recipeId, context = '
     const pantryScore = scorePantry(recipe, pantryItems);
     const contextScore = scoreContext(recipeDimensions, pantryScore, context);
     const diversity = scoreDiversity(recipeDimensions, recentDimensionExposure);
+    const adaptiveAdjustment = scoreAdaptiveAdjustment(targetRecipeId, recipeDimensions, adaptiveFeedbackProfile);
     const heavyPenalty = Math.max(0, Number(recipeDimensions.heavy || 0) * (userProfile.balanceSignals?.heavyWeekDetected ? 0.9 : 0));
     const fatiguePenalty = Number(recentRecipePenaltyMap.get(targetRecipeId) || 0);
     const recommendationType = balance >= preference && balance > pantryScore.score
@@ -376,14 +444,15 @@ async function explainPersonalizedRecommendation({ userId, recipeId, context = '
         recipeId: targetRecipeId,
         recipeName: recipe.recipeName,
         recommendationType,
-        score: Number((preference + balance + pantryScore.score + contextScore + diversity - heavyPenalty - fatiguePenalty).toFixed(2)),
+        score: Number((preference + balance + pantryScore.score + contextScore + diversity + adaptiveAdjustment - heavyPenalty - fatiguePenalty).toFixed(2)),
         reasons: buildReasons({
             recipeDimensions,
             pantryScore,
             balanceSignals: userProfile.balanceSignals || {},
             activeDietNotes,
             context,
-            fatiguePenalty
+            fatiguePenalty,
+            adaptiveAdjustment
         }),
         scoreBreakdown: {
             preference: Number(preference.toFixed(2)),
@@ -391,6 +460,7 @@ async function explainPersonalizedRecommendation({ userId, recipeId, context = '
             pantry: Number(pantryScore.score.toFixed(2)),
             context: Number(contextScore.toFixed(2)),
             diversity: Number(diversity.toFixed(2)),
+            adaptive: Number(adaptiveAdjustment.toFixed(2)),
             penalty: Number((heavyPenalty + fatiguePenalty).toFixed(2))
         }
     };

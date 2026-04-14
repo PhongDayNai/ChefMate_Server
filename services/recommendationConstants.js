@@ -29,6 +29,7 @@ const SIGNAL_WEIGHTS = {
     recommendation_impression: 1,
     recommendation_click: 2,
     recommendation_accept: 5,
+    recommendation_ignore: -1,
     feedback_positive: 4,
     feedback_negative: -3,
     feedback_too_spicy: -4,

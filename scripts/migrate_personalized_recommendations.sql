@@ -32,6 +32,7 @@ CREATE TABLE IF NOT EXISTS UserEatingSignals (
     'recommendation_impression',
     'recommendation_click',
     'recommendation_accept',
+    'recommendation_ignore',
     'feedback_positive',
     'feedback_negative',
     'feedback_too_spicy',

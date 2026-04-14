@@ -1,4 +1,5 @@
 const { getPersonalizedRecommendations, explainPersonalizedRecommendation } = require('../services/recommendationScoringService');
+const recommendationAnalyticsModel = require('../models/recommendationAnalyticsModel');
 const { appendSignal } = require('../services/userSignalService');
 
 exports.getPersonalizedRecommendations = async (req, res) => {
@@ -71,6 +72,27 @@ exports.explainPersonalizedRecommendation = async (req, res) => {
     }
 };
 
+exports.getRecommendationFeedbackSummary = async (req, res) => {
+    const userId = Number(req.auth?.userId || req.userId || 0);
+    const days = Number(req.query.days || 30);
+
+    if (!userId || userId <= 0) {
+        return res.status(400).json({ success: false, data: null, message: 'userId is required' });
+    }
+
+    try {
+        const summary = await recommendationAnalyticsModel.getFeedbackSummaryByUser(userId, { days });
+        return res.status(200).json({
+            success: true,
+            data: summary,
+            message: 'Get recommendation feedback summary successfully'
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ success: false, data: null, message: 'Failed to get recommendation feedback summary' });
+    }
+};
+
 exports.submitRecommendationFeedback = async (req, res) => {
     const userId = Number(req.auth?.userId || req.userId || 0);
     const recipeId = Number(req.body?.recipeId || 0);
@@ -84,7 +106,8 @@ exports.submitRecommendationFeedback = async (req, res) => {
         too_heavy: 'feedback_too_heavy',
         light_preferred: 'feedback_light_preferred',
         accept: 'recommendation_accept',
-        click: 'recommendation_click'
+        click: 'recommendation_click',
+        ignore: 'recommendation_ignore'
     };
 
     if (!userId || userId <= 0 || !recipeId || recipeId <= 0 || !allowedMap[feedbackType]) {
