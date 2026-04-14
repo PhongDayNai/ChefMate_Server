@@ -1,5 +1,37 @@
 const { pool } = require('../config/dbConfig');
 
+exports.findRecentDuplicateSignal = async ({
+    userId,
+    recipeId = null,
+    signalType,
+    source = 'app',
+    windowSeconds = 120
+}) => {
+    const parsedUserId = Number(userId);
+    const parsedRecipeId = recipeId === null || recipeId === undefined ? null : Number(recipeId);
+    const [rows] = await pool.query(
+        `SELECT signalId, createdAt
+         FROM UserEatingSignals
+         WHERE userId = ?
+           AND ((recipeId IS NULL AND ? IS NULL) OR recipeId = ?)
+           AND signalType = ?
+           AND source = ?
+           AND createdAt >= (NOW() - INTERVAL ? SECOND)
+         ORDER BY signalId DESC
+         LIMIT 1`,
+        [
+            parsedUserId,
+            parsedRecipeId && parsedRecipeId > 0 ? parsedRecipeId : null,
+            parsedRecipeId && parsedRecipeId > 0 ? parsedRecipeId : null,
+            signalType,
+            source,
+            Number(windowSeconds || 120)
+        ]
+    );
+
+    return rows[0] || null;
+};
+
 exports.appendSignal = async ({
     userId,
     recipeId = null,

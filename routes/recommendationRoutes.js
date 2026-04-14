@@ -5,6 +5,7 @@ const requireAccessToken = require('../middleware/requireAccessToken');
 const injectAuthUser = require('../middleware/injectAuthUser');
 
 router.get('/personalized', requireAccessToken, injectAuthUser, controller.getPersonalizedRecommendations);
+router.get('/personalized/explain', requireAccessToken, injectAuthUser, controller.explainPersonalizedRecommendation);
 router.post('/feedback', requireAccessToken, injectAuthUser, controller.submitRecommendationFeedback);
 
 module.exports = router;
