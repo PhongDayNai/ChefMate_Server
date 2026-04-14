@@ -1,5 +1,6 @@
 const express = require('express');
 const interactionModel = require('../models/interactionModel');
+const { appendSignal } = require('../services/userSignalService');
 
 exports.likeRecipe = async (req, res) => {
     const { recipeId } = req.body || {};
@@ -20,6 +21,14 @@ exports.likeRecipe = async (req, res) => {
         if (!result.success && result.message === 'Recipe not found') {
             return res.status(404).json(result);
         }
+
+        appendSignal({
+            userId: parsedUserId,
+            recipeId: parsedRecipeId,
+            signalType: result?.data?.liked ? 'recipe_like' : 'recipe_unlike',
+            source: 'app',
+            context: { endpoint: 'interaction.like' }
+        });
 
         return res.status(200).json(result);
     } catch (error) {
@@ -65,14 +74,26 @@ exports.addComment = async (req, res) => {
 };
 
 exports.increaseViewCount = async (req, res) => {
-    const { recipeId } = req.body;
+    const parsedRecipeId = Number(req.body?.recipeId || 0);
+    const parsedUserId = Number(req.auth?.userId || req.userId || req.body?.userId || 0) || null;
 
-    if (!recipeId || typeof recipeId !== 'number' || recipeId <= 0) {
+    if (!parsedRecipeId || parsedRecipeId <= 0) {
         return res.status(400).json({ error: 'recipeId is required and must be a positive number' });
     }
 
     try {
-        const result = await interactionModel.increaseViewCount(recipeId);
+        const result = await interactionModel.increaseViewCount(parsedRecipeId);
+
+        if (parsedUserId && parsedUserId > 0) {
+            appendSignal({
+                userId: parsedUserId,
+                recipeId: parsedRecipeId,
+                signalType: 'recipe_view',
+                source: 'app',
+                context: { endpoint: 'interaction.increase-view-count' }
+            });
+        }
+
         return res.status(200).json(result);
     } catch (error) {
         console.error(error);

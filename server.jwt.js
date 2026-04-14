@@ -11,6 +11,8 @@ const pantryRoutes = require('./routes/pantryRoutes');
 const aiChatRoutes = require('./routes/aiChatRoutes');
 const aiChatV2Routes = require('./routes/aiChatV2Routes');
 const userDietRoutes = require('./routes/userDietRoutes');
+const userEatingProfileRoutes = require('./routes/userEatingProfileRoutes');
+const recommendationRoutes = require('./routes/recommendationRoutes');
 
 const app = express();
 
@@ -27,6 +29,8 @@ app.use('/v2/pantry', pantryRoutes);
 app.use('/v2/ai-chat-v1', aiChatRoutes);
 app.use('/v2/ai-chat', aiChatV2Routes);
 app.use('/v2/user-diet-notes', userDietRoutes);
+app.use('/v2/users', userEatingProfileRoutes);
+app.use('/v2/recommendations', recommendationRoutes);
 
 app.get('/api-docs', (req, res) => {
     res.sendFile(path.join(__dirname, 'docs', 'swagger-ui.html'));
