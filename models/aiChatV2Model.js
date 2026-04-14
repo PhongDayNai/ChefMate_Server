@@ -1,5 +1,6 @@
 const { pool } = require('../config/dbConfig');
 const userDietModel = require('./userDietModel');
+const { appendSignal } = require('../services/userSignalService');
 
 const DEFAULT_AGENT_NAME = 'Bepes';
 const DEFAULT_SESSION_TITLE = 'Bữa ăn nhiều món';
@@ -12,6 +13,30 @@ const MEAL_V2_COMPLETION_REMINDER_MINUTES = Number(process.env.MEAL_V2_COMPLETIO
 const MEAL_V2_COMPLETION_REMINDER_STRONG_MINUTES = Number(process.env.MEAL_V2_COMPLETION_REMINDER_STRONG_MINUTES || 180);
 const MEAL_V2_COMPLETION_REMINDER_COOLDOWN_MINUTES = Number(process.env.MEAL_V2_COMPLETION_REMINDER_COOLDOWN_MINUTES || 30);
 const MEAL_V2_COMPLETION_REMINDER_MAX_PER_DAY = Number(process.env.MEAL_V2_COMPLETION_REMINDER_MAX_PER_DAY || 3);
+
+function emitMealSignalsBestEffort({ userId, recipeIds = [], signalType, context = {} }) {
+    const parsedUserId = Number(userId);
+    const normalizedRecipeIds = Array.from(new Set((recipeIds || []).map(Number).filter(id => id > 0)));
+
+    if (!parsedUserId || parsedUserId <= 0 || normalizedRecipeIds.length === 0 || !signalType) {
+        return;
+    }
+
+    Promise.allSettled(
+        normalizedRecipeIds.map(recipeId => appendSignal({
+            userId: parsedUserId,
+            recipeId,
+            signalType,
+            source: 'chat',
+            context: {
+                flow: 'meal_v2',
+                ...context
+            }
+        }))
+    ).catch(() => {
+        // best-effort only
+    });
+}
 
 function safeParseJson(value) {
     if (!value) return null;
@@ -916,6 +941,35 @@ exports.createMealSession = async ({ userId, title, recipeIds = null, recipes = 
 
         await conn.commit();
 
+        const cookingRecipeIds = selections
+            .filter(item => item.status === 'cooking')
+            .map(item => Number(item.recipeId));
+        const completedRecipeIds = selections
+            .filter(item => item.status === 'done')
+            .map(item => Number(item.recipeId));
+        const abandonedRecipeIds = selections
+            .filter(item => item.status === 'skipped')
+            .map(item => Number(item.recipeId));
+
+        emitMealSignalsBestEffort({
+            userId: parsedUserId,
+            recipeIds: cookingRecipeIds,
+            signalType: 'cook_started',
+            context: { action: 'create_meal_session' }
+        });
+        emitMealSignalsBestEffort({
+            userId: parsedUserId,
+            recipeIds: completedRecipeIds,
+            signalType: 'cook_completed',
+            context: { action: 'create_meal_session' }
+        });
+        emitMealSignalsBestEffort({
+            userId: parsedUserId,
+            recipeIds: abandonedRecipeIds,
+            signalType: 'cook_abandoned',
+            context: { action: 'create_meal_session' }
+        });
+
         const session = await getChatSessionById(chatSessionId, parsedUserId);
         const mealItems = await getMealRecipesBySession(chatSessionId);
 
@@ -1007,6 +1061,35 @@ exports.replaceMealRecipes = async ({ userId, chatSessionId, recipeIds = null, r
         });
 
         await conn.commit();
+
+        const cookingRecipeIds = selections
+            .filter(item => item.status === 'cooking')
+            .map(item => Number(item.recipeId));
+        const completedRecipeIds = selections
+            .filter(item => item.status === 'done')
+            .map(item => Number(item.recipeId));
+        const abandonedRecipeIds = selections
+            .filter(item => item.status === 'skipped')
+            .map(item => Number(item.recipeId));
+
+        emitMealSignalsBestEffort({
+            userId: parsedUserId,
+            recipeIds: cookingRecipeIds,
+            signalType: 'cook_started',
+            context: { action: 'replace_meal_recipes' }
+        });
+        emitMealSignalsBestEffort({
+            userId: parsedUserId,
+            recipeIds: completedRecipeIds,
+            signalType: 'cook_completed',
+            context: { action: 'replace_meal_recipes' }
+        });
+        emitMealSignalsBestEffort({
+            userId: parsedUserId,
+            recipeIds: abandonedRecipeIds,
+            signalType: 'cook_abandoned',
+            context: { action: 'replace_meal_recipes' }
+        });
 
         const updatedSession = await getChatSessionById(parsedSessionId, parsedUserId);
         const mealItems = await getMealRecipesBySession(parsedSessionId);
@@ -1170,6 +1253,33 @@ exports.updateMealRecipeStatus = async ({ userId, chatSessionId, recipeId, statu
 
         await conn.commit();
 
+        if (normalizedStatus === 'cooking') {
+            emitMealSignalsBestEffort({
+                userId: parsedUserId,
+                recipeIds: [parsedRecipeId],
+                signalType: 'cook_started',
+                context: { action: 'update_meal_recipe_status', status: normalizedStatus, chatSessionId: parsedSessionId }
+            });
+        }
+
+        if (normalizedStatus === 'done') {
+            emitMealSignalsBestEffort({
+                userId: parsedUserId,
+                recipeIds: [parsedRecipeId],
+                signalType: 'cook_completed',
+                context: { action: 'update_meal_recipe_status', status: normalizedStatus, chatSessionId: parsedSessionId }
+            });
+        }
+
+        if (normalizedStatus === 'skipped') {
+            emitMealSignalsBestEffort({
+                userId: parsedUserId,
+                recipeIds: [parsedRecipeId],
+                signalType: 'cook_abandoned',
+                context: { action: 'update_meal_recipe_status', status: normalizedStatus, chatSessionId: parsedSessionId }
+            });
+        }
+
         const updatedSession = await getChatSessionById(parsedSessionId, parsedUserId);
         const mealItems = await getMealRecipesBySession(parsedSessionId);
         const updatedItem = mealItems.find(item => item.recipeId === parsedRecipeId) || null;
@@ -1311,7 +1421,17 @@ exports.completeMealSession = async ({
     try {
         await conn.beginTransaction();
 
+        let remainingRecipeIdsToMark = [];
         if (normalizedMarkRemainingStatus) {
+            const [remainingRows] = await conn.query(
+                `SELECT recipeId
+                 FROM ChatSessionRecipes
+                 WHERE chatSessionId = ?
+                   AND status IN ('pending', 'cooking')`,
+                [parsedSessionId]
+            );
+            remainingRecipeIdsToMark = remainingRows.map(row => Number(row.recipeId)).filter(id => id > 0);
+
             await conn.query(
                 `UPDATE ChatSessionRecipes
                  SET status = ?,
@@ -1344,6 +1464,24 @@ exports.completeMealSession = async ({
         });
 
         await conn.commit();
+
+        if (normalizedMarkRemainingStatus === 'done') {
+            emitMealSignalsBestEffort({
+                userId: parsedUserId,
+                recipeIds: remainingRecipeIdsToMark,
+                signalType: 'cook_completed',
+                context: { action: 'complete_meal_session', completionType: normalizedCompletionType, chatSessionId: parsedSessionId }
+            });
+        }
+
+        if (normalizedMarkRemainingStatus === 'skipped') {
+            emitMealSignalsBestEffort({
+                userId: parsedUserId,
+                recipeIds: remainingRecipeIdsToMark,
+                signalType: 'cook_abandoned',
+                context: { action: 'complete_meal_session', completionType: normalizedCompletionType, chatSessionId: parsedSessionId }
+            });
+        }
 
         const updatedSession = await getChatSessionById(parsedSessionId, parsedUserId);
         const mealItems = await getMealRecipesBySession(parsedSessionId);
