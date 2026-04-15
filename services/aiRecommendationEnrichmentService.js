@@ -21,17 +21,23 @@ function clamp01(value) {
 function safeParseJsonFromText(text) {
     const raw = String(text || '').trim();
     if (!raw) return null;
-    try {
-        return JSON.parse(raw);
-    } catch (_) {
-        const match = raw.match(/\{[\s\S]*\}/);
-        if (!match) return null;
+    const candidates = [raw];
+
+    const objectMatch = raw.match(/\{[\s\S]*\}/);
+    if (objectMatch) candidates.push(objectMatch[0]);
+
+    const fencedJsonMatch = raw.match(/```(?:json)?\s*([\s\S]*?)```/i);
+    if (fencedJsonMatch?.[1]) candidates.push(String(fencedJsonMatch[1]).trim());
+
+    for (const candidate of candidates) {
         try {
-            return JSON.parse(match[0]);
+            return JSON.parse(candidate);
         } catch (_) {
-            return null;
+            // continue
         }
     }
+
+    return null;
 }
 
 async function callOpenAICompatible(messages, { temperature = 0.2, timeoutMs = DEFAULT_TIMEOUT_MS } = {}) {
@@ -84,6 +90,8 @@ function sanitizeProfilePayload(payload, baseProfile) {
         if (payload?.nutritionSignals && key in payload.nutritionSignals) nutritionSignals[key] = clamp01(payload.nutritionSignals[key]);
     }
 
+    const nextConfidence = clamp01(Math.max(Number(baseProfile?.confidenceScore || 0), Number(payload?.confidenceScore || 0)));
+
     return {
         ...baseProfile,
         flavor,
@@ -95,8 +103,8 @@ function sanitizeProfilePayload(payload, baseProfile) {
         wellnessFlags: payload?.wellnessFlags && typeof payload.wellnessFlags === 'object'
             ? payload.wellnessFlags
             : baseProfile?.wellnessFlags || {},
-        profilingSource: 'hybrid',
-        confidenceScore: clamp01(Math.max(Number(baseProfile?.confidenceScore || 0), Number(payload?.confidenceScore || 0)))
+        profilingSource: nextConfidence > Number(baseProfile?.confidenceScore || 0) ? 'hybrid' : 'rule',
+        confidenceScore: nextConfidence
     };
 }
 
@@ -110,11 +118,12 @@ async function enrichRecipeProfileWithAI({ recipe, baseProfile }) {
             role: 'system',
             content: [
                 'You enrich recipe profiles for a food recommendation backend.',
-                'Return JSON only.',
+                'Return strict JSON only with no markdown and no prose.',
                 'Never include medical claims.',
                 'Do not override dietary safety logic.',
                 'Only infer flavor, cookingMethods, nutritionSignals, mealContexts, wellnessFlags, confidenceScore.',
-                'All numeric scores must be between 0 and 1.'
+                'All numeric scores must be between 0 and 1.',
+                'If uncertain, keep the base profile pattern but refine weak dimensions conservatively.'
             ].join(' ')
         },
         {
@@ -124,11 +133,23 @@ async function enrichRecipeProfileWithAI({ recipe, baseProfile }) {
                 recipe: {
                     recipeId: recipe?.recipeId,
                     recipeName: recipe?.recipeName,
-                    tags: (recipe?.tags || []).map(tag => tag.tagName || tag),
-                    ingredients: (recipe?.ingredients || []).map(item => item.ingredientName),
-                    steps: (recipe?.cookingSteps || []).map(step => step.stepContent || step.content)
+                    tags: (recipe?.tags || []).slice(0, 10).map(tag => tag.tagName || tag),
+                    ingredients: (recipe?.ingredients || []).slice(0, 12).map(item => item.ingredientName),
+                    textHints: [
+                        recipe?.recipeName || '',
+                        ...(recipe?.tags || []).slice(0, 10).map(tag => tag.tagName || tag),
+                        ...(recipe?.ingredients || []).slice(0, 12).map(item => item.ingredientName)
+                    ].filter(Boolean).join(', ')
                 },
-                baseProfile
+                baseProfile,
+                outputExample: {
+                    flavor: { spicy: 0.1, sweet: 0.2, sour: 0.3, salty: 0.4, light: 0.6, heavy: 0.2, oiliness: 0.1 },
+                    cookingMethods: { soup: 0.0, boiled: 0.0, steamed: 0.0, grilled: 0.0, fried: 0.0, stir_fried: 0.0 },
+                    nutritionSignals: { vegetable: 0.2, seafood: 0.0, red_meat: 0.0, plant_protein: 0.0, quick_meal: 0.3 },
+                    mealContexts: { breakfast: 0.0, lunch: 0.4, dinner: 0.6, light: 0.5, quick_meal: 0.3, weekend: 0.2 },
+                    wellnessFlags: { light_meal_friendly: true, heavy_meal: false },
+                    confidenceScore: 0.72
+                }
             })
         }
     ];
