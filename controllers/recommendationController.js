@@ -4,7 +4,7 @@ const { appendSignal } = require('../services/userSignalService');
 
 exports.getPersonalizedRecommendations = async (req, res) => {
     const userId = Number(req.auth?.userId || req.userId || 0);
-    const context = String(req.query.context || req.body?.context || 'normal');
+    const context = String(req.query.context || req.body?.context || '').trim();
     const limit = Number(req.query.limit || req.body?.limit || 10);
     const includeReasons = String(req.query.includeReasons || 'true') !== 'false';
 
@@ -20,13 +20,14 @@ exports.getPersonalizedRecommendations = async (req, res) => {
             recipeId: null,
             signalType: 'recommendation_impression',
             source: 'app',
-            context: { context, count: result.items.length }
+            context: { requestedContext: context || null, appliedContext: result.context, count: result.items.length }
         });
 
         return res.status(200).json({
             success: true,
             data: {
-                context,
+                context: result.context,
+                appliedContext: result.appliedContext,
                 profileConfidence: Number(result.userProfile?.profileConfidence || 0),
                 recentPattern: result.userProfile?.balanceSignals || {},
                 insights: (result.insights || []).map(item => ({
@@ -49,7 +50,7 @@ exports.getPersonalizedRecommendations = async (req, res) => {
 exports.explainPersonalizedRecommendation = async (req, res) => {
     const userId = Number(req.auth?.userId || req.userId || 0);
     const recipeId = Number(req.query.recipeId || req.params.recipeId || req.body?.recipeId || 0);
-    const context = String(req.query.context || req.body?.context || 'normal');
+    const context = String(req.query.context || req.body?.context || '').trim();
 
     if (!userId || userId <= 0 || !recipeId || recipeId <= 0) {
         return res.status(400).json({ success: false, data: null, message: 'userId and recipeId are required' });

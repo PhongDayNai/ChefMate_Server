@@ -7,6 +7,7 @@ const userEatingSignalModel = require('../models/userEatingSignalModel');
 const { getOrRefreshUserTasteProfile } = require('./userTasteAggregationService');
 const { refreshInsightsForUser } = require('./eatingInsightService');
 const { buildExplanationPayload } = require('./recommendationExplanationService');
+const { resolveContext } = require('./recommendationContextInferenceService');
 
 function clamp(value, min, max) {
     return Math.max(min, Math.min(max, Number(value || 0)));
@@ -289,7 +290,7 @@ async function buildRecommendationContext(parsedUserId) {
     };
 }
 
-async function getPersonalizedRecommendations({ userId, context = 'normal', limit = 10, includeReasons = true }) {
+async function getPersonalizedRecommendations({ userId, context = '', limit = 10, includeReasons = true }) {
     const parsedUserId = Number(userId);
     const parsedLimit = Math.min(Math.max(Number(limit) || 10, 1), 20);
     const recommendationContext = await buildRecommendationContext(parsedUserId);
@@ -299,11 +300,20 @@ async function getPersonalizedRecommendations({ userId, context = 'normal', limi
         pantryItems,
         userProfile,
         profileMap,
+        recentSignals,
         recentRecipePenaltyMap,
         recentDimensionExposure,
         adaptiveFeedbackProfile,
         insights
     } = recommendationContext;
+
+    const appliedContext = resolveContext({
+        requestedContext: context,
+        userProfile,
+        pantryItems,
+        recentSignals
+    });
+    const effectiveContext = appliedContext.context;
 
     const items = [];
     for (const recipe of recipes) {
@@ -313,9 +323,9 @@ async function getPersonalizedRecommendations({ userId, context = 'normal', limi
 
         const recipeDimensions = mergeDimensions(profile);
         const preference = scorePreference(userProfile.tasteVector || {}, recipeDimensions);
-        const balance = scoreBalance(userProfile.balanceSignals || {}, recipeDimensions, context);
+        const balance = scoreBalance(userProfile.balanceSignals || {}, recipeDimensions, effectiveContext);
         const pantryScore = scorePantry(recipe, pantryItems);
-        const contextScore = scoreContext(recipeDimensions, pantryScore, context);
+        const contextScore = scoreContext(recipeDimensions, pantryScore, effectiveContext);
         const diversity = scoreDiversity(recipeDimensions, recentDimensionExposure);
         const adaptiveAdjustment = scoreAdaptiveAdjustment(Number(recipe.recipeId), recipeDimensions, adaptiveFeedbackProfile);
         const heavyPenalty = Math.max(0, Number(recipeDimensions.heavy || 0) * (userProfile.balanceSignals?.heavyWeekDetected ? 0.9 : 0));
@@ -338,7 +348,7 @@ async function getPersonalizedRecommendations({ userId, context = 'normal', limi
                 pantryScore,
                 balanceSignals: userProfile.balanceSignals || {},
                 activeDietNotes,
-                context,
+                context: effectiveContext,
                 fatiguePenalty,
                 adaptiveAdjustment
             }) : [],
@@ -367,7 +377,7 @@ async function getPersonalizedRecommendations({ userId, context = 'normal', limi
 
     recommendationSnapshotModel.createSnapshot({
         userId: parsedUserId,
-        requestContext: context,
+        requestContext: effectiveContext,
         inputMeta: {
             pantryCount: pantryItems.length,
             activeDietNotesCount: activeDietNotes.length,
@@ -389,14 +399,15 @@ async function getPersonalizedRecommendations({ userId, context = 'normal', limi
     });
 
     return {
-        context,
+        context: effectiveContext,
+        appliedContext,
         userProfile,
         insights,
         items: topItems
     };
 }
 
-async function explainPersonalizedRecommendation({ userId, recipeId, context = 'normal' }) {
+async function explainPersonalizedRecommendation({ userId, recipeId, context = '' }) {
     const parsedUserId = Number(userId);
     const targetRecipeId = Number(recipeId);
     if (!targetRecipeId || targetRecipeId <= 0) {
@@ -410,10 +421,19 @@ async function explainPersonalizedRecommendation({ userId, recipeId, context = '
         pantryItems,
         userProfile,
         profileMap,
+        recentSignals,
         recentRecipePenaltyMap,
         recentDimensionExposure,
         adaptiveFeedbackProfile
     } = recommendationContext;
+
+    const appliedContext = resolveContext({
+        requestedContext: context,
+        userProfile,
+        pantryItems,
+        recentSignals
+    });
+    const effectiveContext = appliedContext.context;
 
     const recipe = recipes.find(item => Number(item.recipeId) === targetRecipeId) || null;
     if (!recipe || hasDietConflict(recipe, activeDietNotes)) {
@@ -427,9 +447,9 @@ async function explainPersonalizedRecommendation({ userId, recipeId, context = '
 
     const recipeDimensions = mergeDimensions(profile);
     const preference = scorePreference(userProfile.tasteVector || {}, recipeDimensions);
-    const balance = scoreBalance(userProfile.balanceSignals || {}, recipeDimensions, context);
+    const balance = scoreBalance(userProfile.balanceSignals || {}, recipeDimensions, effectiveContext);
     const pantryScore = scorePantry(recipe, pantryItems);
-    const contextScore = scoreContext(recipeDimensions, pantryScore, context);
+    const contextScore = scoreContext(recipeDimensions, pantryScore, effectiveContext);
     const diversity = scoreDiversity(recipeDimensions, recentDimensionExposure);
     const adaptiveAdjustment = scoreAdaptiveAdjustment(targetRecipeId, recipeDimensions, adaptiveFeedbackProfile);
     const heavyPenalty = Math.max(0, Number(recipeDimensions.heavy || 0) * (userProfile.balanceSignals?.heavyWeekDetected ? 0.9 : 0));
@@ -450,7 +470,7 @@ async function explainPersonalizedRecommendation({ userId, recipeId, context = '
             pantryScore,
             balanceSignals: userProfile.balanceSignals || {},
             activeDietNotes,
-            context,
+            context: effectiveContext,
             fatiguePenalty,
             adaptiveAdjustment
         }),
@@ -470,7 +490,7 @@ async function explainPersonalizedRecommendation({ userId, recipeId, context = '
         recommendation,
         userProfile,
         profile,
-        context
+        context: effectiveContext
     });
 }
 
