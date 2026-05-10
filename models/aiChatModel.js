@@ -590,8 +590,9 @@ async function getPantryMapByUser(userId) {
     const [rows] = await pool.query(
         `SELECT i.ingredientName, p.quantity, p.unit
          FROM PantryItems p
+         JOIN PantryShares ps ON ps.pantryId = p.pantryId
          JOIN Ingredients i ON i.ingredientId = p.ingredientId
-         WHERE p.userId = ?`,
+         WHERE ps.userId = ?`,
         [parsedUserId]
     );
 

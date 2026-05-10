@@ -11,4 +11,4 @@ RUN mkdir -p /app/assets/images
 
 EXPOSE 8080
 
-CMD ["node", "server.js"]
+CMD ["node", "server.legacy.js"]
