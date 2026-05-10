@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node server.js",
     "start:jwt": "node server.jwt.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest --passWithNoTests"
   },
   "keywords": [],
   "author": "",
@@ -14,16 +14,20 @@
   "type": "commonjs",
   "dependencies": {
     "bcrypt": "^6.0.0",
-    "jsonwebtoken": "^9.0.2",
     "body-parser": "^2.2.0",
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
     "fs": "^0.0.1-security",
     "http": "^0.0.1-security",
+    "jsonwebtoken": "^9.0.2",
     "localtunnel": "^1.8.3",
     "multer": "^2.0.0",
     "mysql2": "^3.20.0",
     "path": "^0.12.7"
+  },
+  "devDependencies": {
+    "jest": "^30.4.2",
+    "supertest": "^7.2.2"
   }
 }
