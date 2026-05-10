@@ -185,10 +185,10 @@ exports.getRecipesViewHistory = async (req, res) => {
     const userId = Number(req.auth?.userId || req.userId || req.query.userId || req.body?.userId || 0);
 
     if (!userId || userId <= 0) {
-        return res.status(400).json({
+        return res.status(401).json({
             success: false,
             data: null,
-            message: 'userId is required and must be a positive number'
+            message: 'Authentication required'
         });
     }
 
