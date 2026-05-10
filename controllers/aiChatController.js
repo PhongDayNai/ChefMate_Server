@@ -227,6 +227,7 @@ exports.updateActiveRecipe = async (req, res) => {
 exports.getRecommendationsFromPantry = async (req, res) => {
     const userId = Number(req.body?.userId || req.query.userId);
     const limit = req.body?.limit ?? req.query.limit;
+    const pantryId = req.body?.pantryId ?? req.query.pantryId;
 
     if (!userId || userId <= 0) {
         return res.status(400).json({
@@ -237,7 +238,7 @@ exports.getRecommendationsFromPantry = async (req, res) => {
     }
 
     try {
-        const result = await aiChatModel.getRecommendationsFromPantry({ userId, limit });
+        const result = await aiChatModel.getRecommendationsFromPantry({ userId, pantryId, limit });
         return res.status(200).json(result);
     } catch (error) {
         console.error('Error in getRecommendationsFromPantry:', error);

@@ -585,16 +585,22 @@ function getCompletionReminderPayload({ session, recipeContext, minutesSinceLast
     };
 }
 
-async function getPantryMapByUser(userId) {
+async function getPantryMapByUser(userId, pantryId = null) {
     const parsedUserId = Number(userId);
-    const [rows] = await pool.query(
-        `SELECT i.ingredientName, p.quantity, p.unit
+    let query = `
+        SELECT i.ingredientName, p.quantity, p.unit
          FROM PantryItems p
          JOIN PantryShares ps ON ps.pantryId = p.pantryId
          JOIN Ingredients i ON i.ingredientId = p.ingredientId
-         WHERE ps.userId = ?`,
-        [parsedUserId]
-    );
+         WHERE ps.userId = ?`;
+    let params = [parsedUserId];
+
+    if (pantryId != null) {
+        query += ' AND p.pantryId = ?';
+        params.push(Number(pantryId));
+    }
+
+    const [rows] = await pool.query(query, params);
 
     const exactMap = new Map();
     const nameMap = new Map();
@@ -966,7 +972,7 @@ function resolveRecommendationLimit(limit) {
     return Math.min(Math.floor(parsed), 50);
 }
 
-async function getRecipeRecommendationsFromPantry({ userId, limit, activeDietNotes = [] }) {
+async function getRecipeRecommendationsFromPantry({ userId, pantryId = null, limit, activeDietNotes = [] }) {
     const parsedUserId = Number(userId);
     if (!parsedUserId || parsedUserId <= 0) {
         throw new Error('userId must be a positive number');
@@ -974,7 +980,7 @@ async function getRecipeRecommendationsFromPantry({ userId, limit, activeDietNot
 
     const finalLimit = resolveRecommendationLimit(limit);
 
-    const { exactMap: pantryExactMap, nameMap: pantryNameMap } = await getPantryMapByUser(parsedUserId);
+    const { exactMap: pantryExactMap, nameMap: pantryNameMap } = await getPantryMapByUser(parsedUserId, pantryId);
 
     const [recipeRows] = await pool.query(
         `SELECT recipeId, recipeName, image, cookingTime, ration, likeQuantity, viewCount
@@ -1531,9 +1537,9 @@ exports.updateActiveRecipe = async ({ userId, chatSessionId, recipeId }) => {
     };
 };
 
-exports.getRecommendationsFromPantry = async ({ userId, limit = 10 }) => {
+exports.getRecommendationsFromPantry = async ({ userId, pantryId = null, limit = 10 }) => {
     const activeDietNotes = await userDietModel.getActiveDietNotes(userId);
-    return getRecipeRecommendationsFromPantry({ userId, limit, activeDietNotes });
+    return getRecipeRecommendationsFromPantry({ userId, pantryId, limit, activeDietNotes });
 };
 
 exports.resolvePreviousSession = async ({ userId, previousSessionId, action, pendingUserMessage = '', model = process.env.AI_CHAT_MODEL || 'gemma3:4b' }) => {
