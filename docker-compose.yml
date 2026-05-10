@@ -32,7 +32,7 @@ services:
       DB_PORT: 3306
       OPENAI_API_KEY: ${OPENAI_API_KEY}
       PORT: 8080
-    command: ["node", "server.js"]
+    command: ["node", "server.legacy.js"]
     ports:
       - "8000:8080"
     volumes:
