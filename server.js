@@ -11,6 +11,7 @@ const aiChatRoutes = require('./routes-legacy/aiChatRoutes');
 const aiChatV2Routes = require('./routes-legacy/aiChatV2Routes');
 const userDietRoutes = require('./routes-legacy/userDietRoutes');
 const chatApiKeyAuth = require('./middleware/chatApiKeyAuth');
+const pantrySharingRoutes = require('./routes/pantries');
 
 const app = express();
 
@@ -25,6 +26,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/recipes', recipeRoutes);
 app.use('/api/interactions', interactionRoutes);
 app.use('/api/pantry', pantryRoutes);
+app.use('/api/pantries', pantrySharingRoutes);
 app.use('/api/ai-chat', chatApiKeyAuth, aiChatRoutes);
 app.use('/api/ai-chat/v2', chatApiKeyAuth, aiChatV2Routes);
 app.use('/api/user-diet-notes', userDietRoutes);
