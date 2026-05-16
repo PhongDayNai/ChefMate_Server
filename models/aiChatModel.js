@@ -1842,10 +1842,9 @@ exports.sendMessage = async ({
     let pantryMapData;
     if (session.pantryId) {
         pantryMapData = await getPantryMapByPantryId(session.pantryId, parsedUserId);
-    } else {
-        pantryMapData = await getPantryMapByUser(parsedUserId);
     }
-    const pantryRows = pantryMapData.rows;
+    // pantryId = null → chat thuần túy, không dùng pantry
+    const pantryRows = pantryMapData ? pantryMapData.rows : [];
 
     const [activeDietNotes, userProfile] = await Promise.all([
         userDietModel.getActiveDietNotes(parsedUserId),

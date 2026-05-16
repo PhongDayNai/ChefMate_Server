@@ -13,7 +13,7 @@ function isBadRequestError(error) {
 }
 
 exports.createMealSession = async (req, res) => {
-    const { userId, title, recipeIds, recipes } = req.body || {};
+    const { userId, pantryId, title, recipeIds, recipes } = req.body || {};
 
     if (!userId || Number(userId) <= 0) {
         return res.status(400).json({
@@ -23,9 +23,23 @@ exports.createMealSession = async (req, res) => {
         });
     }
 
+    // Validate viewer cannot create session with pantryId
+    if (pantryId) {
+        const pantryModel = require('../models/pantryModel');
+        const access = await pantryModel.getUserPantryAccess(Number(pantryId), Number(userId));
+        if (access === 'viewer') {
+            return res.status(403).json({
+                success: false,
+                data: null,
+                message: 'Access denied: viewer cannot create chat sessions'
+            });
+        }
+    }
+
     try {
         const result = await aiChatV2Model.createMealSession({
             userId: Number(userId),
+            pantryId: pantryId ? Number(pantryId) : null,
             title,
             recipeIds: Array.isArray(recipeIds) ? recipeIds : null,
             recipes: Array.isArray(recipes) ? recipes : null
@@ -310,6 +324,23 @@ exports.sendMessageV2 = async (req, res) => {
             data: null,
             message: 'message is required'
         });
+    }
+
+    // If chatSessionId provided, check if user is viewer of that session's pantry
+    if (chatSessionId) {
+        const aiChatV2Model = require('../models/aiChatV2Model');
+        const session = await aiChatV2Model.getChatSessionById(Number(chatSessionId), Number(userId));
+        if (session && session.pantryId) {
+            const pantryModel = require('../models/pantryModel');
+            const access = await pantryModel.getUserPantryAccess(session.pantryId, Number(userId));
+            if (access === 'viewer') {
+                return res.status(403).json({
+                    success: false,
+                    data: null,
+                    message: 'Access denied: viewer cannot send messages'
+                });
+            }
+        }
     }
 
     try {

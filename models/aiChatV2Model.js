@@ -330,9 +330,9 @@ async function ensureRecipesApproved(recipeIds = [], conn = null) {
     return uniqueIds;
 }
 
-async function getChatSessionById(chatSessionId, userId) {
+exports.getChatSessionById = async function(chatSessionId, userId) {
     const [rows] = await pool.query(
-        `SELECT chatSessionId, userId, title, activeRecipeId, createdAt, updatedAt
+        `SELECT chatSessionId, userId, pantryId, title, activeRecipeId, createdAt, updatedAt
          FROM ChatSessions
          WHERE chatSessionId = ? AND userId = ?
          LIMIT 1`,
@@ -344,6 +344,7 @@ async function getChatSessionById(chatSessionId, userId) {
     return {
         chatSessionId: Number(rows[0].chatSessionId),
         userId: Number(rows[0].userId),
+        pantryId: rows[0].pantryId ? Number(rows[0].pantryId) : null,
         title: rows[0].title,
         activeRecipeId: rows[0].activeRecipeId ? Number(rows[0].activeRecipeId) : null,
         createdAt: rows[0].createdAt,
@@ -353,7 +354,7 @@ async function getChatSessionById(chatSessionId, userId) {
 
 async function getLatestChatSessionByUser(userId) {
     const [rows] = await pool.query(
-        `SELECT chatSessionId, userId, title, activeRecipeId, createdAt, updatedAt
+        `SELECT chatSessionId, userId, pantryId, title, activeRecipeId, createdAt, updatedAt
          FROM ChatSessions
          WHERE userId = ?
          ORDER BY updatedAt DESC, chatSessionId DESC
@@ -366,6 +367,7 @@ async function getLatestChatSessionByUser(userId) {
     return {
         chatSessionId: Number(rows[0].chatSessionId),
         userId: Number(rows[0].userId),
+        pantryId: rows[0].pantryId ? Number(rows[0].pantryId) : null,
         title: rows[0].title,
         activeRecipeId: rows[0].activeRecipeId ? Number(rows[0].activeRecipeId) : null,
         createdAt: rows[0].createdAt,
@@ -427,16 +429,27 @@ async function setSessionPrimaryRecipeByMeal(chatSessionId, userId, conn = null)
     return nextPrimary;
 }
 
-async function createChatSessionWithIntro({ userId, title = DEFAULT_SESSION_TITLE, activeRecipeId = null }, conn = null) {
+async function createChatSessionWithIntro({ userId, pantryId = null, title = DEFAULT_SESSION_TITLE, activeRecipeId = null }, conn = null) {
     const executor = conn || pool;
+    const parsedUserId = Number(userId);
+    const parsedPantryId = pantryId != null ? Number(pantryId) : null;
+
+    // Verify access if pantryId is provided
+    if (parsedPantryId) {
+        const pantryModel = require('./pantryModel');
+        const access = await pantryModel.getUserPantryAccess(parsedPantryId, parsedUserId);
+        if (!access) {
+            throw new Error('Access denied: you do not have access to this pantry');
+        }
+    }
 
     const finalTitle = title && String(title).trim() ? String(title).trim() : DEFAULT_SESSION_TITLE;
     const parsedActiveRecipeId = activeRecipeId ? Number(activeRecipeId) : null;
 
     const [result] = await executor.query(
-        `INSERT INTO ChatSessions (userId, title, activeRecipeId)
-         VALUES (?, ?, ?)`,
-        [userId, finalTitle, parsedActiveRecipeId]
+        `INSERT INTO ChatSessions (userId, pantryId, title, activeRecipeId)
+         VALUES (?, ?, ?, ?)`,
+        [parsedUserId, parsedPantryId, finalTitle, parsedActiveRecipeId]
     );
 
     const chatSessionId = Number(result.insertId);
@@ -731,6 +744,40 @@ function getMealV2CompletionReminderPayload({
     };
 }
 
+async function getPantryRowsByPantryId(pantryId, userId) {
+    const parsedPantryId = Number(pantryId);
+    const parsedUserId = Number(userId);
+
+    if (!parsedPantryId || parsedPantryId <= 0) {
+        throw new Error('pantryId must be a positive number');
+    }
+
+    if (!parsedUserId || parsedUserId <= 0) {
+        throw new Error('userId must be a positive number');
+    }
+
+    // Verify user has access to this pantry (owner/editor - viewer cannot chat)
+    const pantryModel = require('./pantryModel');
+    const access = await pantryModel.getUserPantryAccess(parsedPantryId, parsedUserId);
+    if (!access) {
+        throw new Error('Access denied: you do not have access to this pantry');
+    }
+
+    const [rows] = await pool.query(
+        `SELECT i.ingredientName, p.quantity, p.unit
+         FROM PantryItems p
+         JOIN Ingredients i ON i.ingredientId = p.ingredientId
+         WHERE p.pantryId = ?`,
+        [parsedPantryId]
+    );
+
+    return rows.map(row => ({
+        ingredientName: row.ingredientName,
+        quantity: Number(row.quantity || 0),
+        unit: row.unit
+    }));
+}
+
 async function getPantryRowsByUser(userId) {
     const [rows] = await pool.query(
         `SELECT i.ingredientName, p.quantity, p.unit
@@ -909,7 +956,7 @@ function buildMealPrompt({
     ].join('\n');
 }
 
-exports.createMealSession = async ({ userId, title, recipeIds = null, recipes = null }) => {
+exports.createMealSession = async ({ userId, pantryId = null, title, recipeIds = null, recipes = null }) => {
     const parsedUserId = Number(userId);
     if (!parsedUserId || parsedUserId <= 0) {
         throw new Error('userId must be a positive number');
@@ -929,6 +976,7 @@ exports.createMealSession = async ({ userId, title, recipeIds = null, recipes = 
 
         const chatSessionId = await createChatSessionWithIntro({
             userId: parsedUserId,
+            pantryId,
             title: title || DEFAULT_SESSION_TITLE,
             activeRecipeId: defaultPrimary
         }, conn);
@@ -971,7 +1019,7 @@ exports.createMealSession = async ({ userId, title, recipeIds = null, recipes = 
             context: { action: 'create_meal_session' }
         });
 
-        const session = await getChatSessionById(chatSessionId, parsedUserId);
+        const session = await exports.getChatSessionById(chatSessionId, parsedUserId);
         const mealItems = await getMealRecipesBySession(chatSessionId);
 
         return {
@@ -1009,7 +1057,7 @@ exports.replaceMealRecipes = async ({ userId, chatSessionId, recipeIds = null, r
         throw new Error('chatSessionId must be a positive number');
     }
 
-    const session = await getChatSessionById(parsedSessionId, parsedUserId);
+    const session = await exports.getChatSessionById(parsedSessionId, parsedUserId);
     if (!session) {
         return {
             success: false,
@@ -1092,7 +1140,7 @@ exports.replaceMealRecipes = async ({ userId, chatSessionId, recipeIds = null, r
             context: { action: 'replace_meal_recipes' }
         });
 
-        const updatedSession = await getChatSessionById(parsedSessionId, parsedUserId);
+        const updatedSession = await exports.getChatSessionById(parsedSessionId, parsedUserId);
         const mealItems = await getMealRecipesBySession(parsedSessionId);
 
         return {
@@ -1140,7 +1188,7 @@ exports.updateMealRecipeStatus = async ({ userId, chatSessionId, recipeId, statu
         throw new Error('status must be one of: pending, cooking, done, skipped');
     }
 
-    const session = await getChatSessionById(parsedSessionId, parsedUserId);
+    const session = await exports.getChatSessionById(parsedSessionId, parsedUserId);
     if (!session) {
         return {
             success: false,
@@ -1177,7 +1225,7 @@ exports.updateMealRecipeStatus = async ({ userId, chatSessionId, recipeId, statu
             };
         }
 
-        const currentSession = await getChatSessionById(parsedSessionId, parsedUserId);
+        const currentSession = await exports.getChatSessionById(parsedSessionId, parsedUserId);
         const currentPrimary = currentSession?.activeRecipeId ? Number(currentSession.activeRecipeId) : null;
         const isClosingCurrentPrimary = Boolean(currentPrimary && currentPrimary === parsedRecipeId && (normalizedStatus === 'done' || normalizedStatus === 'skipped'));
 
@@ -1281,7 +1329,7 @@ exports.updateMealRecipeStatus = async ({ userId, chatSessionId, recipeId, statu
             });
         }
 
-        const updatedSession = await getChatSessionById(parsedSessionId, parsedUserId);
+        const updatedSession = await exports.getChatSessionById(parsedSessionId, parsedUserId);
         const mealItems = await getMealRecipesBySession(parsedSessionId);
         const updatedItem = mealItems.find(item => item.recipeId === parsedRecipeId) || null;
 
@@ -1322,7 +1370,7 @@ exports.setMealPrimaryRecipe = async ({ userId, chatSessionId, recipeId = null }
         throw new Error('chatSessionId must be a positive number');
     }
 
-    const session = await getChatSessionById(parsedSessionId, parsedUserId);
+    const session = await exports.getChatSessionById(parsedSessionId, parsedUserId);
     if (!session) {
         return {
             success: false,
@@ -1358,7 +1406,7 @@ exports.setMealPrimaryRecipe = async ({ userId, chatSessionId, recipeId = null }
 
     await setSessionPrimaryRecipe(parsedSessionId, parsedUserId, parsedRecipeId);
 
-    const updatedSession = await getChatSessionById(parsedSessionId, parsedUserId);
+    const updatedSession = await exports.getChatSessionById(parsedSessionId, parsedUserId);
     const mealItems = await getMealRecipesBySession(parsedSessionId);
 
     return {
@@ -1409,7 +1457,7 @@ exports.completeMealSession = async ({
         throw new Error('markRemainingStatus must be null or one of: done, skipped');
     }
 
-    const session = await getChatSessionById(parsedSessionId, parsedUserId);
+    const session = await exports.getChatSessionById(parsedSessionId, parsedUserId);
     if (!session) {
         return {
             success: false,
@@ -1484,7 +1532,7 @@ exports.completeMealSession = async ({
             });
         }
 
-        const updatedSession = await getChatSessionById(parsedSessionId, parsedUserId);
+        const updatedSession = await exports.getChatSessionById(parsedSessionId, parsedUserId);
         const mealItems = await getMealRecipesBySession(parsedSessionId);
 
         return {
@@ -1540,7 +1588,7 @@ exports.resolveCompletionCheckV2 = async ({
         throw new Error('action is required');
     }
 
-    const session = await getChatSessionById(parsedSessionId, parsedUserId);
+    const session = await exports.getChatSessionById(parsedSessionId, parsedUserId);
     if (!session) {
         return {
             success: false,
@@ -1730,7 +1778,7 @@ exports.sendMessageV2 = async ({
     let session = null;
 
     if (sessionId) {
-        session = await getChatSessionById(sessionId, parsedUserId);
+        session = await exports.getChatSessionById(sessionId, parsedUserId);
         if (!session) {
             return {
                 success: false,
@@ -1746,7 +1794,7 @@ exports.sendMessageV2 = async ({
                 title: DEFAULT_SESSION_TITLE,
                 activeRecipeId: null
             });
-            session = await getChatSessionById(createdId, parsedUserId);
+            session = await exports.getChatSessionById(createdId, parsedUserId);
         }
         sessionId = session.chatSessionId;
     } else {
@@ -1755,7 +1803,7 @@ exports.sendMessageV2 = async ({
             title: DEFAULT_SESSION_TITLE,
             activeRecipeId: null
         });
-        session = await getChatSessionById(createdId, parsedUserId);
+        session = await exports.getChatSessionById(createdId, parsedUserId);
         sessionId = session.chatSessionId;
     }
 
@@ -1799,9 +1847,15 @@ exports.sendMessageV2 = async ({
         recipeIds.push(session.activeRecipeId);
     }
 
-    const [recipeContexts, pantryRows, activeDietNotes, recentMessages, userProfile] = await Promise.all([
+    // Get pantry rows based on session's pantryId
+    let pantryRows = [];
+    if (session && session.pantryId) {
+        pantryRows = await getPantryRowsByPantryId(session.pantryId, parsedUserId);
+    }
+    // pantryId = null → chat thuần túy, không dùng pantry
+
+    const [recipeContexts, activeDietNotes, recentMessages, userProfile] = await Promise.all([
         getRecipeContexts(recipeIds),
-        getPantryRowsByUser(parsedUserId),
         userDietModel.getActiveDietNotes(parsedUserId),
         getRecentMessages(sessionId, 40),
         getUserByIdBasic(parsedUserId)
@@ -1853,7 +1907,7 @@ exports.sendMessageV2 = async ({
             }
         });
 
-        const updatedSession = await getChatSessionById(sessionId, parsedUserId);
+        const updatedSession = await exports.getChatSessionById(sessionId, parsedUserId);
         const updatedMealItems = await getMealRecipesBySession(sessionId);
 
         return {
@@ -1869,7 +1923,7 @@ exports.sendMessageV2 = async ({
             message: 'Chat with AI v2 successfully'
         };
     } catch (error) {
-        const updatedSession = await getChatSessionById(sessionId, parsedUserId);
+        const updatedSession = await exports.getChatSessionById(sessionId, parsedUserId);
         const updatedMealItems = await getMealRecipesBySession(sessionId);
 
         return {
