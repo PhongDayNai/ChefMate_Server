@@ -102,6 +102,7 @@ CREATE TABLE IF NOT EXISTS UsersComment (
 
 CREATE TABLE IF NOT EXISTS PantryItems (
   pantryItemId INT PRIMARY KEY AUTO_INCREMENT,
+  pantryId INT NOT NULL,
   userId INT NOT NULL,
   ingredientId INT NOT NULL,
   quantity DECIMAL(10,2) NOT NULL DEFAULT 0,
@@ -109,11 +110,12 @@ CREATE TABLE IF NOT EXISTS PantryItems (
   expiresAt DATETIME NULL,
   createdAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updatedAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  INDEX idx_userId (userId),
   CONSTRAINT fk_pantry_user FOREIGN KEY (userId) REFERENCES Users(userId)
     ON UPDATE CASCADE ON DELETE CASCADE,
   CONSTRAINT fk_pantry_ingredient FOREIGN KEY (ingredientId) REFERENCES Ingredients(ingredientId)
     ON UPDATE CASCADE ON DELETE RESTRICT,
-  UNIQUE KEY uq_pantry_user_ingredient_unit (userId, ingredientId, unit)
+  UNIQUE KEY uq_pantry_pantry_ingredient_unit (pantryId, ingredientId, unit)
 ) ENGINE=InnoDB;
 
 CREATE TABLE IF NOT EXISTS ChatSessions (

@@ -26,7 +26,7 @@ ALTER TABLE PantryItems DROP FOREIGN KEY fk_pantry_ingredient;
 -- ALTER TABLE PantryItems DROP INDEX uq_pantry_user_ingredient_unit;
 
 -- Add new unique key with pantryId
-ALTER TABLE PantryItems ADD UNIQUE KEY uq_pantry_ingredient_unit (pantryId, ingredientId, unit);
+ALTER TABLE PantryItems ADD UNIQUE KEY uq_pantry_pantry_ingredient_unit (pantryId, ingredientId, unit);
 
 -- Re-add FK on ingredientId
 ALTER TABLE PantryItems ADD CONSTRAINT fk_pantry_ingredient FOREIGN KEY (ingredientId) REFERENCES Ingredients(ingredientId) ON DELETE RESTRICT ON UPDATE CASCADE;
