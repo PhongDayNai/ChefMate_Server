@@ -1407,11 +1407,19 @@ exports.getSessionsByUser = async ({ userId, page = 1, limit = 50 }) => {
         [parsedUserId]
     );
 
+    // Derive `flow` (general | meal) and `mealStatus` (active | completed | null) from
+    // ChatSessionRecipes so the client can pick the right v1/v2 flow without a
+    // separate request per session.
     const [rows] = await pool.query(
-        `SELECT chatSessionId, userId, pantryId, title, activeRecipeId, createdAt, updatedAt
-         FROM ChatSessions
-         WHERE userId = ?
-         ORDER BY updatedAt DESC
+        `SELECT cs.chatSessionId, cs.userId, cs.pantryId, cs.title, cs.activeRecipeId,
+                cs.createdAt, cs.updatedAt,
+                COUNT(csr.chatSessionRecipeId) AS recipeCount,
+                SUM(CASE WHEN csr.status IN ('pending', 'cooking') THEN 1 ELSE 0 END) AS activeRecipeCount
+         FROM ChatSessions cs
+         LEFT JOIN ChatSessionRecipes csr ON csr.chatSessionId = cs.chatSessionId
+         WHERE cs.userId = ?
+         GROUP BY cs.chatSessionId
+         ORDER BY cs.updatedAt DESC
          LIMIT ? OFFSET ?`,
         [parsedUserId, parsedLimit, offset]
     );
@@ -1422,15 +1430,25 @@ exports.getSessionsByUser = async ({ userId, page = 1, limit = 50 }) => {
     return {
         success: true,
         data: {
-            items: rows.map(r => ({
-                chatSessionId: Number(r.chatSessionId),
-                userId: Number(r.userId),
-                pantryId: r.pantryId ? Number(r.pantryId) : null,
-                title: r.title,
-                activeRecipeId: r.activeRecipeId ? Number(r.activeRecipeId) : null,
-                createdAt: r.createdAt,
-                updatedAt: r.updatedAt
-            })),
+            items: rows.map(r => {
+                const recipeCount = Number(r.recipeCount || 0);
+                const activeRecipeCount = Number(r.activeRecipeCount || 0);
+                const flow = recipeCount > 0 ? 'meal' : 'general';
+                const mealStatus = recipeCount === 0
+                    ? null
+                    : (activeRecipeCount > 0 ? 'active' : 'completed');
+                return {
+                    chatSessionId: Number(r.chatSessionId),
+                    userId: Number(r.userId),
+                    pantryId: r.pantryId ? Number(r.pantryId) : null,
+                    title: r.title,
+                    activeRecipeId: r.activeRecipeId ? Number(r.activeRecipeId) : null,
+                    flow,
+                    mealStatus,
+                    createdAt: r.createdAt,
+                    updatedAt: r.updatedAt
+                };
+            }),
             pagination: {
                 page: parsedPage,
                 limit: parsedLimit,
@@ -1529,18 +1547,31 @@ exports.getSessionHistory = async ({ userId, chatSessionId }) => {
         getMealRecipesBySession(chatSessionId)
     ]);
 
+    const recipeCount = Array.isArray(mealItems) ? mealItems.length : 0;
+    const activeRecipeCount = Array.isArray(mealItems)
+        ? mealItems.filter(item => item && (item.status === 'pending' || item.status === 'cooking')).length
+        : 0;
+    const flow = recipeCount > 0 ? 'meal' : 'general';
+    const mealStatus = recipeCount === 0
+        ? null
+        : (activeRecipeCount > 0 ? 'active' : 'completed');
+
     return {
         success: true,
         data: {
-            session,
+            session: {
+                ...session,
+                flow,
+                mealStatus
+            },
             messages,
             meal: {
-                totalRecipes: mealItems.length,
+                totalRecipes: recipeCount,
                 items: mealItems
             },
             focus: {
                 activeRecipeId: session?.activeRecipeId || null,
-                needsSelection: mealItems.length > 1 && !session?.activeRecipeId
+                needsSelection: recipeCount > 1 && !session?.activeRecipeId
             }
         },
         message: 'Get chat history successfully'
@@ -1609,6 +1640,76 @@ exports.updateActiveRecipe = async ({ userId, chatSessionId, recipeId }) => {
         success: true,
         data: updatedSession,
         message: 'Update active recipe successfully'
+    };
+};
+
+/**
+ * Update the pantryId attached to an existing chat session.
+ * Pass pantryId = null to detach the session from any pantry (chat thuan tuy).
+ * Validates pantry access for the caller before persisting.
+ */
+exports.updateSessionPantry = async ({ userId, chatSessionId, pantryId }) => {
+    const parsedUserId = Number(userId);
+    const parsedSessionId = Number(chatSessionId);
+
+    if (!parsedUserId || parsedUserId <= 0) {
+        throw new Error('userId must be a positive number');
+    }
+    if (!parsedSessionId || parsedSessionId <= 0) {
+        throw new Error('chatSessionId must be a positive number');
+    }
+
+    const session = await exports.getChatSessionById(parsedSessionId, parsedUserId);
+    if (!session) {
+        return {
+            success: false,
+            data: null,
+            message: 'Chat session not found'
+        };
+    }
+
+    let parsedPantryId = null;
+    if (pantryId !== null && pantryId !== undefined && pantryId !== '') {
+        parsedPantryId = Number(pantryId);
+        if (!Number.isFinite(parsedPantryId) || parsedPantryId <= 0) {
+            return {
+                success: false,
+                data: null,
+                message: 'pantryId must be a positive number or null'
+            };
+        }
+
+        const pantryModel = require('./pantryModel');
+        const access = await pantryModel.getUserPantryAccess(parsedPantryId, parsedUserId);
+        if (!access) {
+            return {
+                success: false,
+                data: null,
+                message: 'Access denied: you do not have access to this pantry'
+            };
+        }
+        if (access === 'viewer') {
+            return {
+                success: false,
+                data: null,
+                message: 'Access denied: viewer cannot attach a pantry to a chat session'
+            };
+        }
+    }
+
+    await pool.query(
+        `UPDATE ChatSessions
+         SET pantryId = ?, updatedAt = CURRENT_TIMESTAMP
+         WHERE chatSessionId = ? AND userId = ?`,
+        [parsedPantryId, parsedSessionId, parsedUserId]
+    );
+
+    const updatedSession = await exports.getChatSessionById(parsedSessionId, parsedUserId);
+
+    return {
+        success: true,
+        data: updatedSession,
+        message: 'Update chat session pantry successfully'
     };
 };
 

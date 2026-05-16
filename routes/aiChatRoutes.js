@@ -10,6 +10,7 @@ router.get('/sessions/:sessionId', requireAccessTokenOrChatApiKey, injectAuthUse
 router.delete('/sessions/:id', requireAccessTokenOrChatApiKey, injectAuthUser, aiChatController.deleteSession);
 router.patch('/sessions/title', requireAccessTokenOrChatApiKey, injectAuthUser, aiChatController.updateSessionTitle);
 router.patch('/sessions/active-recipe', requireAccessTokenOrChatApiKey, injectAuthUser, aiChatController.updateActiveRecipe);
+router.patch('/sessions/:sessionId/pantry', requireAccessTokenOrChatApiKey, injectAuthUser, aiChatController.updateSessionPantry);
 router.post('/recommendations-from-pantry', requireAccessTokenOrChatApiKey, injectAuthUser, aiChatController.getRecommendationsFromPantry);
 router.get('/recommendations-from-pantry', requireAccessTokenOrChatApiKey, injectAuthUser, aiChatController.getRecommendationsFromPantry);
 router.post('/sessions/resolve-previous', requireAccessTokenOrChatApiKey, injectAuthUser, aiChatController.resolvePreviousSession);

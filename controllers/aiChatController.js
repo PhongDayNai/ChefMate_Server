@@ -238,6 +238,66 @@ exports.updateActiveRecipe = async (req, res) => {
     }
 };
 
+exports.updateSessionPantry = async (req, res) => {
+    const userId = Number(req.body?.userId);
+    const chatSessionId = Number(req.params?.sessionId || req.params?.id || req.body?.chatSessionId);
+    const pantryIdRaw = req.body && Object.prototype.hasOwnProperty.call(req.body, 'pantryId')
+        ? req.body.pantryId
+        : undefined;
+
+    if (!userId || userId <= 0) {
+        return res.status(400).json({
+            success: false,
+            data: null,
+            message: 'userId is required and must be a positive number'
+        });
+    }
+
+    if (!chatSessionId || chatSessionId <= 0) {
+        return res.status(400).json({
+            success: false,
+            data: null,
+            message: 'chatSessionId is required and must be a positive number'
+        });
+    }
+
+    if (pantryIdRaw === undefined) {
+        return res.status(400).json({
+            success: false,
+            data: null,
+            message: 'pantryId is required (use null to detach the pantry)'
+        });
+    }
+
+    try {
+        const result = await aiChatModel.updateSessionPantry({
+            userId,
+            chatSessionId,
+            pantryId: pantryIdRaw
+        });
+
+        if (!result.success) {
+            const message = String(result.message || '').toLowerCase();
+            if (message.includes('access denied')) {
+                return res.status(403).json(result);
+            }
+            if (message.includes('not found')) {
+                return res.status(404).json(result);
+            }
+            return res.status(400).json(result);
+        }
+
+        return res.status(200).json(result);
+    } catch (error) {
+        console.error('Error in updateSessionPantry:', error);
+        return res.status(500).json({
+            success: false,
+            data: null,
+            message: `Failed to update session pantry: ${error.message}`
+        });
+    }
+};
+
 exports.getRecommendationsFromPantry = async (req, res) => {
     const userId = Number(req.body?.userId || req.query.userId);
     const limit = req.body?.limit ?? req.query.limit;

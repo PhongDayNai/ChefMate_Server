@@ -57,3 +57,8 @@ exports.getUnifiedTimeline = (req, res) => {
     withAuthUser(req);
     return aiChatController.getUnifiedTimeline(req, res);
 };
+
+exports.updateSessionPantry = (req, res) => {
+    withAuthUser(req);
+    return aiChatController.updateSessionPantry(req, res);
+};
