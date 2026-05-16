@@ -15,7 +15,6 @@ router.post('/recommendations-from-pantry', requireAccessTokenOrChatApiKey, inje
 router.get('/recommendations-from-pantry', requireAccessTokenOrChatApiKey, injectAuthUser, aiChatController.getRecommendationsFromPantry);
 router.post('/sessions/resolve-previous', requireAccessTokenOrChatApiKey, injectAuthUser, aiChatController.resolvePreviousSession);
 router.post('/messages', requireAccessTokenOrChatApiKey, injectAuthUser, aiChatController.sendMessage);
-router.post('/messages/stream', requireAccessTokenOrChatApiKey, injectAuthUser, aiChatController.sendMessageStream);
 router.get('/messages', requireAccessTokenOrChatApiKey, injectAuthUser, aiChatController.getUnifiedTimeline);
 
 module.exports = router;
