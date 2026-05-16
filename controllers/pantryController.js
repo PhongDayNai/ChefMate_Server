@@ -300,11 +300,29 @@ exports.listPantryShares = async (req, res) => {
 exports.sharePantry = async (req, res) => {
     const userId = Number(req.auth?.userId || req.userId || 0);
     const pantryId = Number(req.params.pantryId || 0);
-    const { targetUserId, role } = req.body || {};
+    const { targetUserIdentifier, role } = req.body || {};
+
+    if (!targetUserIdentifier || typeof targetUserIdentifier !== 'string') {
+        return res.status(400).json({
+            success: false,
+            error: 'INVALID_INPUT',
+            message: 'targetUserIdentifier is required (phone or email)'
+        });
+    }
 
     try {
+        const userModel = require('../models/userModel');
+        const targetUser = await userModel.getUserByIdentifier(targetUserIdentifier);
+        if (!targetUser) {
+            return res.status(404).json({
+                success: false,
+                error: 'USER_NOT_FOUND',
+                message: 'User not found with given phone or email'
+            });
+        }
+
         const result = await pantryModel.sharePantry({
-            pantryId, ownerUserId: userId, targetUserId, role
+            pantryId, ownerUserId: userId, targetUserId: targetUser.userId, role
         });
         return res.status(200).json(result);
     } catch (error) {
