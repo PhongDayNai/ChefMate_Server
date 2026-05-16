@@ -121,10 +121,13 @@ CREATE TABLE IF NOT EXISTS PantryItems (
 CREATE TABLE IF NOT EXISTS ChatSessions (
   chatSessionId INT PRIMARY KEY AUTO_INCREMENT,
   userId INT NOT NULL,
+  pantryId INT NULL,
   title VARCHAR(255) NOT NULL DEFAULT 'Phiên chat nấu ăn',
   activeRecipeId INT NULL,
   createdAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updatedAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  INDEX idx_chatsession_pantry (pantryId),
+  INDEX idx_chatsession_user_pantry (userId, pantryId),
   CONSTRAINT fk_chat_session_user FOREIGN KEY (userId) REFERENCES Users(userId)
     ON UPDATE CASCADE ON DELETE CASCADE,
   CONSTRAINT fk_chat_session_active_recipe FOREIGN KEY (activeRecipeId) REFERENCES Recipes(recipeId)
