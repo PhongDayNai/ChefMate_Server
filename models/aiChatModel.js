@@ -944,7 +944,7 @@ async function createChatSession({ userId, pantryId = null, title = DEFAULT_SESS
     return Number(result.insertId);
 }
 
-async function getChatSessionById(chatSessionId, userId) {
+exports.getChatSessionById = async function(chatSessionId, userId) {
     const [rows] = await pool.query(
         `SELECT chatSessionId, userId, pantryId, title, activeRecipeId, createdAt, updatedAt
          FROM ChatSessions
@@ -1379,7 +1379,7 @@ exports.createSession = async ({ userId, pantryId = null, title, activeRecipeId 
         }
     });
 
-    const session = await getChatSessionById(chatSessionId, userId);
+    const session = await exports.getChatSessionById(chatSessionId, userId);
 
     return {
         success: true,
@@ -1505,7 +1505,7 @@ exports.updateSessionTitle = async ({ userId, chatSessionId, title }) => {
         };
     }
 
-    const updated = await getChatSessionById(parsedSessionId, parsedUserId);
+    const updated = await exports.getChatSessionById(parsedSessionId, parsedUserId);
 
     return {
         success: true,
@@ -1515,7 +1515,7 @@ exports.updateSessionTitle = async ({ userId, chatSessionId, title }) => {
 };
 
 exports.getSessionHistory = async ({ userId, chatSessionId }) => {
-    const session = await getChatSessionById(chatSessionId, userId);
+    const session = await exports.getChatSessionById(chatSessionId, userId);
     if (!session) {
         return {
             success: false,
@@ -1592,7 +1592,7 @@ exports.getUnifiedTimeline = async ({ userId, beforeMessageId = null, limit = 30
 };
 
 exports.updateActiveRecipe = async ({ userId, chatSessionId, recipeId }) => {
-    const session = await getChatSessionById(chatSessionId, userId);
+    const session = await exports.getChatSessionById(chatSessionId, userId);
     if (!session) {
         return {
             success: false,
@@ -1603,7 +1603,7 @@ exports.updateActiveRecipe = async ({ userId, chatSessionId, recipeId }) => {
 
     await setActiveRecipe({ chatSessionId, userId, recipeId });
 
-    const updatedSession = await getChatSessionById(chatSessionId, userId);
+    const updatedSession = await exports.getChatSessionById(chatSessionId, userId);
 
     return {
         success: true,
@@ -1634,7 +1634,7 @@ exports.resolvePreviousSession = async ({ userId, previousSessionId, action, pen
         throw new Error('action must be one of: complete_and_deduct, skip_deduction, continue_current_session');
     }
 
-    const session = await getChatSessionById(parsedSessionId, parsedUserId);
+    const session = await exports.getChatSessionById(parsedSessionId, parsedUserId);
     if (!session) {
         return {
             success: false,
@@ -1672,7 +1672,7 @@ exports.resolvePreviousSession = async ({ userId, previousSessionId, action, pen
             });
         }
 
-        const currentSession = await getChatSessionById(parsedSessionId, parsedUserId);
+        const currentSession = await exports.getChatSessionById(parsedSessionId, parsedUserId);
 
         return {
             success: true,
@@ -1739,7 +1739,7 @@ exports.resolvePreviousSession = async ({ userId, previousSessionId, action, pen
         });
     }
 
-    const newSession = await getChatSessionById(newSessionId, parsedUserId);
+    const newSession = await exports.getChatSessionById(newSessionId, parsedUserId);
 
     return {
         success: true,
@@ -1798,14 +1798,14 @@ exports.sendMessage = async ({
         });
     }
 
-    session = session || await getChatSessionById(sessionId, parsedUserId);
+    session = session || await exports.getChatSessionById(sessionId, parsedUserId);
     if (!session) {
         throw new Error('Chat session not found');
     }
 
     if (activeRecipeId !== null && activeRecipeId !== undefined) {
         await setActiveRecipe({ chatSessionId: sessionId, userId: parsedUserId, recipeId: activeRecipeId });
-        session = await getChatSessionById(sessionId, parsedUserId);
+        session = await exports.getChatSessionById(sessionId, parsedUserId);
     }
 
     if (!chatSessionId && useUnifiedSession && session.activeRecipeId) {
@@ -1900,7 +1900,7 @@ exports.sendMessage = async ({
             }
         });
 
-        const updatedSession = await getChatSessionById(sessionId, parsedUserId);
+        const updatedSession = await exports.getChatSessionById(sessionId, parsedUserId);
 
         return {
             success: true,
@@ -1923,7 +1923,7 @@ exports.sendMessage = async ({
             }
         });
 
-        const updatedSession = await getChatSessionById(sessionId, parsedUserId);
+        const updatedSession = await exports.getChatSessionById(sessionId, parsedUserId);
 
         return {
             success: false,
