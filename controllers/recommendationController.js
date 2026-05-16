@@ -7,13 +7,14 @@ exports.getPersonalizedRecommendations = async (req, res) => {
     const context = String(req.query.context || req.body?.context || '').trim();
     const limit = Number(req.query.limit || req.body?.limit || 10);
     const includeReasons = String(req.query.includeReasons || 'true') !== 'false';
+    const pantryId = Number(req.query.pantryId || req.body?.pantryId || 0) || null;
 
     if (!userId || userId <= 0) {
         return res.status(400).json({ success: false, data: null, message: 'userId is required' });
     }
 
     try {
-        const result = await getPersonalizedRecommendations({ userId, context, limit, includeReasons });
+        const result = await getPersonalizedRecommendations({ userId, context, limit, includeReasons, pantryId });
 
         appendSignal({
             userId,
@@ -51,13 +52,14 @@ exports.explainPersonalizedRecommendation = async (req, res) => {
     const userId = Number(req.auth?.userId || req.userId || 0);
     const recipeId = Number(req.query.recipeId || req.params.recipeId || req.body?.recipeId || 0);
     const context = String(req.query.context || req.body?.context || '').trim();
+    const pantryId = Number(req.query.pantryId || req.body?.pantryId || 0) || null;
 
     if (!userId || userId <= 0 || !recipeId || recipeId <= 0) {
         return res.status(400).json({ success: false, data: null, message: 'userId and recipeId are required' });
     }
 
     try {
-        const explanation = await explainPersonalizedRecommendation({ userId, recipeId, context });
+        const explanation = await explainPersonalizedRecommendation({ userId, recipeId, context, pantryId });
         if (!explanation) {
             return res.status(404).json({ success: false, data: null, message: 'Recipe explanation not found for current user/context' });
         }

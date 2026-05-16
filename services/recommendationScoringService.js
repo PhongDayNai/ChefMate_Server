@@ -257,11 +257,15 @@ function scoreAdaptiveAdjustment(recipeId, recipeDimensions, adaptiveFeedbackPro
     return clamp(recipeAdjustment + dimensionAdjustment, -2, 2);
 }
 
-async function buildRecommendationContext(parsedUserId) {
+async function buildRecommendationContext(parsedUserId, pantryId = null) {
     const [recipesResult, activeDietNotes, pantryResult, userProfile, recentSignals] = await Promise.all([
         recipeModel.getAllRecipes(),
         userDietModel.getActiveDietNotes(parsedUserId),
-        pantryModel.listPantryByUser(parsedUserId).catch(() => ({ success: true, data: [] })),
+        pantryId
+            ? pantryModel.listPantryItemsByPantryIdPaginated(pantryId, parsedUserId, { page: 1, limit: 500 })
+                .catch(() => ({ success: true, data: [] }))
+            : pantryModel.listPantryByUser(parsedUserId)
+                .catch(() => ({ success: true, data: [] })),
         getOrRefreshUserTasteProfile(parsedUserId),
         userEatingSignalModel.listSignalsByUser(parsedUserId, { limit: 100 })
     ]);
@@ -290,10 +294,10 @@ async function buildRecommendationContext(parsedUserId) {
     };
 }
 
-async function getPersonalizedRecommendations({ userId, context = '', limit = 10, includeReasons = true }) {
+async function getPersonalizedRecommendations({ userId, context = '', limit = 10, includeReasons = true, pantryId = null }) {
     const parsedUserId = Number(userId);
     const parsedLimit = Math.min(Math.max(Number(limit) || 10, 1), 20);
-    const recommendationContext = await buildRecommendationContext(parsedUserId);
+    const recommendationContext = await buildRecommendationContext(parsedUserId, pantryId);
     const {
         recipes,
         activeDietNotes,
@@ -407,14 +411,14 @@ async function getPersonalizedRecommendations({ userId, context = '', limit = 10
     };
 }
 
-async function explainPersonalizedRecommendation({ userId, recipeId, context = '' }) {
+async function explainPersonalizedRecommendation({ userId, recipeId, context = '', pantryId = null }) {
     const parsedUserId = Number(userId);
     const targetRecipeId = Number(recipeId);
     if (!targetRecipeId || targetRecipeId <= 0) {
         throw new Error('recipeId must be a positive number');
     }
 
-    const recommendationContext = await buildRecommendationContext(parsedUserId);
+    const recommendationContext = await buildRecommendationContext(parsedUserId, pantryId);
     const {
         recipes,
         activeDietNotes,
