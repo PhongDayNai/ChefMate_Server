@@ -265,8 +265,8 @@ exports.sharePantry = async ({ pantryId, ownerUserId, targetUserId, role }) => {
     const parsedTargetUserId = Number(targetUserId);
     const parsedRole = String(role || 'viewer').toLowerCase();
 
-    if (!['viewer', 'editor'].includes(parsedRole)) {
-        throw new Error('Invalid role. Must be "viewer" or "editor"');
+    if (!['viewer', 'editor', 'admin'].includes(parsedRole)) {
+        throw new Error('Invalid role. Must be "viewer", "editor", or "admin"');
     }
     if (parsedTargetUserId === parsedOwnerUserId) {
         throw new Error('Cannot share pantry with yourself');
@@ -380,8 +380,8 @@ exports.updatePantryShareRole = async ({ pantryId, ownerUserId, targetUserId, ro
     const parsedTargetUserId = Number(targetUserId);
     const parsedRole = String(role || 'viewer').toLowerCase();
 
-    if (!['viewer', 'editor'].includes(parsedRole)) {
-        throw new Error('Invalid role. Must be "viewer" or "editor"');
+    if (!['viewer', 'editor', 'admin'].includes(parsedRole)) {
+        throw new Error('Invalid role. Must be "viewer", "editor", or "admin"');
     }
     if (parsedTargetUserId === parsedOwnerUserId) {
         throw new Error('Cannot share pantry with yourself');
