@@ -62,3 +62,8 @@ exports.updateSessionPantry = (req, res) => {
     withAuthUser(req);
     return aiChatController.updateSessionPantry(req, res);
 };
+
+exports.sendMessageStream = (req, res) => {
+    withAuthUser(req);
+    return aiChatController.sendMessageStream(req, res);
+};

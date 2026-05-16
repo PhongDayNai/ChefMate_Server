@@ -1258,6 +1258,98 @@ async function callAiPrimary({ apiUrl, model, messages, stream, timeoutMs }) {
     }
 }
 
+/**
+ * Streaming variant of callAiPrimary. Issues a request to Ollama-style endpoints with
+ * `stream: true`, reads the NDJSON response chunk by chunk, and invokes `onDelta(token)`
+ * for every text fragment the model emits. Returns the assembled full message at the end.
+ */
+async function callAiPrimaryStream({ apiUrl, model, messages, timeoutMs, onDelta }) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+
+    try {
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ model, messages, stream: true }),
+            signal: controller.signal
+        });
+
+        if (!response.ok || !response.body) {
+            const text = await response.text().catch(() => '');
+            const err = new Error(`Primary AI API failed with status ${response.status}`);
+            err.status = response.status;
+            try {
+                err.payload = JSON.parse(text);
+            } catch (_) {
+                err.payload = { raw: text };
+            }
+            throw err;
+        }
+
+        const decoder = new TextDecoder('utf-8');
+        let buffer = '';
+        let combined = '';
+        const reader = response.body.getReader();
+
+        while (true) {
+            const { value, done } = await reader.read();
+            if (done) break;
+            buffer += decoder.decode(value, { stream: true });
+
+            let newlineIndex;
+            while ((newlineIndex = buffer.indexOf('\n')) !== -1) {
+                const line = buffer.slice(0, newlineIndex).trim();
+                buffer = buffer.slice(newlineIndex + 1);
+                if (!line) continue;
+                try {
+                    const payload = JSON.parse(line);
+                    const token =
+                        payload?.message?.content ||
+                        payload?.response ||
+                        payload?.content ||
+                        '';
+                    if (token) {
+                        combined += token;
+                        if (typeof onDelta === 'function') {
+                            try { onDelta(token); } catch (_) {}
+                        }
+                    }
+                } catch (_) {
+                    // ignore non-JSON line
+                }
+            }
+        }
+
+        // Flush any tail bytes that didn't end with a newline.
+        if (buffer.trim()) {
+            try {
+                const payload = JSON.parse(buffer.trim());
+                const token =
+                    payload?.message?.content ||
+                    payload?.response ||
+                    payload?.content ||
+                    '';
+                if (token) {
+                    combined += token;
+                    if (typeof onDelta === 'function') {
+                        try { onDelta(token); } catch (_) {}
+                    }
+                }
+            } catch (_) {}
+        }
+
+        return {
+            raw: { provider: 'primary', mode: 'stream' },
+            assistantMessage: combined || null
+        };
+    } finally {
+        clearTimeout(timer);
+    }
+}
+
 async function callAiFallbackOpenAI({ apiUrl, apiKey, model, messages, stream, timeoutMs }) {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), timeoutMs);
@@ -2017,6 +2109,235 @@ exports.sendMessage = async ({
             content: fallbackAssistantMessage,
             meta: {
                 model,
+                error: error.message,
+                status: error.status || null,
+                payload: error.payload || null
+            }
+        });
+
+        const updatedSession = await exports.getChatSessionById(sessionId, parsedUserId);
+
+        return {
+            success: false,
+            code: 'AI_SERVER_BUSY',
+            data: {
+                session: updatedSession,
+                assistantMessage: fallbackAssistantMessage
+            },
+            message: 'AI server is busy'
+        };
+    }
+};
+
+/**
+ * Streaming version of sendMessage. Builds the same prompt context as the
+ * non-streaming variant but emits incremental tokens to `onDelta` as the AI
+ * generates them. Persists the user + assistant messages exactly like
+ * sendMessage. Returns the final assembled assistantMessage and updated session.
+ *
+ * If the primary streaming AI fails and a non-streaming fallback exists, the
+ * fallback's full reply is split into pseudo-deltas (small slices) so the
+ * client UX still progresses smoothly.
+ */
+exports.sendMessageStream = async ({
+    userId,
+    chatSessionId = null,
+    message,
+    model = process.env.AI_CHAT_MODEL || 'gemma3:4b',
+    activeRecipeId = null,
+    useUnifiedSession = false,
+    onDelta
+}) => {
+    const parsedUserId = Number(userId);
+    if (!parsedUserId || parsedUserId <= 0) {
+        throw new Error('userId must be a positive number');
+    }
+
+    if (!message || typeof message !== 'string' || !message.trim()) {
+        throw new Error('message is required');
+    }
+
+    let sessionId = chatSessionId ? Number(chatSessionId) : null;
+    let session;
+
+    if (!sessionId && useUnifiedSession) {
+        session = await getOrCreateDefaultChatSession(parsedUserId);
+        sessionId = session?.chatSessionId || null;
+    }
+
+    if (!sessionId) {
+        const autoTitle = await generateSessionTitleByAgentApi({ firstMessage: message, model });
+        sessionId = await createChatSession({ userId: parsedUserId, title: autoTitle });
+
+        await addChatMessage({
+            chatSessionId: sessionId,
+            role: 'assistant',
+            content: DEFAULT_SESSION_INTRO_MESSAGE,
+            meta: {
+                agentName: DEFAULT_AGENT_NAME,
+                intro: true
+            }
+        });
+    }
+
+    session = session || await exports.getChatSessionById(sessionId, parsedUserId);
+    if (!session) {
+        throw new Error('Chat session not found');
+    }
+
+    if (activeRecipeId !== null && activeRecipeId !== undefined) {
+        await setActiveRecipe({ chatSessionId: sessionId, userId: parsedUserId, recipeId: activeRecipeId });
+        session = await exports.getChatSessionById(sessionId, parsedUserId);
+    }
+
+    if (!chatSessionId && useUnifiedSession && session.activeRecipeId) {
+        const userMessageCount = await getUserMessageCountBySession(session.chatSessionId);
+        if (userMessageCount > 0) {
+            const latestMessage = await getLatestMessageBySession(session.chatSessionId);
+            const minutesSinceLastMessage = getMinutesSince(latestMessage?.createdAt);
+            const recipeContextBeforeContinue = await getRecipeContext(session.activeRecipeId);
+            const reminderPayload = getCompletionReminderPayload({
+                session,
+                recipeContext: recipeContextBeforeContinue,
+                minutesSinceLastMessage,
+                pendingUserMessage: message.trim()
+            });
+
+            if (reminderPayload) {
+                return reminderPayload;
+            }
+        }
+    }
+
+    await addChatMessage({
+        chatSessionId: sessionId,
+        role: 'user',
+        content: message.trim()
+    });
+
+    const recentMessages = await getRecentMessages(sessionId, 30);
+
+    let pantryMapData;
+    if (session.pantryId) {
+        pantryMapData = await getPantryMapByPantryId(session.pantryId, parsedUserId);
+    }
+    const pantryRows = pantryMapData ? pantryMapData.rows : [];
+
+    const [activeDietNotes, userProfile] = await Promise.all([
+        userDietModel.getActiveDietNotes(parsedUserId),
+        getUserByIdBasic(parsedUserId)
+    ]);
+
+    const recipeContext = session.activeRecipeId
+        ? await getRecipeContext(session.activeRecipeId)
+        : null;
+
+    const extraSystemPrompt = process.env.AI_CHAT_SYSTEM_PROMPT || '';
+
+    const contextMessage = {
+        role: 'system',
+        content: [
+            DEFAULT_AGENTIC_SYSTEM_PROMPT,
+            extraSystemPrompt,
+            buildUserAddressingHintByGender(userProfile?.gender || 'unknown'),
+            `Tủ lạnh hiện tại của user: ${JSON.stringify(pantryRows, null, 2)}`,
+            `Ghi chú ăn uống (dị ứng/hạn chế/sở thích) đang hiệu lực: ${JSON.stringify(activeDietNotes, null, 2)}`,
+            recipeContext
+                ? `Món đang chọn: ${recipeContext.recipeName}. Công thức: ${JSON.stringify(recipeContext, null, 2)}`
+                : 'Hiện chưa có món nào được chọn.'
+        ].filter(Boolean).join('\n')
+    };
+
+    const llmMessages = [
+        contextMessage,
+        ...recentMessages
+            .filter(msg => msg.role === 'user' || msg.role === 'assistant')
+            .map(msg => ({ role: msg.role, content: msg.content }))
+    ];
+
+    const fallbackAssistantMessage = 'Máy chủ AI đang bận hoặc tạm thời không khả dụng, anh vui lòng thử lại sau ít phút.';
+
+    const primaryApiUrl = process.env.AI_CHAT_API_URL || 'https://your-ai-api-url.com';
+    const timeoutMs = Number(process.env.AI_CHAT_TIMEOUT_MS || 20000);
+    const fallbackApiUrl = process.env.AI_CHAT_FALLBACK_API_URL || '';
+    const fallbackApiKey = process.env.AI_CHAT_FALLBACK_API_KEY || process.env.OPENAI_API_KEY || '';
+    const fallbackModel = process.env.AI_CHAT_FALLBACK_MODEL || 'gpt-4.1-mini';
+
+    const safeOnDelta = typeof onDelta === 'function' ? onDelta : null;
+    let assistantMessage = '';
+
+    try {
+        let primaryError = null;
+        try {
+            const result = await callAiPrimaryStream({
+                apiUrl: primaryApiUrl,
+                model,
+                messages: llmMessages,
+                timeoutMs,
+                onDelta: safeOnDelta ? (token) => safeOnDelta(token) : undefined
+            });
+            assistantMessage = result.assistantMessage || '';
+        } catch (err) {
+            primaryError = err;
+        }
+
+        // If primary streaming failed and a fallback is configured, use it but
+        // simulate streaming by chunking the final reply for the client UX.
+        if (!assistantMessage && primaryError) {
+            if (!fallbackApiUrl || !fallbackApiKey) {
+                throw primaryError;
+            }
+            const fbResult = await callAiFallbackOpenAI({
+                apiUrl: fallbackApiUrl,
+                apiKey: fallbackApiKey,
+                model: fallbackModel,
+                messages: llmMessages,
+                stream: false,
+                timeoutMs
+            });
+            assistantMessage = fbResult.assistantMessage || '';
+
+            if (assistantMessage && safeOnDelta) {
+                const CHUNK_LEN = 24;
+                for (let i = 0; i < assistantMessage.length; i += CHUNK_LEN) {
+                    const slice = assistantMessage.slice(i, i + CHUNK_LEN);
+                    try { safeOnDelta(slice); } catch (_) {}
+                }
+            }
+        }
+
+        if (!assistantMessage) {
+            assistantMessage = 'Em chưa nhận được phản hồi hợp lệ từ AI, anh thử lại giúp em nhé.';
+        }
+
+        await addChatMessage({
+            chatSessionId: sessionId,
+            role: 'assistant',
+            content: assistantMessage,
+            meta: {
+                model,
+                streamed: true
+            }
+        });
+
+        const updatedSession = await exports.getChatSessionById(sessionId, parsedUserId);
+
+        return {
+            success: true,
+            data: {
+                session: updatedSession,
+                assistantMessage
+            },
+            message: 'Chat with AI successfully'
+        };
+    } catch (error) {
+        await addChatMessage({
+            chatSessionId: sessionId,
+            role: 'assistant',
+            content: fallbackAssistantMessage,
+            meta: {
+                model,
+                streamed: true,
                 error: error.message,
                 status: error.status || null,
                 payload: error.payload || null

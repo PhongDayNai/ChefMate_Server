@@ -431,6 +431,117 @@ exports.sendMessage = async (req, res) => {
     }
 };
 
+/**
+ * Streaming variant of sendMessage. Responds with line-delimited JSON (NDJSON):
+ *   {"type":"session", "session": {...}}
+ *   {"type":"delta", "content":"..."}
+ *   ...repeated...
+ *   {"type":"done", "assistantMessage":"...", "session":{...}}
+ *   on error: {"type":"error", "code":"...", "message":"..."}
+ *
+ * The client should read the response body as a stream, split on \n, and parse
+ * each non-empty line as JSON.
+ */
+exports.sendMessageStream = async (req, res) => {
+    const { userId, chatSessionId, message, model, activeRecipeId, useUnifiedSession } = req.body || {};
+
+    const respondJsonError = (status, payload) => {
+        if (res.headersSent) {
+            try {
+                res.write(JSON.stringify({ type: 'error', ...payload }) + '\n');
+                res.end();
+            } catch (_) {}
+            return;
+        }
+        return res.status(status).json({ success: false, data: null, message: payload.message });
+    };
+
+    if (!userId || Number(userId) <= 0) {
+        return respondJsonError(400, { code: 'INVALID_USER_ID', message: 'userId is required and must be a positive number' });
+    }
+
+    if (!message || typeof message !== 'string' || !message.trim()) {
+        return respondJsonError(400, { code: 'INVALID_MESSAGE', message: 'message is required' });
+    }
+
+    if (chatSessionId) {
+        const session = await aiChatModel.getChatSessionById(Number(chatSessionId), Number(userId));
+        if (session && session.pantryId) {
+            const pantryModel = require('../models/pantryModel');
+            const access = await pantryModel.getUserPantryAccess(session.pantryId, Number(userId));
+            if (access === 'viewer') {
+                return respondJsonError(403, { code: 'VIEWER_FORBIDDEN', message: 'Access denied: viewer cannot send messages' });
+            }
+        }
+    }
+
+    // Open a chunked NDJSON response. Disable any proxy buffering so deltas
+    // arrive at the client as they're produced.
+    res.status(200);
+    res.setHeader('Content-Type', 'application/x-ndjson; charset=utf-8');
+    res.setHeader('Cache-Control', 'no-cache, no-transform');
+    res.setHeader('X-Accel-Buffering', 'no');
+    res.setHeader('Connection', 'keep-alive');
+    if (typeof res.flushHeaders === 'function') {
+        try { res.flushHeaders(); } catch (_) {}
+    }
+
+    const writeEvent = (event) => {
+        try {
+            res.write(JSON.stringify(event) + '\n');
+        } catch (_) {}
+    };
+
+    let clientGone = false;
+    req.on('close', () => { clientGone = true; });
+
+    try {
+        const result = await aiChatModel.sendMessageStream({
+            userId: Number(userId),
+            chatSessionId: chatSessionId ? Number(chatSessionId) : null,
+            message,
+            model,
+            activeRecipeId: activeRecipeId === null || activeRecipeId === undefined ? null : Number(activeRecipeId),
+            useUnifiedSession: useUnifiedSession === undefined ? true : Boolean(useUnifiedSession),
+            onDelta: (token) => {
+                if (clientGone) return;
+                writeEvent({ type: 'delta', content: token });
+            }
+        });
+
+        if (clientGone) {
+            try { res.end(); } catch (_) {}
+            return;
+        }
+
+        if (!result?.success && result?.code === 'AI_SERVER_BUSY') {
+            writeEvent({
+                type: 'error',
+                code: 'AI_SERVER_BUSY',
+                message: result?.message || 'AI server is busy',
+                session: result?.data?.session || null,
+                assistantMessage: result?.data?.assistantMessage || null
+            });
+            return res.end();
+        }
+
+        writeEvent({
+            type: 'done',
+            assistantMessage: result?.data?.assistantMessage || '',
+            session: result?.data?.session || null
+        });
+        res.end();
+    } catch (error) {
+        console.error('Error in sendMessageStream:', error);
+        writeEvent({
+            type: 'error',
+            code: 'INTERNAL_ERROR',
+            message: `Failed to stream message: ${error.message}`
+        });
+        try { res.end(); } catch (_) {}
+    }
+};
+
 exports.getUnifiedTimeline = async (req, res) => {
     const userId = Number(req.query.userId || req.body?.userId);
     const beforeMessageId = req.query.beforeMessageId || req.body?.beforeMessageId || null;
