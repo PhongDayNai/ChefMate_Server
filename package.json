@@ -23,7 +23,7 @@
     "jsonwebtoken": "^9.0.2",
     "localtunnel": "^1.8.3",
     "multer": "^2.0.0",
-    "mysql2": "^3.20.0",
+    "mysql2": "^3.22.3",
     "path": "^0.12.7"
   },
   "devDependencies": {
