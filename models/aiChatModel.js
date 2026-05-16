@@ -585,6 +585,68 @@ function getCompletionReminderPayload({ session, recipeContext, minutesSinceLast
     };
 }
 
+async function getPantryMapByPantryId(pantryId, userId) {
+    const parsedPantryId = Number(pantryId);
+    const parsedUserId = Number(userId);
+
+    if (!parsedPantryId || parsedPantryId <= 0) {
+        throw new Error('pantryId must be a positive number');
+    }
+
+    if (!parsedUserId || parsedUserId <= 0) {
+        throw new Error('userId must be a positive number');
+    }
+
+    // Verify user has access to this pantry (owner/editor - viewer cannot chat)
+    const pantryModel = require('./pantryModel');
+    const access = await pantryModel.getUserPantryAccess(parsedPantryId, parsedUserId);
+    if (!access) {
+        throw new Error('Access denied: you do not have access to this pantry');
+    }
+
+    const [rows] = await pool.query(
+        `SELECT i.ingredientName, p.quantity, p.unit
+         FROM PantryItems p
+         JOIN Ingredients i ON i.ingredientId = p.ingredientId
+         WHERE p.pantryId = ?`,
+        [parsedPantryId]
+    );
+
+    const exactMap = new Map();
+    const nameMap = new Map();
+
+    for (const row of rows) {
+        const normalizedName = normalizeIngredientName(row.ingredientName);
+        const canonicalName = canonicalizeIngredientName(row.ingredientName);
+        const normalizedUnit = String(row.unit || '').trim().toLowerCase();
+        const qty = Number(row.quantity || 0);
+
+        const keys = new Set([
+            `${normalizedName}|${normalizedUnit}`,
+            canonicalName ? `${canonicalName}|${normalizedUnit}` : null
+        ].filter(Boolean));
+
+        for (const key of keys) {
+            exactMap.set(key, (exactMap.get(key) || 0) + qty);
+        }
+
+        nameMap.set(normalizedName, (nameMap.get(normalizedName) || 0) + qty);
+        if (canonicalName) {
+            nameMap.set(canonicalName, (nameMap.get(canonicalName) || 0) + qty);
+        }
+    }
+
+    return {
+        rows: rows.map(r => ({
+            ingredientName: r.ingredientName,
+            quantity: Number(r.quantity),
+            unit: r.unit
+        })),
+        exactMap,
+        nameMap
+    };
+}
+
 async function getPantryMapByUser(userId, pantryId = null) {
     const parsedUserId = Number(userId);
     let query = `
@@ -855,18 +917,28 @@ async function generateSessionTitleByAgentApi({
     }
 }
 
-async function createChatSession({ userId, title = DEFAULT_SESSION_TITLE, activeRecipeId = null }) {
+async function createChatSession({ userId, pantryId = null, title = DEFAULT_SESSION_TITLE, activeRecipeId = null }) {
     const parsedUserId = Number(userId);
+    const parsedPantryId = pantryId != null ? Number(pantryId) : null;
     const parsedActiveRecipeId = activeRecipeId ? Number(activeRecipeId) : null;
+
+    // Verify access if pantryId is provided
+    if (parsedPantryId) {
+        const pantryModel = require('./pantryModel');
+        const access = await pantryModel.getUserPantryAccess(parsedPantryId, parsedUserId);
+        if (!access) {
+            throw new Error('Access denied: you do not have access to this pantry');
+        }
+    }
 
     const finalTitle = title && String(title).trim()
         ? String(title).trim()
         : DEFAULT_SESSION_TITLE;
 
     const [result] = await pool.query(
-        `INSERT INTO ChatSessions (userId, title, activeRecipeId)
-         VALUES (?, ?, ?)`,
-        [parsedUserId, finalTitle, parsedActiveRecipeId]
+        `INSERT INTO ChatSessions (userId, pantryId, title, activeRecipeId)
+         VALUES (?, ?, ?, ?)`,
+        [parsedUserId, parsedPantryId, finalTitle, parsedActiveRecipeId]
     );
 
     return Number(result.insertId);
@@ -874,7 +946,7 @@ async function createChatSession({ userId, title = DEFAULT_SESSION_TITLE, active
 
 async function getChatSessionById(chatSessionId, userId) {
     const [rows] = await pool.query(
-        `SELECT chatSessionId, userId, title, activeRecipeId, createdAt, updatedAt
+        `SELECT chatSessionId, userId, pantryId, title, activeRecipeId, createdAt, updatedAt
          FROM ChatSessions
          WHERE chatSessionId = ? AND userId = ?
          LIMIT 1`,
@@ -886,6 +958,7 @@ async function getChatSessionById(chatSessionId, userId) {
     return {
         chatSessionId: Number(rows[0].chatSessionId),
         userId: Number(rows[0].userId),
+        pantryId: rows[0].pantryId ? Number(rows[0].pantryId) : null,
         title: rows[0].title,
         activeRecipeId: rows[0].activeRecipeId ? Number(rows[0].activeRecipeId) : null,
         createdAt: rows[0].createdAt,
@@ -895,7 +968,7 @@ async function getChatSessionById(chatSessionId, userId) {
 
 async function getLatestChatSessionByUser(userId) {
     const [rows] = await pool.query(
-        `SELECT chatSessionId, userId, title, activeRecipeId, createdAt, updatedAt
+        `SELECT chatSessionId, userId, pantryId, title, activeRecipeId, createdAt, updatedAt
          FROM ChatSessions
          WHERE userId = ?
          ORDER BY updatedAt DESC, chatSessionId DESC
@@ -908,6 +981,7 @@ async function getLatestChatSessionByUser(userId) {
     return {
         chatSessionId: Number(rows[0].chatSessionId),
         userId: Number(rows[0].userId),
+        pantryId: rows[0].pantryId ? Number(rows[0].pantryId) : null,
         title: rows[0].title,
         activeRecipeId: rows[0].activeRecipeId ? Number(rows[0].activeRecipeId) : null,
         createdAt: rows[0].createdAt,
@@ -1288,12 +1362,12 @@ async function callAiApi({ model, messages, stream = false }) {
     }
 }
 
-exports.createSession = async ({ userId, title, activeRecipeId = null, firstMessage = '', model }) => {
+exports.createSession = async ({ userId, pantryId = null, title, activeRecipeId = null, firstMessage = '', model }) => {
     const autoTitle = title && String(title).trim()
         ? String(title).trim()
         : await generateSessionTitleByAgentApi({ firstMessage, model });
 
-    const chatSessionId = await createChatSession({ userId, title: autoTitle, activeRecipeId });
+    const chatSessionId = await createChatSession({ userId, pantryId, title: autoTitle, activeRecipeId });
 
     await addChatMessage({
         chatSessionId,
@@ -1334,7 +1408,7 @@ exports.getSessionsByUser = async ({ userId, page = 1, limit = 50 }) => {
     );
 
     const [rows] = await pool.query(
-        `SELECT chatSessionId, userId, title, activeRecipeId, createdAt, updatedAt
+        `SELECT chatSessionId, userId, pantryId, title, activeRecipeId, createdAt, updatedAt
          FROM ChatSessions
          WHERE userId = ?
          ORDER BY updatedAt DESC
@@ -1351,6 +1425,7 @@ exports.getSessionsByUser = async ({ userId, page = 1, limit = 50 }) => {
             items: rows.map(r => ({
                 chatSessionId: Number(r.chatSessionId),
                 userId: Number(r.userId),
+                pantryId: r.pantryId ? Number(r.pantryId) : null,
                 title: r.title,
                 activeRecipeId: r.activeRecipeId ? Number(r.activeRecipeId) : null,
                 createdAt: r.createdAt,
@@ -1762,12 +1837,20 @@ exports.sendMessage = async ({
     });
 
     const recentMessages = await getRecentMessages(sessionId, 30);
-    const [pantryMapData, activeDietNotes, userProfile] = await Promise.all([
-        getPantryMapByUser(parsedUserId),
+
+    // Get pantry map based on session's pantryId
+    let pantryMapData;
+    if (session.pantryId) {
+        pantryMapData = await getPantryMapByPantryId(session.pantryId, parsedUserId);
+    } else {
+        pantryMapData = await getPantryMapByUser(parsedUserId);
+    }
+    const pantryRows = pantryMapData.rows;
+
+    const [activeDietNotes, userProfile] = await Promise.all([
         userDietModel.getActiveDietNotes(parsedUserId),
         getUserByIdBasic(parsedUserId)
     ]);
-    const pantryRows = pantryMapData.rows;
 
     const recipeContext = session.activeRecipeId
         ? await getRecipeContext(session.activeRecipeId)
