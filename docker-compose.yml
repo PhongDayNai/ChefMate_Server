@@ -58,7 +58,7 @@ services:
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-__CHANGE_ME_JWT_REFRESH_SECRET__}
       JWT_ACCESS_EXPIRES_IN: ${JWT_ACCESS_EXPIRES_IN:-1h}
       JWT_REFRESH_EXPIRES_IN: ${JWT_REFRESH_EXPIRES_IN:-30d}
-      AI_CHAT_FALLBACK_API_URL: http://172.17.0.1:8317/v1/chat/completions
+      AI_CHAT_FALLBACK_API_URL: ${AI_CHAT_FALLBACK_API_URL}
     command: ["node", "server.jwt.js"]
     ports:
       - "13081:13081"
